@@ -35,27 +35,13 @@ public class MainWindow extends JPanel implements SingletonWindow {
 
 	private static final long serialVersionUID = -4706517331314435778L;				
 	private FormPanel form;
-	private WindowController controller;
 
 	
-	public MainWindow(InpExtension model) {		
-		
+	public MainWindow() {		
 		setLayout(new BorderLayout());	    						
 		this.form = new FormPanel(Constants.MAIN_FORM);			
-		this.controller = new WindowController(model, this);				
-		
 		add(this.form, BorderLayout.CENTER);
-
-		form.getRadioButton(Constants.OPT_EPANET).addActionListener(controller);
-		form.getRadioButton(Constants.OPT_SWMM).addActionListener(controller);
-		form.getButton(Constants.BTN_FOLDER_SHP).addActionListener(controller);
-		form.getButton(Constants.BTN_FOLDER_OUT).addActionListener(controller);
-		form.getButton(Constants.BTN_ACCEPT).addActionListener(controller);	
-		form.getButton(Constants.BTN_CANCEL).addActionListener(controller);			
-		form.getButton(Constants.BTN_HELP_TEMPLATE).addActionListener(controller);			
-		
 		this.revalidate();
-		
 	}
 	
 
@@ -83,8 +69,4 @@ public class MainWindow extends JPanel implements SingletonWindow {
 		return this.form;
 	}
 	
-	public WindowController getController() {
-		return controller;
-	}	
-
 }

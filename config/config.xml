@@ -5,11 +5,19 @@
   <libraries library-dir="."/>
   
   <extensions>
-        <extension class-name="com.tecnicsassociats.gvsig.inpcom.InpExtension"
-                description="INP.com. Exportacion datos Epanet y EpaSWMM"
+  
+        <extension class-name="com.tecnicsassociats.gvsig.inpcom.InpExtension2"
+                description="INP.com. Exportación datos EPA SWMM"
                 active="true"
-                priority="1">
-           <menu text="INP.com/menu_title" action-command="init" icon="images/logo_epa.jpg" position="99997"/>
-        </extension>            
+                priority="2">
+           <menu text="INP.com/swmm_menu_title" action-command="SWMM_" position="99997"/>
+        </extension>      
+        <extension class-name="com.tecnicsassociats.gvsig.inpcom.InpExtension2"
+                description="INP.com. Exportación datos EPANET"
+                active="true"
+                priority="2">
+           <menu text="INP.com/epanet_menu_title" action-command="EPANET_" position="99998"/>
+        </extension>      
+        
   </extensions>
  </plugin-config>

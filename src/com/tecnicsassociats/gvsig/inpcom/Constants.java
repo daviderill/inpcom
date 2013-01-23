@@ -23,12 +23,19 @@ package com.tecnicsassociats.gvsig.inpcom;
 
 public class Constants {
 
-	public static final String INI_FILE = "inp.properties";
+	public static final String EXEC_GVSIG = "GVSIG";
+	public static final String EXEC_CONSOLE = "CONSOLE";
+	public static final String CONFIG_FOLDER = "config";
+	public static final String CONFIG_FILE = "inp.properties";
 	public static final String DIR_SHP = "DIR_SHP";
 
 	public static final String CONFIG_PLUGIN = "com.tecnicsassociats.gvsig.inpcom";	    
 	public static final String FORMSPACKAGE = "com/tecnicsassociats/gvsig/inpcom/";
-	public static final String MAIN_FORM = FORMSPACKAGE + "FormExport.jfrm";
+	//public static final String MAIN_FORM = FORMSPACKAGE + "FormDbf.jfrm";
+	//public static final String MAIN_FORM = FORMSPACKAGE + "FormExport.jfrm";
+	public static final String MAIN_FORM = FORMSPACKAGE + "FormBoth.jfrm";
+	
+	public static final String FORM_BOTH = FORMSPACKAGE + "FormBoth.jfrm";
 
 	public static final String LBL_TITLE = "lbl_title";  //com.jeta.forms.components.label.JETALabel
 	public static final String LBL_DIR_OUT = "lbl_dir_out";  //com.jeta.forms.components.label.JETALabel
@@ -43,9 +50,10 @@ public class Constants {
 	public static final String TXT_DIR_SHP = "txt_dir_shp";  //javax.swing.JFormattedTextField
 	public static final String TXT_DIR_OUT = "txt_dir_out";  //javax.swing.JFormattedTextField
 	public static final String BTN_FOLDER_SHP = "btn_folder_shp";  //javax.swing.JButton
-	public static final String BTN_FOLDER_OUT = "btn_folder_out";  //javax.swing.JButton
+	public static final String BTN_FOLDER_INP = "btn_folder_out";  //javax.swing.JButton
 	public static final String OPT_SWMM = "opt_swmm";  //javax.swing.JRadioButton
 	public static final String OPT_EPANET = "opt_epanet";  //javax.swing.JRadioButton
 	public static final String CHK_POLYGONS = "chk_polygons";  	
+
 
 }

@@ -46,7 +46,6 @@ import org.geotools.data.shapefile.dbf.DbaseFileReader;
 
 public class Dbf2PgSql extends Thread{
 
-	private String dbf_charset;
 	private String pgsql_database;
 	private String pgsql_esquema;
 	private String pgsql_host;
@@ -74,7 +73,6 @@ public class Dbf2PgSql extends Thread{
 		String user, String password, boolean crear_sql, File[] dbf_files, String sql_file, 
 		boolean crear_log, boolean nomes_sql, boolean append, String t_append){
 		
-		this.dbf_charset = charset;
 		this.pgsql_database = database;
 		this.pgsql_esquema = esquema;
 		this.pgsql_host = host;
