@@ -42,7 +42,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
-import org.postgresql.util.PSQLException;
 
 
 public class Dbf2PgSql extends Thread{
@@ -422,13 +421,6 @@ public class Dbf2PgSql extends Thread{
 					 	//System.out.println("\n---------------");
 					 	i++;
 				 	} 
-			 	
-			 	} catch(PSQLException psqle) {
-			 		JOptionPane.showMessageDialog(null, "Error al fitxer " + dbf_files[l].getAbsolutePath() + "\n" + psqle.getMessage(), "ERROR (PSQLException)", JOptionPane.ERROR_MESSAGE);
-			 		bwlog.write("\nError al fitxer " + dbf_files[l].getAbsolutePath() + "\n" + psqle.getMessage() + "\n");
-			 		rs.close();
-				 	consulta.close();
-				 	db.close();
 			 	
 			 	} catch(SQLException sqle) {
 			 		JOptionPane.showMessageDialog(null, "Error al fitxer " + dbf_files[l].getAbsolutePath() + "\n" + sqle.getMessage(), "ERROR (SQLException)", JOptionPane.ERROR_MESSAGE);

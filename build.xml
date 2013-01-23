@@ -6,7 +6,7 @@
 	<property name="src" location="src" />
 	<property name="build" location="bin" />
 	<property name="dist" location="dist" />
-	<property name="plugin" value="com.tecnicsassociats.gvsig.swmm_epanet" />
+	<property name="plugin" value="com.tecnicsassociats.gvsig.inpcom" />
 	<property name="extension-dir" location="${GVSIG_INSTALL_DIR}/bin/gvSIG/extensiones" />
 
 	<target name="init">

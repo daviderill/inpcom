@@ -29,4 +29,4 @@ Developer: David Erill <daviderill79@gmail.com>
 Coordinator: Xavier Torret <xtorret@tecnicsassociats.com>
 GIS assistance: Carlos Lopez <carlos.lopez@psig.es>
 
-Complete source code for the INPcom application is available from https://github.com/daviderill/swmm_epanet
+Complete source code for the INPcom application is available from https://github.com/daviderill/inpcom

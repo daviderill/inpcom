@@ -52,8 +52,6 @@ import com.hardcode.gdbms.driver.exceptions.ReadDriverException;
 import com.iver.andami.PluginServices;
 import com.iver.andami.plugins.Extension;
 
-import com.tecnicsassociats.gvsig.swmm_epanet.Constants;
-
 import org.cresques.cts.IProjection;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader.Row;

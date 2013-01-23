@@ -5,7 +5,7 @@
   <libraries library-dir="."/>
   
   <extensions>
-        <extension class-name="com.tecnicsassociats.gvsig.swmm_epanet.InpExtension"
+        <extension class-name="com.tecnicsassociats.gvsig.inpcom.InpExtension"
                 description="INP.com. Exportacion datos Epanet y EpaSWMM"
                 active="true"
                 priority="1">
