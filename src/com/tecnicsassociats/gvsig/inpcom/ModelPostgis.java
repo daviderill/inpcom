@@ -281,7 +281,7 @@ public class ModelPostgis extends Model {
         }
 
         // If table is null or doesn't exit then exit function
-        if (!checkTable(tableName)) {
+        if (!checkTable(tableName) && !checkView(tableName)) {
             return;
         }
 
@@ -371,7 +371,21 @@ public class ModelPostgis extends Model {
             return false;
         }
     }
-
+    
+    
+    // Check if the view exists
+    private boolean checkView(String viewName) {
+        String sql = "SELECT * FROM pg_views WHERE upper(viewname) = '" + viewName + "'";
+        try {
+            Statement stat = connectionPostgis.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            return (rs.next());
+        } catch (SQLException e) {
+            logger.severe(e.getMessage());
+            return false;
+        }
+    }    
+    
 
     // Exec SWMM
     public boolean execSWMM(File fileInp, File fileRpt) {
