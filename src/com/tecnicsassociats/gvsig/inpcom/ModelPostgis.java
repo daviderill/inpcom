@@ -103,7 +103,6 @@ public class ModelPostgis extends Model {
 
         if (execType.equals(Constants.EXEC_GVSIG)) {
             // Open main form
-            //openForm();
             modelDbf = new ModelDbf();            
             Utils.openForm(modelDbf, this);
         } else if (execType.equals(Constants.EXEC_CONSOLE)) {

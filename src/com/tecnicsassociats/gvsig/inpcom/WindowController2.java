@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -110,11 +111,16 @@ public class WindowController2 implements ActionListener {
 
             // Postgis panel
             String export = this.modelPostgis.sExport.toLowerCase();
-            form.getLabel(Constants.LBL_TITLE).setText(PluginServices.getText(null, export + "lbl_title"));            
+            form.getLabel("lbl_title").setText(PluginServices.getText(null, export + "lbl_title"));            
             form.getLabel("lbl_type").setText(PluginServices.getText(null, "lbl_type"));
+            form.getLabel("lbl_select").setText(PluginServices.getText(null, "lbl_select"));  
+            form.getLabel("lbl_file_inp").setText(PluginServices.getText(null, "lbl_file_inp"));  
+            form.getLabel("lbl_file_rpt").setText(PluginServices.getText(null, "lbl_file_rpt"));  
+            form.getLabel("lbl_project").setText(PluginServices.getText(null, "lbl_project"));              
             form.getCheckBox("chk_export_inp").setText(PluginServices.getText(null, "chk_export_inp"));
-            form.getCheckBox("chk_exec_swmm").setText(PluginServices.getText(null, "chk_exec_swmm"));
+            form.getCheckBox("chk_exec").setText(PluginServices.getText(null, "chk_" + export + "exec"));
             form.getCheckBox("chk_import").setText(PluginServices.getText(null, "chk_import"));
+            form.getCheckBox("chk_import").setText(PluginServices.getText(null, "chk_import"));            
             form.getButton("btn_file_inp").setActionCommand("file_inp");
             form.getButton("btn_file_rpt").setActionCommand("file_rpt");
             form.getRadioButton("opt_now").setActionCommand("ACTUAL");
@@ -126,6 +132,15 @@ public class WindowController2 implements ActionListener {
             form.getButton("btn_accept_postgis").setActionCommand("accept_postgis");
             form.getButton("btn_cancel_postgis").setActionCommand("cancel_postgis");
 
+            JCheckBox c = form.getCheckBox("chk_polygons_postgis");
+            System.out.println(this.modelPostgis.sExport);
+            if (export.equals("swmm_")){
+            	c.setText(PluginServices.getText(null, "chk_polygons"));
+            	c.setVisible(true);            	
+            } else{
+            	c.setVisible(false);
+            }
+            
             form.getRadioButton("opt_now").setSelected(true);
             form.getRadioButton("opt_now").addActionListener(this);
             form.getRadioButton("opt_future").addActionListener(this);
@@ -135,13 +150,13 @@ public class WindowController2 implements ActionListener {
             form.getButton("btn_file_rpt").addActionListener(this);
 
             fileInp = new File(prop.getProperty("FILE_INP", new File(Launcher.getAppHomeDir()).getParent()));
-            if (fileInp.getParentFile().exists()) {
+            if (fileInp.getParentFile() != null && fileInp.getParentFile().exists()) {
                 form.getTextComponent("txt_file_inp").setText(fileInp.getAbsolutePath());
                 readyFileInp = true;
             }
 
             fileRpt = new File(prop.getProperty("FILE_RPT", new File(Launcher.getAppHomeDir()).getParent()));
-            if (fileRpt.getParentFile().exists()) {
+            if (fileRpt.getParentFile() != null && fileRpt.getParentFile().exists()) {
                 form.getTextComponent("txt_file_rpt").setText(fileRpt.getAbsolutePath());
                 readyFileRpt = true;
             }
@@ -184,7 +199,7 @@ public class WindowController2 implements ActionListener {
         } else if (command.equalsIgnoreCase("ACTUAL") || command.equalsIgnoreCase("FUTURE")) {
             netType = command;
             String schemaProp = this.modelPostgis.sExport + "SCHEMA_" + netType;              
-        	this.modelPostgis.schema = prop.getProperty(schemaProp);;            
+        	this.modelPostgis.schema = prop.getProperty(schemaProp);     
         } else if (command.equalsIgnoreCase("accept_postgis")) {
             exportChecked = form.getCheckBox("chk_export_inp").isSelected();
             execChecked = form.getCheckBox("chk_exec_swmm").isSelected();
@@ -292,7 +307,6 @@ public class WindowController2 implements ActionListener {
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogTitle(PluginServices.getText(null, "file_inp"));
         File file = new File(prop.getProperty("FILE_INP", new File(Launcher.getAppHomeDir()).getParent()));	
-        //File file = new File(prop.getProperty("FILE_INP"));
         chooser.setCurrentDirectory(file.getParentFile());
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
