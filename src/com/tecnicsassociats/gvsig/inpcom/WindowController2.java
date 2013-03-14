@@ -202,7 +202,7 @@ public class WindowController2 implements ActionListener {
         	this.modelPostgis.schema = prop.getProperty(schemaProp);     
         } else if (command.equalsIgnoreCase("accept_postgis")) {
             exportChecked = form.getCheckBox("chk_export_inp").isSelected();
-            execChecked = form.getCheckBox("chk_exec_swmm").isSelected();
+            execChecked = form.getCheckBox("chk_exec").isSelected();
             importChecked = form.getCheckBox("chk_import").isSelected();
             executePostgis();
         } else if (command.equalsIgnoreCase("cancel_postgis")) {
