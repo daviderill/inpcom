@@ -235,13 +235,6 @@ public class WindowController2 implements ActionListener {
             return;
         }
 
-        fileInp = null;
-        String sFileOut = form.getTextField(Constants.TXT_FILE_OUT).getText().trim();
-        if (!sFileOut.equals("")) {
-            sFileOut = dirOut.getAbsolutePath() + File.separator + sFileOut;
-            fileInp = new File(sFileOut);
-        }
-
         // Connect to sqlite database
         String sqliteFile = prop.getProperty(this.model.sExport + "DB_DBF");
         if (!this.model.connectDB(sqliteFile)) {
@@ -253,8 +246,15 @@ public class WindowController2 implements ActionListener {
             return;
         }
 
+//        fileInp = null;
+        String sFileOut = form.getTextField(Constants.TXT_FILE_OUT).getText().trim();
+//        if (!sFileOut.equals("")) {
+//            sFileOut = dirOut.getAbsolutePath() + File.separator + sFileOut;
+//            fileInp = new File(sFileOut);
+//        }
+        
         // Process all shapes and output to INP file
-        this.model.processALL(fileInp);
+        this.model.processALL(dirOut.getAbsolutePath(), sFileOut);
 
     }
 

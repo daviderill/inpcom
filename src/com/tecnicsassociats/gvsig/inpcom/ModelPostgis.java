@@ -21,7 +21,6 @@
 
 package com.tecnicsassociats.gvsig.inpcom;
 
-import com.tecnicsassociats.gvsig.inpcom.util.LogFormatter;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,8 +41,6 @@ import java.util.LinkedHashMap;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
@@ -103,7 +100,7 @@ public class ModelPostgis extends Model {
 
         if (execType.equals(Constants.EXEC_GVSIG)) {
             // Open main form
-            modelDbf = new ModelDbf();            
+            modelDbf = new ModelDbf(this.sExport);            
             Utils.openForm(modelDbf, this);
         } else if (execType.equals(Constants.EXEC_CONSOLE)) {
 
@@ -133,28 +130,6 @@ public class ModelPostgis extends Model {
     }
 
     
-    private static Logger getLogger(String folderRoot) {
-    	
-        if (logger == null) {
-            try {
-                String folder = folderRoot + "log/";
-                (new File(folder)).mkdirs();
-                //String logFile = folder + "log_" + getCurrentTimeStamp() + ".log";
-                String logFile = folder + "log_console.log";
-                FileHandler fh = new FileHandler(logFile, true);
-                LogFormatter lf = new LogFormatter();
-                fh.setFormatter(lf);
-                logger = Logger.getLogger(logFile);
-                logger.addHandler(fh);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Error al crear el fitxer de log", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        return logger;
-
-    }
-    
-
     private boolean enabledPostgis() {
     	
         if (connectionPostgis == null) {
@@ -490,8 +465,7 @@ public class ModelPostgis extends Model {
         
         // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + schema + ".rpt_target WHERE enabled = true ORDER BY id";
-        //String sql = "SELECT * FROM " + schema + ".rpt_target ORDER BY id";
+        String sql = "SELECT * FROM " + schema + ".rpt_target ORDER BY id";
         try {
     		connectionPostgis.setAutoCommit(false);        	
             Statement stat = connectionPostgis.createStatement();
@@ -563,7 +537,6 @@ public class ModelPostgis extends Model {
 		boolean found = false;
 		String line;
 		String aux;
-		System.out.println(rpt.getDescription());
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
 		while (!found){
 			lineNumber++;

@@ -60,11 +60,38 @@ public class ModelDbf extends Model{
 	private File fDbf[];
 	private File fShp[];	
 
-
-    public ModelDbf() {
+	
+    public ModelDbf(String action) {
+    	this.sExport = action;
+    	this.execute();    	
     }   	
 
+    public ModelDbf() {
+    	this.execute();
+    }   	
 
+    
+    private void execute(){
+    	
+        // Get properties file
+        if (!enabledPropertiesFile()) {
+            return;
+        }
+
+        // Sets initial configuration files
+        configIni();
+        
+        // Get log file
+        if (execType.equals(Constants.EXEC_GVSIG)) {
+            logger = Utils.getLogger(appPath);
+        } else{
+        	logger = getLogger(appPath);
+            System.out.println("Log File: \n" + logger.getName());               	
+        }    	
+        
+    }
+    
+    
 	// Read content of the DBF file and saved it in an Array
 	private ArrayList<Map<String, String>> readDBF(File file) {
 
@@ -101,16 +128,19 @@ public class ModelDbf extends Model{
 
 
 	// Main procedure
-	public void processALL(File fileInp) {
+	public void processALL(String dirOut, String fileOut) {
 
 		try {
 
 			// Get INP output file
-			if (fileInp == null){
-				String sFile = iniProperties.getProperty(sExport + "INP");
-				sFile = folderConfig + File.separator + sFile;
-				fileInp = new File(sFile);
+			if (dirOut.equals("")){
+				dirOut = folderConfig;
 			}
+			if (fileOut.equals("")){
+				fileOut = iniProperties.getProperty(sExport + "INP");
+			}
+			String sFile = dirOut + File.separator + fileOut;
+			File fileInp = new File(sFile);
 			
 			// Get some properties
 			polygons_target_id = Integer.parseInt(iniProperties.getProperty(sExport + "POLYGONS_TARGET_ID"));

@@ -22,6 +22,7 @@
 package com.tecnicsassociats.gvsig.inpcom;
 
 import com.iver.andami.PluginServices;
+import com.tecnicsassociats.gvsig.inpcom.util.LogFormatter;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +36,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+
+import javax.swing.JOptionPane;
 
 
 public class Model {
@@ -47,7 +51,6 @@ public class Model {
     protected static Connection connectionSqlite;
     private File fSqlite;
     protected String folderConfig;
-    //protected File fileInp;
     protected File fileTemplate;
     protected ArrayList<Map<String, String>> lMapDades;
 	protected Map<String, Integer> mHeader;
@@ -58,7 +61,7 @@ public class Model {
     public boolean bPolygons;   // True if we have to process polygons target (810)
     public String sExport;   // "EPANET_" o "SWMM_"
     public File fileHelp;
-    protected String execType;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG
+    protected String execType = Constants.EXEC_GVSIG;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG
     protected String schema;
 
 
@@ -148,7 +151,6 @@ public class Model {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            System.out.println("sqlite OK");
             String sFile = folderConfig + File.separator + fileName;
             fSqlite = new File(sFile);
             if (fSqlite.exists()) {
@@ -168,6 +170,28 @@ public class Model {
         }
 
     }
+    
+    
+    protected static Logger getLogger(String folderRoot) {
+    	
+        if (logger == null) {
+            try {
+                String folder = folderRoot + "log/";
+                (new File(folder)).mkdirs();
+                //String logFile = folder + "log_" + getCurrentTimeStamp() + ".log";
+                String logFile = folder + "log_console.log";
+                FileHandler fh = new FileHandler(logFile, true);
+                LogFormatter lf = new LogFormatter();
+                fh.setFormatter(lf);
+                logger = Logger.getLogger(logFile);
+                logger.addHandler(fh);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error al crear el fitxer de log", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        return logger;
+
+    }    
     
     
 }
