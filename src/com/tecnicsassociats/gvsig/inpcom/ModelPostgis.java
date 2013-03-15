@@ -365,7 +365,6 @@ public class ModelPostgis extends Model {
             ResultSet rs = stat.executeQuery(sql);
             return (rs.next());
         } catch (SQLException e) {
-            //Utils.showError("inp_error_execution", e.getMessage(), "inp_descr");
             logger.severe(e.getMessage());
             return false;
         }
@@ -414,6 +413,14 @@ public class ModelPostgis extends Model {
             sFile = sFile.replace(".inp", ".rpt");
             fileRpt = new File(sFile);
         }
+        if (!fileInp.exists()){
+			Utils.showError("inp_error_notfound", fileInp.getAbsolutePath(), "inp_descr");     
+			return false;
+        }
+        if (!fileRpt.exists()){
+			Utils.showError("inp_error_notfound", fileRpt.getAbsolutePath(), "inp_descr");     
+			return false;
+        }        
         sFile = fileRpt.getAbsolutePath().replace(".rpt", ".out");
         File fileOut = new File(sFile);
 
@@ -437,6 +444,13 @@ public class ModelPostgis extends Model {
 			Utils.showError("inp_error_io", exeCmd, "inp_descr");
 		}
 
+        // Ending message
+        if (execType.equals(Constants.EXEC_GVSIG)) {                
+            Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr", execType);                
+            logger.info(fileOut.getAbsolutePath());
+        } else{
+            System.out.println(fileOut.getAbsolutePath());
+        }		
         return true;
 
     }
@@ -449,7 +463,11 @@ public class ModelPostgis extends Model {
     	this.projectName = projectName;
     	
     	// TODO: Show RPT content
-    	
+
+        if (execType.equals(Constants.EXEC_GVSIG)) {                
+            logger.info("importRpt");
+        }
+        
     	// Check if Project Name exists in rpt_result_id
     	boolean exists = false;
     	if (existsProjectName()){
@@ -462,10 +480,6 @@ public class ModelPostgis extends Model {
             }
     	}
     	
-        if (execType.equals(Constants.EXEC_GVSIG)) {                
-            logger.info("importRpt");
-        }
-        
 		// Open RPT file
 		try {
 			rat = new RandomAccessFile(fileRpt, "r");
@@ -474,9 +488,10 @@ public class ModelPostgis extends Model {
 			return;
 		}			
         
-        // Get info from var.rpt_table into memory
+        // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + schema + ".rpt_target ORDER BY id";
+        String sql = "SELECT * FROM " + schema + ".rpt_target WHERE enabled = true ORDER BY id";
+        //String sql = "SELECT * FROM " + schema + ".rpt_target ORDER BY id";
         try {
     		connectionPostgis.setAutoCommit(false);        	
             Statement stat = connectionPostgis.createStatement();
@@ -497,21 +512,25 @@ public class ModelPostgis extends Model {
         	insertSql = "";
             Map.Entry<Integer, RptTarget> mapEntry = it.next();
             RptTarget rpt = mapEntry.getValue();
-
-        	processRpt(rpt);  
-    		if (exists){
-    			sql = "DELETE FROM " + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
-    			executeSql(sql, false);
-    		}
-    		System.out.println(insertSql);        		
-			if (!executeSql(insertSql, false)){
-				return;
-			}
+        	if (processRpt(rpt)){
+	    		if (exists){
+	    			sql = "DELETE FROM " + schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
+	    			executeSql(sql, false);
+	    		}
+	    		System.out.println(insertSql);        		
+				if (!executeSql(insertSql, false)){
+					return;
+				}
+        	} else{
+        		logger.info("Target not found: " + rpt.getId() + " - " + rpt.getDescription());
+        	}
         }
+        
+        // Ending process
         if (exists){
-    		sql = "UPDATE rpt_result_id SET exec_date = Now()";
+    		sql = "UPDATE " + schema + ".rpt_result_id SET exec_date = Now()";
         } else{
-    		sql = "INSERT INTO rpt_result_id VALUES ('" + projectName + "')";
+    		sql = "INSERT INTO " + schema + ".rpt_result_id VALUES ('" + projectName + "')";
         }
 		executeSql(sql, true);
 		
@@ -526,7 +545,7 @@ public class ModelPostgis extends Model {
 
 
 	private boolean existsProjectName() {
-		String sql = "SELECT * FROM rpt_result_id WHERE result_id = '" + projectName + "'";
+		String sql = "SELECT * FROM " + schema + ".rpt_result_id WHERE result_id = '" + projectName + "'";
 		try {
 			PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -538,17 +557,23 @@ public class ModelPostgis extends Model {
 	}
 
 		
-	private void processRpt(RptTarget rpt) {
+	private boolean processRpt(RptTarget rpt) {
 
 		// Read lines until rpt.getDescription() is found		
 		boolean found = false;
 		String line;
 		String aux;
+		System.out.println(rpt.getDescription());
+		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
 		while (!found){
 			lineNumber++;
 			try {
+				// If pointer has reached EOF, return to first position
+				if (rat.getFilePointer() >= rat.length()){
+					rat.seek(0);
+					return false;
+				}
 				line = rat.readLine().trim();
-				//System.out.println(line);
 				if (line.length() >= rpt.getDescription().length()){
 					aux = line.substring(0, rpt.getDescription().length());
 					if (aux.equals(rpt.getDescription())){
@@ -580,6 +605,8 @@ public class ModelPostgis extends Model {
 		if (rpt.getType() == 2 || rpt.getType() == 3){
 			processTokens(rpt);				
 		}
+		
+		return true;
 		
 	}	
 	
@@ -741,7 +768,7 @@ public class ModelPostgis extends Model {
 
 		String fields = "result_id, ";
 		String values = "'" + projectName + "', ";
-		String sql = "SELECT * FROM " + rpt.getTable();
+		String sql = "SELECT * FROM " + schema + "." + rpt.getTable();
 		try {
 	        PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -771,7 +798,7 @@ public class ModelPostgis extends Model {
 	
 		fields = fields.substring(0, fields.length() - 2);
 		values = values.substring(0, values.length() - 2);
-		sql = "INSERT INTO " + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 		insertSql += sql;
 		
 	}
@@ -789,7 +816,7 @@ public class ModelPostgis extends Model {
 			for (int i = 0; i < pollutants.size(); i++) {
 				units = Double.valueOf(tokens.get(i + 1));
 				values = fixedValues + "'" + pollutants.get(i) + "', " + units;
-				sql = "INSERT INTO " + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+				sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 				insertSql += sql;		        
 			}
 		}
@@ -817,7 +844,7 @@ public class ModelPostgis extends Model {
 			values += tokens.get(j) + ", ";
 		}
 		values = values.substring(0, values.length() - 2);		
-		sql = "INSERT INTO " + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 		insertSql += sql;				
 		
 		// Iterate over pollutants
@@ -825,10 +852,10 @@ public class ModelPostgis extends Model {
 			int j = i + 5;
 			units = Double.valueOf(tokens.get(j));
 			values = fixedValues + "'" + pollutants.get(i) + "', " + units;
-			sql = "DELETE FROM rpt_outfallload_sum " +
+			sql = "DELETE FROM " + schema + ".rpt_outfallload_sum " +
 				"WHERE result_id = '" + projectName + "' AND node_id = '"  + tokens.get(0) + "' AND poll_id = '" + pollutants.get(i) + "';\n";
 			insertSql += sql;	
-			sql = "INSERT INTO rpt_outfallload_sum (" + fields2 + ") VALUES (" + values + ");\n";
+			sql = "INSERT INTO " + schema + ".rpt_outfallload_sum (" + fields2 + ") VALUES (" + values + ");\n";
 			insertSql += sql;		        
 		}
 		
