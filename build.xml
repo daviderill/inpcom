@@ -36,9 +36,9 @@
 		<delete file="${dist}/config/text.properties"/>
 		<delete file="${dist}/config/text_ca.properties"/>			
 		<delete file="${dist}/config/text_en.properties"/>
-		<copy todir="${dist}/images">
+		<!-->copy todir="${dist}/images">
 			<fileset dir="images/" includes="*" />
-		</copy>
+		</copy-->
 		<copy todir="${dist}/shapes">
 			<fileset dir="shapes/" includes="**/**" />
 		</copy>

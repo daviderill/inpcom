@@ -90,7 +90,6 @@ public class ModelPostgis extends Model {
             logger = Utils.getLogger(appPath);
         } else{
         	logger = getLogger(appPath);
-            System.out.println("Log File: \n" + logger.getName());               	
         }
             
         // Get Postgis connection
@@ -106,7 +105,6 @@ public class ModelPostgis extends Model {
 
             // Connect to sqlite database
             String sqliteFile = iniProperties.getProperty("SWMM_DB_POSTGIS_ACTUAL");
-            System.out.println(sqliteFile);
             if (!connectDB(sqliteFile)) {
                 return;
             }
@@ -133,8 +131,7 @@ public class ModelPostgis extends Model {
     private boolean enabledPostgis() {
     	
         if (connectionPostgis == null) {
-            //String connectionString = "jdbc:postgresql://servidor:5432/demo_sbd?user=tecnics&password=tecnics.01";
-            String connectionString = iniProperties.getProperty("POSTGIS_CONNECTION_STRING");
+            String connectionString = iniProperties.getProperty("POSTGIS_CONNECTION_STRING");    	
             try {
                 connectionPostgis = DriverManager.getConnection(connectionString);
             } catch (SQLException e) {
@@ -143,8 +140,7 @@ public class ModelPostgis extends Model {
                 } catch (SQLException e1) {
                     Utils.showError(e.getMessage(), "", "inp_descr");
                     return false;
-                }
-                //logger.info(connectionString);        		
+                }   		
             }
         }
         return true;
@@ -392,10 +388,6 @@ public class ModelPostgis extends Model {
 			Utils.showError("inp_error_notfound", fileInp.getAbsolutePath(), "inp_descr");     
 			return false;
         }
-        if (!fileRpt.exists()){
-			Utils.showError("inp_error_notfound", fileRpt.getAbsolutePath(), "inp_descr");     
-			return false;
-        }        
         sFile = fileRpt.getAbsolutePath().replace(".rpt", ".out");
         File fileOut = new File(sFile);
 
