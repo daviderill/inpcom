@@ -27,20 +27,19 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.iver.andami.Launcher;
-import com.iver.andami.PluginServices;
 import com.jeta.forms.components.panel.FormPanel;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
 public class WindowController2 implements ActionListener {
 
+	private MainWindow view;
     private ModelDbf model;
     private ModelPostgis modelPostgis;
     private Properties prop;
@@ -60,10 +59,14 @@ public class WindowController2 implements ActionListener {
     private boolean exportChecked;
     private boolean execChecked;
     private boolean importChecked;
+    
+    private String userHomeFolder;
+    private ResourceBundle bundle;
 
-
+    
     public WindowController2(ModelDbf modelDbf, ModelPostgis modelPostgis, MainWindow view) {
 
+    	this.view = view;
         this.model = modelDbf;
         this.modelPostgis = modelPostgis;
         this.form = view.getForm();
@@ -71,20 +74,22 @@ public class WindowController2 implements ActionListener {
         String sVersion = ""; 
         String schemaProp = this.modelPostgis.sExport + "SCHEMA_" + netType;       
     	this.modelPostgis.schema = prop.getProperty(schemaProp);
+    	
+    	userHomeFolder = System.getProperty("user.home");
+    	this.bundle = Utils.getBundle();
 
         try {
 
             // DBF panel
-            form.getLabel(Constants.LBL_TITLE).setText(PluginServices.getText(null, "lbl_title"));
-            form.getLabel(Constants.LBL_DIR_SHP).setText(PluginServices.getText(null, "lbl_dir_shp"));
-            form.getLabel(Constants.LBL_DIR_OUT).setText(PluginServices.getText(null, "lbl_dir_out"));
-            form.getLabel(Constants.LBL_FILE_OUT).setText(PluginServices.getText(null, "lbl_file_out"));
-            sVersion = PluginServices.getText(null, "lbl_version") + " " + prop.getProperty("VERSION_CODE");
+            form.getLabel(Constants.LBL_TITLE).setText(bundle.getString("lbl_title"));
+            form.getLabel(Constants.LBL_DIR_SHP).setText(bundle.getString("lbl_dir_shp"));
+            form.getLabel(Constants.LBL_DIR_OUT).setText(bundle.getString("lbl_dir_out"));
+            form.getLabel(Constants.LBL_FILE_OUT).setText(bundle.getString("lbl_file_out"));
+            sVersion = bundle.getString("lbl_version") + " " + prop.getProperty("VERSION_CODE");
             form.getLabel(Constants.LBL_VERSION).setText(sVersion);
-            form.getButton(Constants.BTN_ACCEPT).setText(PluginServices.getText(null, "btn_accept"));
-            form.getButton(Constants.BTN_CANCEL).setText(PluginServices.getText(null, "btn_cancel"));
-            form.getButton(Constants.BTN_HELP_TEMPLATE).setText(PluginServices.getText(null, "btn_help_template"));
-            form.getCheckBox(Constants.CHK_POLYGONS).setText(PluginServices.getText(null, "chk_polygons"));
+            form.getButton(Constants.BTN_ACCEPT).setText(bundle.getString("btn_accept"));
+            form.getButton(Constants.BTN_CANCEL).setText(bundle.getString("btn_cancel"));
+            form.getButton(Constants.BTN_HELP_TEMPLATE).setText(bundle.getString("btn_help_template"));
 
             form.getButton(Constants.BTN_FOLDER_SHP).setActionCommand("shp");
             form.getButton(Constants.BTN_FOLDER_INP).setActionCommand("out");
@@ -98,12 +103,12 @@ public class WindowController2 implements ActionListener {
             form.getButton(Constants.BTN_CANCEL).addActionListener(this);
             form.getButton(Constants.BTN_HELP_TEMPLATE).addActionListener(this);
 
-            dirShp = new File(prop.getProperty("FOLDER_SHP", new File(Launcher.getAppHomeDir()).getParent()));
+            dirShp = new File(prop.getProperty("FOLDER_SHP2", userHomeFolder));
             if (dirShp.exists()) {
                 form.getTextComponent(Constants.TXT_DIR_SHP).setText(dirShp.getAbsolutePath());
                 readyShp = true;
             }
-            dirOut = new File(prop.getProperty("FOLDER_INP", new File(Launcher.getAppHomeDir()).getParent()));
+            dirOut = new File(prop.getProperty("FOLDER_INP", userHomeFolder));
             if (dirOut.exists()) {
                 form.getTextComponent(Constants.TXT_DIR_OUT).setText(dirOut.getAbsolutePath());
                 readyOut = true;
@@ -111,37 +116,27 @@ public class WindowController2 implements ActionListener {
 
             // Postgis panel
             String export = this.modelPostgis.sExport.toLowerCase();
-            form.getLabel("lbl_title").setText(PluginServices.getText(null, export + "lbl_title"));            
-            form.getLabel("lbl_type").setText(PluginServices.getText(null, "lbl_type"));
-            form.getLabel("lbl_select").setText(PluginServices.getText(null, "lbl_select"));  
-            form.getLabel("lbl_file_inp").setText(PluginServices.getText(null, "lbl_file_inp"));  
-            form.getLabel("lbl_file_rpt").setText(PluginServices.getText(null, "lbl_file_rpt"));  
-            form.getLabel("lbl_project").setText(PluginServices.getText(null, "lbl_project"));              
-            form.getCheckBox("chk_export_inp").setText(PluginServices.getText(null, "chk_export_inp"));
-            form.getCheckBox("chk_exec").setText(PluginServices.getText(null, "chk_" + export + "exec"));
-            form.getCheckBox("chk_import").setText(PluginServices.getText(null, "chk_import"));
-            form.getCheckBox("chk_import").setText(PluginServices.getText(null, "chk_import"));            
+            form.getLabel("lbl_title").setText(bundle.getString(export + "lbl_title"));            
+            form.getLabel("lbl_type").setText(bundle.getString("lbl_type"));
+            form.getLabel("lbl_file_inp").setText(bundle.getString("lbl_file_inp"));  
+            form.getLabel("lbl_file_rpt").setText(bundle.getString("lbl_file_rpt"));  
+            form.getLabel("lbl_project").setText(bundle.getString("lbl_project"));              
+            form.getCheckBox("chk_export_inp").setText(bundle.getString("chk_export_inp"));
+            form.getCheckBox("chk_exec").setText(bundle.getString("chk_" + export + "exec"));
+            form.getCheckBox("chk_import").setText(bundle.getString("chk_import"));
+            form.getCheckBox("chk_import").setText(bundle.getString("chk_import"));            
             form.getButton("btn_file_inp").setActionCommand("file_inp");
             form.getButton("btn_file_rpt").setActionCommand("file_rpt");
             form.getRadioButton("opt_now").setActionCommand("ACTUAL");
             form.getRadioButton("opt_future").setActionCommand("FUTURE");
-            form.getRadioButton("opt_now").setText(PluginServices.getText(null, "opt_now"));
-            form.getRadioButton("opt_future").setText(PluginServices.getText(null, "opt_future"));
-            form.getButton("btn_accept_postgis").setText(PluginServices.getText(null, "btn_accept"));
-            form.getButton("btn_cancel_postgis").setText(PluginServices.getText(null, "btn_cancel"));
+            form.getRadioButton("opt_now").setText(bundle.getString("opt_now"));
+            form.getRadioButton("opt_future").setText(bundle.getString("opt_future"));
+            form.getButton("btn_accept_postgis").setText(bundle.getString("btn_accept"));
+            form.getButton("btn_cancel_postgis").setText(bundle.getString("btn_cancel"));
             form.getButton("btn_accept_postgis").setActionCommand("accept_postgis");
             form.getButton("btn_cancel_postgis").setActionCommand("cancel_postgis");
 
-            JCheckBox c = form.getCheckBox("chk_polygons_postgis");
-            System.out.println(this.modelPostgis.sExport);
-            if (export.equals("swmm_")){
-            	c.setText(PluginServices.getText(null, "chk_polygons"));
-            	c.setVisible(true);            	
-            } else{
-            	c.setVisible(false);
-            }
-            
-            form.getRadioButton("opt_now").setSelected(true);
+            form.getRadioButton("opt_future").setSelected(true);
             form.getRadioButton("opt_now").addActionListener(this);
             form.getRadioButton("opt_future").addActionListener(this);
             form.getButton("btn_accept_postgis").addActionListener(this);
@@ -149,13 +144,13 @@ public class WindowController2 implements ActionListener {
             form.getButton("btn_file_inp").addActionListener(this);
             form.getButton("btn_file_rpt").addActionListener(this);
 
-            fileInp = new File(prop.getProperty("FILE_INP", new File(Launcher.getAppHomeDir()).getParent()));
+            fileInp = new File(prop.getProperty("FILE_INP", userHomeFolder));
             if (fileInp.getParentFile() != null && fileInp.getParentFile().exists()) {
                 form.getTextComponent("txt_file_inp").setText(fileInp.getAbsolutePath());
                 readyFileInp = true;
             }
 
-            fileRpt = new File(prop.getProperty("FILE_RPT", new File(Launcher.getAppHomeDir()).getParent()));
+            fileRpt = new File(prop.getProperty("FILE_RPT", userHomeFolder));
             if (fileRpt.getParentFile() != null && fileRpt.getParentFile().exists()) {
                 form.getTextComponent("txt_file_rpt").setText(fileRpt.getAbsolutePath());
                 readyFileRpt = true;
@@ -185,10 +180,9 @@ public class WindowController2 implements ActionListener {
         } else if (command.equalsIgnoreCase("out")) {
             chooseFolderOut();
         } else if (command.equalsIgnoreCase("accept")) {
-            this.model.bPolygons = !form.getCheckBox(Constants.CHK_POLYGONS).isSelected();
             executeDbf();
         } else if (command.equalsIgnoreCase("cancel")) {
-            PluginServices.getMDIManager().closeWindow(PluginServices.getMDIManager().getActiveWindow());
+        	view.close();
         } else if (command.equalsIgnoreCase("help")) {
             openPDF();
         } // Postgis actions
@@ -206,7 +200,7 @@ public class WindowController2 implements ActionListener {
             importChecked = form.getCheckBox("chk_import").isSelected();
             executePostgis();
         } else if (command.equalsIgnoreCase("cancel_postgis")) {
-            PluginServices.getMDIManager().closeWindow(PluginServices.getMDIManager().getActiveWindow());
+        	view.close();
         }
 
     }
@@ -263,8 +257,8 @@ public class WindowController2 implements ActionListener {
 
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle(PluginServices.getText(null, "folder_shp"));
-        File file = new File(prop.getProperty("FOLDER_SHP", new File(Launcher.getAppHomeDir()).getParent()));
+        chooser.setDialogTitle(bundle.getString("folder_shp"));
+        File file = new File(prop.getProperty("FOLDER_SHP", userHomeFolder));
         chooser.setCurrentDirectory(file);
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -282,8 +276,8 @@ public class WindowController2 implements ActionListener {
 
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle(PluginServices.getText(null, "folder_out"));
-        File file = new File(prop.getProperty("FOLDER_INP", new File(Launcher.getAppHomeDir()).getParent()));
+        chooser.setDialogTitle(bundle.getString("folder_out"));
+        File file = new File(prop.getProperty("FOLDER_INP", userHomeFolder));
         chooser.setCurrentDirectory(file);
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -305,8 +299,8 @@ public class WindowController2 implements ActionListener {
         FileFilter filter = new FileNameExtensionFilter("INP extension file", "inp");
         chooser.setFileFilter(filter);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setDialogTitle(PluginServices.getText(null, "file_inp"));
-        File file = new File(prop.getProperty("FILE_INP", new File(Launcher.getAppHomeDir()).getParent()));	
+        chooser.setDialogTitle(bundle.getString("file_inp"));
+        File file = new File(prop.getProperty("FILE_INP", userHomeFolder));	
         chooser.setCurrentDirectory(file.getParentFile());
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -331,9 +325,8 @@ public class WindowController2 implements ActionListener {
         FileFilter filter = new FileNameExtensionFilter("RPT extension file", "rpt");
         chooser.setFileFilter(filter);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setDialogTitle(PluginServices.getText(null, "file_rpt"));
-        File file = new File(prop.getProperty("FILE_RPT", new File(Launcher.getAppHomeDir()).getParent()));	
-        //File file = new File(prop.getProperty("FILE_RPT"));
+        chooser.setDialogTitle(bundle.getString("file_rpt"));
+        File file = new File(prop.getProperty("FILE_RPT", userHomeFolder));	
         chooser.setCurrentDirectory(file.getParentFile());
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {

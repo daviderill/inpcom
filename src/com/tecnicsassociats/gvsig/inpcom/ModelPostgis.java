@@ -39,12 +39,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 
@@ -99,8 +102,12 @@ public class ModelPostgis extends Model {
 
         if (execType.equals(Constants.EXEC_GVSIG)) {
             // Open main form
-            modelDbf = new ModelDbf(this.sExport);            
-            Utils.openForm(modelDbf, this);
+            modelDbf = new ModelDbf(this.sExport);
+            MainWindow cmWindow = new MainWindow();
+            new WindowController2(modelDbf, this, cmWindow);
+            JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame());
+            cmWindow.setFrame(frame);
+            
         } else if (execType.equals(Constants.EXEC_CONSOLE)) {
 
             // Connect to sqlite database
@@ -138,7 +145,7 @@ public class ModelPostgis extends Model {
                 try {
                     connectionPostgis = DriverManager.getConnection(connectionString);
                 } catch (SQLException e1) {
-                    Utils.showError(e.getMessage(), "", "inp_descr");
+                    Utils.showError(e1.getMessage(), "", "inp_descr");
                     return false;
                 }   		
             }
@@ -226,7 +233,7 @@ public class ModelPostgis extends Model {
 
             // Ending message
             if (execType.equals(Constants.EXEC_GVSIG)) {                
-                Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr", execType);                
+                Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr");                
                 logger.info(fileInp.getAbsolutePath());
             } else{
                 System.out.println(fileInp.getAbsolutePath());
@@ -252,11 +259,6 @@ public class ModelPostgis extends Model {
 
         // If table is null or doesn't exit then exit function
         if (!checkTable(tableName) && !checkView(tableName)) {
-            return;
-        }
-
-        // Target polygons: Write only if check is selected
-        if (bPolygons == false && id == polygons_target_id) {
             return;
         }
 
@@ -413,7 +415,7 @@ public class ModelPostgis extends Model {
 
         // Ending message
         if (execType.equals(Constants.EXEC_GVSIG)) {                
-            Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr", execType);                
+            Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr");                
             logger.info(fileOut.getAbsolutePath());
         } else{
             System.out.println(fileOut.getAbsolutePath());
@@ -502,7 +504,7 @@ public class ModelPostgis extends Model {
 		
         // Ending message
         if (execType.equals(Constants.EXEC_GVSIG)) {                
-            Utils.showMessage("import_end", "", "inp_descr", execType);                
+            Utils.showMessage("import_end", "", "inp_descr");                
         } else{
             System.out.println("Process executed");
         }		

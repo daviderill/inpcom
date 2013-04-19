@@ -1,7 +1,7 @@
 <project name="Generar extDbfToInp en Andami" default="generate-without-source" basedir=".">
 	<description>
-       Instala extDbfToInp en Andami.
-   </description>
+       Instala INPcom en Andami.
+   	</description>
 	<!-- set global properties for this build -->
 	<property name="src" location="src" />
 	<property name="build" location="bin" />
@@ -17,15 +17,16 @@
 		<mkdir dir="${dist}" />
 		<!-- Creamos un fichero con el timeStamp para que lo lea el FPanelAbout -->
 		<buildnumber />
-
 	</target>
 
 	<target name="generate-without-source" description="generate the distribution without the source file">
+	    
 		<!-- Create the distribution directory -->
 		<mkdir dir="${dist}" />
 
 		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
 		<jar jarfile="${dist}/${plugin}.jar" basedir="${build}" />
+		
 		<copy file="config/config.xml" todir="${dist}" />
 		<copy todir="${dist}">
 		    <fileset dir="config/" includes="text*.properties"/>			
@@ -36,9 +37,6 @@
 		<delete file="${dist}/config/text.properties"/>
 		<delete file="${dist}/config/text_ca.properties"/>			
 		<delete file="${dist}/config/text_en.properties"/>
-		<!-->copy todir="${dist}/images">
-			<fileset dir="images/" includes="*" />
-		</copy-->
 		<copy todir="${dist}/shapes">
 			<fileset dir="shapes/" includes="**/**" />
 		</copy>
@@ -48,9 +46,14 @@
 		<copy todir="${dist}">
 			<fileset dir="lib/" includes="*.jar" />
 		</copy>
-
+		<copy todir="${dist}/lib">
+			<fileset dir="lib/" includes="*.jar" />
+		</copy>		
+		
 		<move todir="${extension-dir}/${plugin}/">
 			<fileset dir="${dist}" includes="**/**" />
 		</move>
+		
 	</target>
+	
 </project>

@@ -21,7 +21,6 @@
 
 package com.tecnicsassociats.gvsig.inpcom;
 
-import java.awt.geom.PathIterator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +30,6 @@ import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,18 +38,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.hardcode.gdbms.driver.exceptions.ReadDriverException;
-
-import org.cresques.cts.IProjection;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.shapefile.dbf.DbaseFileReader.Row;
 
-import com.iver.cit.gvsig.exceptions.layers.LoadLayerException;
-import com.iver.cit.gvsig.fmap.core.IGeometry;
-import com.iver.cit.gvsig.fmap.crs.CRSFactory;
-import com.iver.cit.gvsig.fmap.drivers.VectorialDriver;
-import com.iver.cit.gvsig.fmap.layers.FLyrVect;
-import com.iver.cit.gvsig.fmap.layers.LayerFactory;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
@@ -164,7 +153,7 @@ public class ModelDbf extends Model{
 			raf.close();
 
 			// Ending message
-			Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr", execType);
+			Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr");
 
 		} catch (IOException e) {
 			Utils.showError("inp_error_io", e.getMessage(), "inp_descr");			
@@ -189,11 +178,6 @@ public class ModelDbf extends Model{
 			return;
 		}
 
-		// Target polygons: Write only if check is selected
-		if (bPolygons == false && id == polygons_target_id){
-			return;
-		}
-		
 		// Get data of the specified DBF file
 		this.lMapDades = readDBF(fDbf[fileIndex]);
 		if (this.lMapDades.isEmpty()) return;		
@@ -239,21 +223,7 @@ public class ModelDbf extends Model{
 					}					
 				}
 			}
-			// Target polygons: Write id and coordinates of the current row
-			if (id == polygons_target_id && sValor != null){
-				if (fShp[fileIndex] != null && fShp[fileIndex].exists()) {	
-					VectorialDriver vd = getDriver(fShp[fileIndex]);				
-					writePoint(vd, index, sValor, size);
-					index++;
-				}		
-				else{
-					//System.out.println("Shape null");
-					//Utils.showError("inp_error_notfound", fShp[index].getPath(), "inp_descr");	
-				}
-			}
-			else{
-				raf.writeBytes("\r\n");
-			}
+			
 		}
 
 	}
@@ -311,68 +281,6 @@ public class ModelDbf extends Model{
 		String sSHP = sDir + File.separator + sFile + ".shp";
 		fShp[index] = new File(sSHP);	
 		return true;
-
-	}
-
-
-	// Write point: id and coordinates has the same length (specified by size parameter)
-	private void writePoint(VectorialDriver vd, int index, String sValor, int size) throws IOException{
-
-		int num = 0;
-		try {
-
-			IGeometry geometry = vd.getShape(index);
-			double[] pd = new double[2];			
-			PathIterator iter = geometry.getPathIterator(null);
-			while (!(iter.isDone())) {
-				if (iter.currentSegment(pd)!= PathIterator.SEG_CLOSE){
-					if (num > 0){
-						// Id of the point
-						raf.writeBytes(sValor);
-						for (int j = sValor.length(); j <= size; j++) {
-							raf.writeBytes(" ");
-						}			
-					}
-					// Decimal control
-					DecimalFormat df = new DecimalFormat("##.000"); 
-					String sX = df.format(pd[0]).replace(',' , '.');
-					String sY = df.format(pd[1]).replace(',' , '.');					
-					// Write x and y coordinates
-					// Write empty spaces with null values		
-					raf.writeBytes(sX);
-					for (int j = sX.length(); j <= default_size; j++) {
-						raf.writeBytes(" ");
-					}		
-					raf.writeBytes(sY);				
-					for (int j = sY.length(); j <= default_size; j++) {
-						raf.writeBytes(" ");
-					}		
-					raf.writeBytes("\r\n");
-					num++;
-				}
-				iter.next();	
-			}
-
-		} catch (ReadDriverException e) {
-			System.out.println("writePoint Error. num = " + num);
-			e.printStackTrace();
-		}	
-
-	}
-
-
-	// Get VectorialDriver of the specified Shapefile
-	private VectorialDriver getDriver(File fileShp){
-
-		VectorialDriver vd = null;
-		IProjection projection = CRSFactory.getCRS("EPSG:23031");
-		try {
-			FLyrVect lyr = (FLyrVect) LayerFactory.createLayer("name", "gvSIG shp driver", fileShp, projection);
-			vd = lyr.getSource().getDriver();
-		} catch (LoadLayerException e) {
-			e.printStackTrace();
-		} 
-		return vd;		
 
 	}
 

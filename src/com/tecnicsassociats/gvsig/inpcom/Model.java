@@ -58,7 +58,6 @@ public class Model {
     protected int default_size;
     protected RandomAccessFile rat;
     protected RandomAccessFile raf;
-    public boolean bPolygons;   // True if we have to process polygons target (810)
     public String sExport;   // "EPANET_" o "SWMM_"
     public File fileHelp;
     protected String execType = Constants.EXEC_GVSIG;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG

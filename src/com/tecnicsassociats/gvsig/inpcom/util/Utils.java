@@ -21,6 +21,7 @@
 
 package com.tecnicsassociats.gvsig.inpcom.util;
 
+import java.awt.BorderLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,35 +33,26 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-import com.iver.andami.PluginServices;
-import com.iver.andami.ui.mdiManager.MDIManager;
-import com.tecnicsassociats.gvsig.inpcom.Constants;
-import com.tecnicsassociats.gvsig.inpcom.MainWindow;
-import com.tecnicsassociats.gvsig.inpcom.ModelDbf;
-import com.tecnicsassociats.gvsig.inpcom.ModelPostgis;
-import com.tecnicsassociats.gvsig.inpcom.WindowController2;
 
 public class Utils {
 
+	private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("text"); //$NON-NLS-1$		
     private static Logger logger;
     private static final String LOG_FOLDER = "log/";
 
-    // Open main form
-    public static void openForm(ModelDbf modelDbf, ModelPostgis modelPostgis) {
-        MainWindow cmWindow = new MainWindow();
-        new WindowController2(modelDbf, modelPostgis, cmWindow);
-        MDIManager mdi = PluginServices.getMDIManager();
-        mdi.addCentredWindow(cmWindow);
-    }
-    
     
     public static Logger getLogger(String folderRoot) {
-        if (logger == null) {
+
+    	if (logger == null) {
             try {
                 String folder = folderRoot + LOG_FOLDER;
                 (new File(folder)).mkdirs();
@@ -77,6 +69,23 @@ public class Utils {
         return logger;
 
     }
+    
+    
+    public static ResourceBundle getBundle(){
+    	return BUNDLE;
+    }
+    
+    
+	public static JFrame openForm(JPanel view, JFrame f){
+		//JFrame f = new JFrame();
+	    f.setLayout(new BorderLayout());
+	    f.add(view, BorderLayout.CENTER);
+	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
+	    f.pack();
+	    f.setLocationRelativeTo(null);   
+	    f.setVisible(true);		
+	    return f;
+	}       
 
 
     public static String getCurrentTimeStamp() {
@@ -123,57 +132,56 @@ public class Utils {
     }
 
 
-    public static void showMessage(String msg, String param, String title, String execType) {
-        if (execType.equals(Constants.EXEC_GVSIG)) {             
-            try {
-                JOptionPane.showMessageDialog(null, PluginServices.getText(Constants.CONFIG_PLUGIN, msg) + "\n" + param,
-                    PluginServices.getText(Constants.CONFIG_PLUGIN, title), JOptionPane.PLAIN_MESSAGE);
-                if (logger != null) {
-                    logger.info(PluginServices.getText(Constants.CONFIG_PLUGIN, msg) + "\n" + param);
-                }
-            }  catch (NoClassDefFoundError e) {
-                JOptionPane.showMessageDialog(null, msg + param, title, JOptionPane.PLAIN_MESSAGE);
-                if (logger != null) {
-                    logger.info(msg + "\n" + param);
-                }
-            }    
-        }
-    }
+    public static void showMessage(String msg, String param, String title) {
+    	try{
+    		JOptionPane.showMessageDialog(null, BUNDLE.getString(msg) + "\n" + param,
+        		BUNDLE.getString(title), JOptionPane.PLAIN_MESSAGE);
+    		if (logger != null) {
+    			logger.info(BUNDLE.getString(msg) + "\n" + param);
+    		}
+    	} catch (MissingResourceException e){
+    		JOptionPane.showMessageDialog(null, msg + "\n" + param,	title, JOptionPane.PLAIN_MESSAGE);
+    		if (logger != null) {
+    			logger.info(msg + "\n" + param);
+    		}    		
+    	}
+    }    
 
-
+    
     public static void showError(String msg, String param, String title) {
-        try {
-            JOptionPane.showMessageDialog(null, PluginServices.getText(Constants.CONFIG_PLUGIN, msg) + "\n" + param,
-                PluginServices.getText(Constants.CONFIG_PLUGIN, title), JOptionPane.WARNING_MESSAGE);
-            if (logger != null) {
-                logger.warning(PluginServices.getText(Constants.CONFIG_PLUGIN, msg) + "\n" + param);
-            }
-        } catch (NoClassDefFoundError e) {
-            JOptionPane.showMessageDialog(null, msg + "\n" + param, title, JOptionPane.WARNING_MESSAGE);
-            if (logger != null) {
-                logger.warning(msg + "\n" + param);
-            }
-        }
+    	try{
+    		JOptionPane.showMessageDialog(null, BUNDLE.getString(msg) + "\n" + param,
+    			BUNDLE.getString(title), JOptionPane.WARNING_MESSAGE);
+    		if (logger != null) {
+    			logger.warning(BUNDLE.getString(msg) + "\n" + param);
+    		}
+    	} catch (MissingResourceException e){
+    		JOptionPane.showMessageDialog(null, msg + "\n" + param,	title, JOptionPane.WARNING_MESSAGE);
+    		if (logger != null) {
+    			logger.info(msg + "\n" + param);
+    		}    		
+    	}        
     }
 
     
     public static int confirmDialog(String msg, String title) {
     	int reply;
-        try {
-            reply = JOptionPane.showConfirmDialog(null, PluginServices.getText(Constants.CONFIG_PLUGIN, msg),
-                PluginServices.getText(Constants.CONFIG_PLUGIN, title), JOptionPane.YES_NO_OPTION);
-            if (logger != null) {
-                logger.warning(PluginServices.getText(Constants.CONFIG_PLUGIN, msg));
-            }
-        } catch (NoClassDefFoundError e) {
-            reply = JOptionPane.showConfirmDialog(null, msg, title, JOptionPane.YES_NO_OPTION);
-            if (logger != null) {
-                logger.warning(msg);
-            }
-        }
-        return reply;
-    }
+    	try{
+	    	reply = JOptionPane.showConfirmDialog(null, BUNDLE.getString(msg),
+	    		BUNDLE.getString(title), JOptionPane.YES_NO_OPTION);
+	        if (logger != null) {
+	            logger.warning(BUNDLE.getString(msg));
+	        }
+    	} catch (MissingResourceException e){
+	    	reply = JOptionPane.showConfirmDialog(null, msg, title, JOptionPane.YES_NO_OPTION);
+    		if (logger != null) {
+    			logger.info(msg);
+    		}    		
+    	}
+        return reply;    	
+    }        
     
+
 
     /**
      * From geotools Adds quotes to an object for storage in postgis. The object

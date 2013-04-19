@@ -27,8 +27,10 @@ public class MainClass {
         
         ModelPostgis modelPostgis = null;
         modelPostgis = new ModelPostgis("SWMM_");        
-        modelPostgis.execute(Constants.EXEC_CONSOLE, args[0], args[1], args[2]);
-        System.out.println(args[0] + " " + args[1] + " " + args[2]);
+
+		modelPostgis.execute(Constants.EXEC_GVSIG);
+        //modelPostgis.execute(Constants.EXEC_CONSOLE, args[0], args[1], args[2]);
+        //System.out.println(args[0] + " " + args[1] + " " + args[2]);
 
     }
     

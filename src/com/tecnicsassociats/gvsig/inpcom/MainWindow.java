@@ -23,6 +23,7 @@ package com.tecnicsassociats.gvsig.inpcom;
 
 import java.awt.BorderLayout;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.iver.andami.PluginServices;
@@ -35,6 +36,7 @@ public class MainWindow extends JPanel implements SingletonWindow {
 
 	private static final long serialVersionUID = -4706517331314435778L;				
 	private FormPanel form;
+	private JFrame f;
 
 	
 	public MainWindow() {		
@@ -42,8 +44,8 @@ public class MainWindow extends JPanel implements SingletonWindow {
 		this.form = new FormPanel(Constants.MAIN_FORM);			
 		add(this.form, BorderLayout.CENTER);
 		this.revalidate();
+		f = new JFrame();
 	}
-	
 
 	public WindowInfo getWindowInfo() {		
 		WindowInfo m_viewInfo = new WindowInfo(WindowInfo.RESIZABLE);
@@ -67,6 +69,19 @@ public class MainWindow extends JPanel implements SingletonWindow {
 
 	public FormPanel getForm() {
 		return this.form;
+	}
+
+	public JFrame getFrame() {
+		return new JFrame();
+	}
+
+	public void close() {
+        f.setVisible(false); 
+        f.dispose(); 
+	}
+
+	public void setFrame(JFrame frame) {
+		this.f = frame;
 	}
 	
 }
