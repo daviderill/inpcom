@@ -19,9 +19,8 @@
  *   David Erill <daviderill79@gmail.com>
  */
 
-package com.tecnicsassociats.gvsig.inpcom;
+package com.tecnicsassociats.gvsig.inpcom.model;
 
-import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,23 +37,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import com.tecnicsassociats.gvsig.inpcom.RptTarget;
+import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
+import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
+import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
 public class ModelPostgis extends Model {
 
     protected static Connection connectionPostgis;   	
-    private ModelDbf modelDbf;
     private String insertSql;
 	private ArrayList<String> tokens;
 	private ArrayList<ArrayList<String>> tokensList;	
@@ -62,24 +66,21 @@ public class ModelPostgis extends Model {
 	private String projectName;
 	private int lineNumber;   // Number of lines read
 	private ArrayList<String> pollutants;
+	private boolean isForm = false;
 	
-	
-    public ModelPostgis(String action) {
-    	this.sExport = action;
+    public ModelPostgis(String export, String execType) {
+    	this.sExport = export;
+        this.execType = execType;    	
+    	init();
     }
 
     public ModelPostgis() {
+    	init();
     }    
 
-    public void execute(String execType) {
-        this.execute(execType, "0", "0", "0");
-    }
-
     
-    public void execute(String execType, String export, String exec, String import_) {
-
-        this.execType = execType;
-
+    private void init(){
+    	
         // Get properties file
         if (!enabledPropertiesFile()) {
             return;
@@ -89,47 +90,36 @@ public class ModelPostgis extends Model {
         configIni();
         
         // Get log file
-        if (execType.equals(Constants.EXEC_GVSIG)) {
-            logger = Utils.getLogger(appPath);
-        } else{
-        	logger = getLogger(appPath);
-        }
+        logger = Utils.getLogger();
             
         // Get Postgis connection
         if (!enabledPostgis()) {
             return;
         }
+        
+    }
 
-        if (execType.equals(Constants.EXEC_GVSIG)) {
-            // Open main form
-            modelDbf = new ModelDbf(this.sExport);
-            MainWindow cmWindow = new MainWindow();
-            new WindowController2(modelDbf, this, cmWindow);
-            JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame());
-            cmWindow.setFrame(frame);
-            
-        } else if (execType.equals(Constants.EXEC_CONSOLE)) {
+    
+//    public void execute(String execType, boolean isForm) {
+//    	this.isForm = isForm;
+//        this.execute(execType, "0", "0", "0");
+//    }
+    
+    
+    public void execute(String execType, String export, String exec, String import_) {
 
-            // Connect to sqlite database
-            String sqliteFile = iniProperties.getProperty("SWMM_DB_POSTGIS_ACTUAL");
-            if (!connectDB(sqliteFile)) {
-                return;
-            }
+        // Process all Postgis tables and output to INP file
+        if (export.equals("1")) {
+            processAll(null);
+        }
 
-            // Process all Postgis tables and output to INP file
-            if (export.equals("1")) {
-                processALL(null);
-            }
+        if (exec.equals("1")) {
+            execSWMM(null, null);
+        }
 
-            if (exec.equals("1")) {
-                execSWMM(null, null);
-            }
-
-            if (import_.equals("1")) {
-                File file = new File(iniProperties.getProperty("FILE_RPT"));            	
-                importRpt(file, "test");
-            }
-
+        if (import_.equals("1")) {
+            File file = new File(iniProperties.getProperty("FILE_RPT"));            	
+            importRpt(file, "test");
         }
 
     }
@@ -160,7 +150,7 @@ public class ModelPostgis extends Model {
 
         Map<String, String> mDades;
         ArrayList<Map<String, String>> mAux = new ArrayList<Map<String, String>>();
-        String sql = "SELECT * FROM " + schema + "." + tableName;
+        String sql = "SELECT * FROM sewnet." + tableName;
         PreparedStatement ps;
         try {
             ps = connectionPostgis.prepareStatement(sql);
@@ -186,7 +176,7 @@ public class ModelPostgis extends Model {
             }
             rs.close();
         } catch (SQLException e) {
-            Utils.showError("inp_error_sql", sql, "inp_descr");
+        	Utils.showError(e.getMessage(), sql, "inp_descr");
         }
         return mAux;
 
@@ -194,12 +184,11 @@ public class ModelPostgis extends Model {
 
 
     // Main procedure
-    public void processALL(File fileInp) {
+    public boolean processAll(File fileInp) {
 
-        if (execType.equals(Constants.EXEC_GVSIG)) {        
-            logger.info("exportINP");
-        }
-
+        logger.info("exportINP");
+    	String sql = "";
+   	
         try {
         	
             // Get default INP output file
@@ -210,7 +199,6 @@ public class ModelPostgis extends Model {
             }
                 
             // Get some properties
-            polygons_target_id = Integer.parseInt(iniProperties.getProperty(sExport + "POLYGONS_TARGET_ID"));
             default_size = Integer.parseInt(iniProperties.getProperty(sExport + "SIZE_DEFAULT"));
 
             // Open template and output file
@@ -219,30 +207,33 @@ public class ModelPostgis extends Model {
             raf.setLength(0);
 
             // Get content of target table
-            String sql = "SELECT target.id as target_id, target.name as target_name, lines, dbf.name as dbf_name "
-                + "FROM target INNER JOIN dbf ON target.dbf_id = dbf.id";
-            Statement stat = connectionSqlite.createStatement();
+            //sql = "SELECT target.id as target_id, target.name as target_name, lines, main.name as table_name "
+            	//	+ "FROM drivers.swmm_inp_target as target INNER JOIN drivers.swmm_inp_table as main ON target.table_id = main.id";
+            sql = "SELECT target.id as target_id, target.name as target_name, lines, main.name as table_name "
+            		+ "FROM " + schemaDrivers + ".swmm_inp_target as target " 
+            		+ "INNER JOIN " + schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";            
+            Statement stat = connectionPostgis.createStatement();            
+            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
-                System.out.println(rs.getInt("target_id") + "  " + rs.getString("dbf_name"));
-                processTarget(rs.getInt("target_id"), rs.getString("dbf_name"), rs.getInt("lines"));
+                //System.out.println(rs.getInt("target_id") + "  " + rs.getString("table_name"));
+                processTarget(rs.getInt("target_id"), rs.getString("table_name"), rs.getInt("lines"));
             }
             rs.close();
             rat.close();
             raf.close();
 
             // Ending message
-            if (execType.equals(Constants.EXEC_GVSIG)) {                
-                Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr");                
-                logger.info(fileInp.getAbsolutePath());
-            } else{
-                System.out.println(fileInp.getAbsolutePath());
-            }
+            Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr");
+            logger.info(fileInp.getAbsolutePath());
+            return true;
 
         } catch (IOException e) {
             Utils.showError("inp_error_io", e.getMessage(), "inp_descr");
+            return false;
         } catch (SQLException e) {
-            Utils.showError("inp_error_execution", e.getMessage(), "inp_descr");
+            Utils.showError(e.getMessage(), sql, "inp_descr");
+            return false;
         }
 
     }
@@ -270,8 +261,8 @@ public class ModelPostgis extends Model {
 
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
-        String sql = "SELECT name, space FROM target_fields WHERE target_id = " + id + " ORDER BY pos";
-        Statement stat = connectionSqlite.createStatement();
+        String sql = "SELECT name, space FROM " + schemaDrivers + ".swmm_inp_target_fields WHERE target_id = " + id + " ORDER BY pos";
+        Statement stat = connectionPostgis.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
             mHeader.put(rs.getString("name").trim().toLowerCase(), rs.getInt("space"));
@@ -308,23 +299,7 @@ public class ModelPostgis extends Model {
                     }
                 }
             }
-
-            //TODO: Target polygons: Write id and coordinates of the current row
-//			if (id == polygons_target_id && sValor != null){
-//				if (fShp[fileIndex] != null && fShp[fileIndex].exists()) {
-//					VectorialDriver vd = getDriver(fShp[fileIndex]);
-//					writePoint(vd, index, sValor, size);
-//					index++;
-//				}
-//				else{
-//					//System.out.println("Shape null");
-//					//Utils.showError("inp_error_notfound", fShp[index].getPath(), "inp_descr");
-//				}
-//			} 
-//			else{
             raf.writeBytes("\r\n");
-//			}
-
         }
 
     }
@@ -332,7 +307,7 @@ public class ModelPostgis extends Model {
 
     // Check if the table exists
     private boolean checkTable(String tableName) {
-        String sql = "SELECT * FROM pg_tables WHERE upper(tablename) = '" + tableName + "'";
+        String sql = "SELECT * FROM pg_tables WHERE lower(tablename) = '" + tableName + "'";
         try {
             Statement stat = connectionPostgis.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -346,7 +321,7 @@ public class ModelPostgis extends Model {
     
     // Check if the view exists
     private boolean checkView(String viewName) {
-        String sql = "SELECT * FROM pg_views WHERE upper(viewname) = '" + viewName + "'";
+        String sql = "SELECT * FROM pg_views WHERE lower(viewname) = '" + viewName + "'";
         try {
             Statement stat = connectionPostgis.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -361,9 +336,7 @@ public class ModelPostgis extends Model {
     // Exec SWMM
     public boolean execSWMM(File fileInp, File fileRpt) {
 
-        if (execType.equals(Constants.EXEC_GVSIG)) {                
-            logger.info("execSWMM");
-        }
+        logger.info("execSWMM");
 
 //		file = folder + "swmm5.exe " + folder + "222.inp " + folder + "2.rpt " + folder + "2.out";
 
@@ -396,11 +369,7 @@ public class ModelPostgis extends Model {
         exeCmd += " " + fileInp.getAbsolutePath() + " " + fileRpt.getAbsolutePath() + " " + fileOut.getAbsolutePath();
 
         // Ending message
-        if (execType.equals(Constants.EXEC_GVSIG)) {                
-            logger.info(exeCmd);            
-        } else{
-            System.out.println(exeCmd);
-        }        
+        logger.info(exeCmd);            
 
         // Exec process
     	Process p;
@@ -409,44 +378,36 @@ public class ModelPostgis extends Model {
 	        p.waitFor();			
 		} catch (IOException e) {
 			Utils.showError("inp_error_io", exeCmd, "inp_descr");
+			return false;
 		} catch (InterruptedException e) {
 			Utils.showError("inp_error_io", exeCmd, "inp_descr");
+			return false;
 		}
 
         // Ending message
-        if (execType.equals(Constants.EXEC_GVSIG)) {                
-            Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr");                
-            logger.info(fileOut.getAbsolutePath());
-        } else{
-            System.out.println(fileOut.getAbsolutePath());
-        }		
+        Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr");                
+
         return true;
 
     }
 
 
     // Import RPT file into Postgis tables
-    public void importRpt(File fileRpt, String projectName) {
+    public boolean importRpt(File fileRpt, String projectName) {
         
     	this.fileRpt = fileRpt;
     	this.projectName = projectName;
-    	
-    	// TODO: Show RPT content
 
-        if (execType.equals(Constants.EXEC_GVSIG)) {                
-            logger.info("importRpt");
-        }
+        logger.info("importRpt");
         
     	// Check if Project Name exists in rpt_result_id
     	boolean exists = false;
     	if (existsProjectName()){
     		exists = true;
-            if (execType.equals(Constants.EXEC_GVSIG)) {         		
-            	int reply = Utils.confirmDialog("project_exists", "inp_descr");    		
-            	if (reply == JOptionPane.NO_OPTION){
-            		return;
-            	}
-            }
+        	int reply = Utils.confirmDialog("project_exists", "inp_descr");    		
+        	if (reply == JOptionPane.NO_OPTION){
+        		return false;
+        	}
     	}
     	
 		// Open RPT file
@@ -454,12 +415,12 @@ public class ModelPostgis extends Model {
 			rat = new RandomAccessFile(fileRpt, "r");
 		} catch (FileNotFoundException e) {
 			Utils.showError("inp_error_notfound", fileRpt.getAbsolutePath(), "inp_descr");
-			return;
+			return false;
 		}			
         
         // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + schema + ".rpt_target ORDER BY id";
+        String sql = "SELECT * FROM " + schemaDrivers + "." + sExport.toLowerCase() + "rpt_target ORDER BY id";
         try {
     		connectionPostgis.setAutoCommit(false);        	
             Statement stat = connectionPostgis.createStatement();
@@ -471,7 +432,7 @@ public class ModelPostgis extends Model {
             rs.close();
         } catch (SQLException e) {
             Utils.showError(e.getMessage(), "", "inp_descr");
-            return;
+            return false;
         }
         
         // Iterate over targets
@@ -485,9 +446,8 @@ public class ModelPostgis extends Model {
 	    			sql = "DELETE FROM " + schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
 	    			executeSql(sql, false);
 	    		}
-	    		System.out.println(insertSql);        		
 				if (!executeSql(insertSql, false)){
-					return;
+					return false;
 				}
         	} else{
         		logger.info("Target not found: " + rpt.getId() + " - " + rpt.getDescription());
@@ -503,16 +463,15 @@ public class ModelPostgis extends Model {
 		executeSql(sql, true);
 		
         // Ending message
-        if (execType.equals(Constants.EXEC_GVSIG)) {                
-            Utils.showMessage("import_end", "", "inp_descr");                
-        } else{
-            System.out.println("Process executed");
-        }		
-	
+        Utils.showMessage("import_end", "", "inp_descr");                
+
+		return true;
+		
     }
 
 
 	private boolean existsProjectName() {
+		
 		String sql = "SELECT * FROM " + schema + ".rpt_result_id WHERE result_id = '" + projectName + "'";
 		try {
 			PreparedStatement ps = connectionPostgis.prepareStatement(sql);
@@ -522,6 +481,7 @@ public class ModelPostgis extends Model {
             Utils.showError(e.getMessage(), "", "inp_descr");
 			return false;
 		}
+		
 	}
 
 		
@@ -531,7 +491,9 @@ public class ModelPostgis extends Model {
 		boolean found = false;
 		String line;
 		String aux;
+		
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
+		
 		while (!found){
 			lineNumber++;
 			try {
@@ -846,5 +808,26 @@ public class ModelPostgis extends Model {
 		}
 	}
 		
+	
+	public List<String> getSchemas(){
+
+        String sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name <> 'information_schema' ORDER BY schema_name";
+          //and schema_name !~ E'^pg_'        
+    	List<String> elems = new ArrayList<String>();
+        try {
+    		connectionPostgis.setAutoCommit(false);        	
+            Statement stat = connectionPostgis.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            while (rs.next()) {
+            	elems.add(rs.getString(1));
+            }
+            rs.close();
+    		return elems;	            
+        } catch (SQLException e) {
+            Utils.showError(e.getMessage(), "", "inp_descr");
+            return elems;
+        }
+		
+	}
 	
 }

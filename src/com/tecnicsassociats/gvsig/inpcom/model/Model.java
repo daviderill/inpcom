@@ -19,11 +19,8 @@
  *   David Erill <daviderill79@gmail.com>
  */
 
-package com.tecnicsassociats.gvsig.inpcom;
+package com.tecnicsassociats.gvsig.inpcom.model;
 
-import com.iver.andami.PluginServices;
-import com.tecnicsassociats.gvsig.inpcom.util.LogFormatter;
-import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,10 +33,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
+import com.iver.andami.PluginServices;
+import com.tecnicsassociats.gvsig.inpcom.Constants;
+import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
 public class Model {
@@ -54,14 +52,14 @@ public class Model {
     protected File fileTemplate;
     protected ArrayList<Map<String, String>> lMapDades;
 	protected Map<String, Integer> mHeader;
-    protected int polygons_target_id;
     protected int default_size;
     protected RandomAccessFile rat;
     protected RandomAccessFile raf;
     public String sExport;   // "EPANET_" o "SWMM_"
     public File fileHelp;
     protected String execType = Constants.EXEC_GVSIG;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG
-    protected String schema;
+    public String schema;
+	public String schemaDrivers = "drivers";	
 
 
     public static Properties getPropertiesFile() {
@@ -69,7 +67,7 @@ public class Model {
     }
 
 
-    protected static void savePropertiesFile() {
+    public static void savePropertiesFile() {
 
         File iniFile = new File(configFile);
         try {
@@ -116,10 +114,14 @@ public class Model {
     // Sets initial configuration files
     protected boolean configIni() {
 
-        // Get schema name
+        // Get schema data
         String schemaProp = sExport + "SCHEMA_" + "ACTUAL";       
     	this.schema = iniProperties.getProperty(schemaProp);     	
 
+        // Get schema drivers
+        schemaProp = sExport + "SCHEMA_" + "DRIVERS";       
+    	this.schemaDrivers = iniProperties.getProperty(schemaProp);     	
+    	
         // Get INP folder
         folderConfig = iniProperties.getProperty("FOLDER_CONFIG");
         folderConfig = appPath + folderConfig;
@@ -146,7 +148,8 @@ public class Model {
 
 
     // Connect to sqlite Database
-    protected boolean connectDB(String fileName) {
+    // May still be useful for DBF procedures!
+    public boolean connectDB(String fileName) {
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -169,28 +172,6 @@ public class Model {
         }
 
     }
-    
-    
-    protected static Logger getLogger(String folderRoot) {
-    	
-        if (logger == null) {
-            try {
-                String folder = folderRoot + "log/";
-                (new File(folder)).mkdirs();
-                //String logFile = folder + "log_" + getCurrentTimeStamp() + ".log";
-                String logFile = folder + "log_console.log";
-                FileHandler fh = new FileHandler(logFile, true);
-                LogFormatter lf = new LogFormatter();
-                fh.setFormatter(lf);
-                logger = Logger.getLogger(logFile);
-                logger.addHandler(fh);
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Error al crear el fitxer de log", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        return logger;
-
-    }    
     
     
 }

@@ -21,13 +21,39 @@
 
 package com.tecnicsassociats.gvsig.inpcom;
 
+import javax.swing.JDialog;
+
 import com.iver.andami.plugins.Extension;
+import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
+import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
+import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.model.ModelDbf;
+import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
+import com.tecnicsassociats.gvsig.inpcom.util.Utils;
+
 
 public class InpExtension2 extends Extension {
 
 	public void execute(String action) {
-		ModelPostgis modelPostgis = new ModelPostgis(action);
-		modelPostgis.execute(Constants.EXEC_GVSIG);
+		
+		//ModelPostgis modelPostgis = new ModelPostgis(action);
+		//modelPostgis.execute(Constants.EXEC_GVSIG, true);
+
+        // Create models
+        ModelDbf modelDbf = new ModelDbf(action, Constants.EXEC_GVSIG);
+        ModelPostgis modelPostgis = new ModelPostgis(action, Constants.EXEC_GVSIG);        
+
+        // Create form
+    	Form cmWindow = new Form();
+    	
+    	// Create controllers
+        new MainController(modelPostgis, cmWindow);
+        new DbfController(modelDbf, cmWindow);
+        
+        // Open form in a dialog box
+        JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog());
+        cmWindow.setDialog(dialog);  
+        
 	}
 
 	public void initialize() {

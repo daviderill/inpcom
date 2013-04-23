@@ -19,7 +19,7 @@
  *   David Erill <daviderill79@gmail.com>
  */
 
-package com.tecnicsassociats.gvsig.inpcom;
+package com.tecnicsassociats.gvsig.inpcom.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
@@ -46,22 +47,23 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 public class ModelDbf extends Model{
 
-	private File fDbf[];
-	private File fShp[];	
-
+	//private File fDbf[];
+	private Map<Integer, File> dbfFiles;
 	
-    public ModelDbf(String action) {
-    	this.sExport = action;
-    	this.execute();    	
+	
+    public ModelDbf(String export, String execType) {
+    	this.sExport = export;
+    	this.execType = execType;
+    	init();
     }   	
 
     public ModelDbf() {
-    	this.execute();
+    	init();
     }   	
 
     
-    private void execute(){
-    	
+    private void init(){
+
         // Get properties file
         if (!enabledPropertiesFile()) {
             return;
@@ -71,18 +73,15 @@ public class ModelDbf extends Model{
         configIni();
         
         // Get log file
-        if (execType.equals(Constants.EXEC_GVSIG)) {
-            logger = Utils.getLogger(appPath);
-        } else{
-        	logger = getLogger(appPath);
-            System.out.println("Log File: \n" + logger.getName());               	
-        }    	
+        logger = Utils.getLogger();
+        
+        dbfFiles = new HashMap<Integer, File>();
         
     }
     
     
 	// Read content of the DBF file and saved it in an Array
-	private ArrayList<Map<String, String>> readDBF(File file) {
+	public ArrayList<Map<String, String>> readDBF(File file) {
 
 		FileChannel in;
 		Row row;
@@ -109,6 +108,8 @@ public class ModelDbf extends Model{
 			return mAux;
 		} catch (IOException e) {
 			return mAux;
+		} catch (Exception e){
+			Utils.getLogger().warning(e.getMessage());
 		}
 
 		return mAux;
@@ -117,7 +118,7 @@ public class ModelDbf extends Model{
 
 
 	// Main procedure
-	public void processALL(String dirOut, String fileOut) {
+	public void processAll(String dirOut, String fileOut) {
 
 		try {
 
@@ -132,7 +133,7 @@ public class ModelDbf extends Model{
 			File fileInp = new File(sFile);
 			
 			// Get some properties
-			polygons_target_id = Integer.parseInt(iniProperties.getProperty(sExport + "POLYGONS_TARGET_ID"));
+			//polygons_target_id = Integer.parseInt(iniProperties.getProperty(sExport + "POLYGONS_TARGET_ID"));
 			default_size = Integer.parseInt(iniProperties.getProperty(sExport + "SIZE_DEFAULT"));
 
 			// Open template and output file
@@ -145,7 +146,6 @@ public class ModelDbf extends Model{
 			Statement stat = connectionSqlite.createStatement();
 			ResultSet rs = stat.executeQuery(sql);					
 			while (rs.next()) {
-				System.out.println(rs.getInt("id") + "  " + rs.getInt("dbf_id"));
 				processTarget(rs.getInt("id"), rs.getInt("dbf_id"), rs.getInt("lines"));	
 			}		    
 			rs.close();
@@ -174,12 +174,21 @@ public class ModelDbf extends Model{
 		}
 
 		// If file is null or out of bounds or not exists then exit function
-		if (fileIndex < 0 || fDbf[fileIndex] == null || !fDbf[fileIndex].exists()){
+		if (fileIndex < 0){
+			return;
+		}
+		File file = dbfFiles.get(fileIndex);		
+		if (file == null || !file.exists()){
 			return;
 		}
 
 		// Get data of the specified DBF file
-		this.lMapDades = readDBF(fDbf[fileIndex]);
+		try{
+			this.lMapDades = readDBF(file);
+		}
+		catch (Exception e){
+			Utils.getLogger().warning(e.getMessage());
+		}
 		if (this.lMapDades.isEmpty()) return;		
 
 		// Get DBF fields to write into this target
@@ -223,7 +232,7 @@ public class ModelDbf extends Model{
 					}					
 				}
 			}
-			
+            raf.writeBytes("\r\n");			
 		}
 
 	}
@@ -240,27 +249,14 @@ public class ModelDbf extends Model{
 			Utils.showError("inp_error_notfound", sFile, "inp_descr");				
 			return false;
 		}
-
-		// Get from Database Shapes and DBF's to handle
-		String sql = "SELECT Max(id) as maxim FROM dbf WHERE id > -1";
+		
+		String sql = "SELECT id, name FROM dbf WHERE id > -1 ORDER BY id";
 		try {
 			Statement stat = connectionSqlite.createStatement();
 			ResultSet rs = stat.executeQuery(sql);		
-			int total = rs.getInt("maxim");
-			fDbf = new File[total + 1];
-			fShp = new File[total + 1];	 		
-			rs.close();
-		} catch (SQLException e) {
-			Utils.showError("inp_error_execution", e.getMessage(), "inp_descr");				
-			return false;	
-		}				
-		boolean ok = true;
-		sql = "SELECT id, name FROM dbf WHERE id > -1 ORDER BY id";
-		try {
-			Statement stat = connectionSqlite.createStatement();
-			ResultSet rs = stat.executeQuery(sql);		
-			while (rs.next() && ok) {
-				ok = checkFile(sDirShp, rs.getString("name").trim(), rs.getInt("id"));
+			while (rs.next()) {
+				String sDBF = sDirShp + File.separator + rs.getString("name").trim() + ".dbf";
+				dbfFiles.put(rs.getInt("id"), new File(sDBF));
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -268,21 +264,8 @@ public class ModelDbf extends Model{
 			return false;	
 		}				
 
-		return ok;
-
-	}
-
-
-	// Check if DBF and Shapefile exist
-	public boolean checkFile(String sDir, String sFile, int index) {
-
-		String sDBF = sDir + File.separator + sFile + ".dbf";
-		fDbf[index] = new File(sDBF);
-		String sSHP = sDir + File.separator + sFile + ".shp";
-		fShp[index] = new File(sSHP);	
 		return true;
 
 	}
-
 
 }

@@ -19,7 +19,7 @@
  *   David Erill <daviderill79@gmail.com>
  */
 
-package com.tecnicsassociats.gvsig.inpcom;
+package com.tecnicsassociats.gvsig.inpcom.util;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;

@@ -19,7 +19,7 @@
  *   David Erill <daviderill79@gmail.com>
  */
 
-package com.tecnicsassociats.gvsig.inpcom;
+package com.tecnicsassociats.gvsig.inpcom.gui;
 
 import java.awt.BorderLayout;
 
@@ -41,7 +41,7 @@ public class MainWindow extends JPanel implements SingletonWindow {
 	
 	public MainWindow() {		
 		setLayout(new BorderLayout());	    						
-		this.form = new FormPanel(Constants.MAIN_FORM);			
+		this.form = new FormPanel("FormBoth.jfrm");			
 		add(this.form, BorderLayout.CENTER);
 		this.revalidate();
 		f = new JFrame();
@@ -75,13 +75,13 @@ public class MainWindow extends JPanel implements SingletonWindow {
 		return new JFrame();
 	}
 
+	public void setFrame(JFrame frame) {
+		this.f = frame;
+	}
+
 	public void close() {
         f.setVisible(false); 
         f.dispose(); 
-	}
-
-	public void setFrame(JFrame frame) {
-		this.f = frame;
 	}
 	
 }

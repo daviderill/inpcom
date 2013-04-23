@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -45,15 +46,17 @@ import javax.swing.JPanel;
 
 public class Utils {
 
-	private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("text"); //$NON-NLS-1$		
+	private static final ResourceBundle BUNDLE_FORM = ResourceBundle.getBundle("form"); //$NON-NLS-1$
+	private static final ResourceBundle BUNDLE_TEXT = ResourceBundle.getBundle("text"); //$NON-NLS-1$
     private static Logger logger;
     private static final String LOG_FOLDER = "log/";
 
     
-    public static Logger getLogger(String folderRoot) {
+    public static Logger getLogger() {
 
     	if (logger == null) {
             try {
+            	String folderRoot = new File(".").getCanonicalPath() + File.separator;            	
                 String folder = folderRoot + LOG_FOLDER;
                 (new File(folder)).mkdirs();
                 String logFile = folder + "log_" + getCurrentTimeStamp() + ".log";
@@ -71,23 +74,38 @@ public class Utils {
     }
     
     
-    public static ResourceBundle getBundle(){
-    	return BUNDLE;
+    public static ResourceBundle getBundleForm(){
+    	return BUNDLE_FORM;
     }
-    
+
+	public static ResourceBundle getBundleText() {
+    	return BUNDLE_TEXT;
+	}    
     
 	public static JFrame openForm(JPanel view, JFrame f){
-		//JFrame f = new JFrame();
 	    f.setLayout(new BorderLayout());
 	    f.add(view, BorderLayout.CENTER);
 	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
 	    f.pack();
+	    f.setBounds(100, 200, 700, 600);
 	    f.setLocationRelativeTo(null);   
 	    f.setVisible(true);		
+	    f.setResizable(false);
 	    return f;
 	}       
 
-
+	public static JDialog openDialogForm(JPanel view, JDialog f){
+	    f.setLayout(new BorderLayout());
+	    f.add(view, BorderLayout.CENTER);
+	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
+	    f.pack();
+	    f.setBounds(100, 200, 700, 600);
+	    f.setLocationRelativeTo(null);   
+	    f.setVisible(true);		
+	    f.setModal(true);
+	    return f;
+	}     
+	
     public static String getCurrentTimeStamp() {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");
         Date now = new Date();
@@ -134,10 +152,10 @@ public class Utils {
 
     public static void showMessage(String msg, String param, String title) {
     	try{
-    		JOptionPane.showMessageDialog(null, BUNDLE.getString(msg) + "\n" + param,
-        		BUNDLE.getString(title), JOptionPane.PLAIN_MESSAGE);
+    		JOptionPane.showMessageDialog(null, BUNDLE_TEXT.getString(msg) + "\n" + param,
+        		BUNDLE_TEXT.getString(title), JOptionPane.PLAIN_MESSAGE);
     		if (logger != null) {
-    			logger.info(BUNDLE.getString(msg) + "\n" + param);
+    			logger.info(BUNDLE_TEXT.getString(msg) + "\n" + param);
     		}
     	} catch (MissingResourceException e){
     		JOptionPane.showMessageDialog(null, msg + "\n" + param,	title, JOptionPane.PLAIN_MESSAGE);
@@ -150,10 +168,10 @@ public class Utils {
     
     public static void showError(String msg, String param, String title) {
     	try{
-    		JOptionPane.showMessageDialog(null, BUNDLE.getString(msg) + "\n" + param,
-    			BUNDLE.getString(title), JOptionPane.WARNING_MESSAGE);
+    		JOptionPane.showMessageDialog(null, BUNDLE_TEXT.getString(msg) + "\n" + param,
+    			BUNDLE_TEXT.getString(title), JOptionPane.WARNING_MESSAGE);
     		if (logger != null) {
-    			logger.warning(BUNDLE.getString(msg) + "\n" + param);
+    			logger.warning(BUNDLE_TEXT.getString(msg) + "\n" + param);
     		}
     	} catch (MissingResourceException e){
     		JOptionPane.showMessageDialog(null, msg + "\n" + param,	title, JOptionPane.WARNING_MESSAGE);
@@ -167,10 +185,10 @@ public class Utils {
     public static int confirmDialog(String msg, String title) {
     	int reply;
     	try{
-	    	reply = JOptionPane.showConfirmDialog(null, BUNDLE.getString(msg),
-	    		BUNDLE.getString(title), JOptionPane.YES_NO_OPTION);
+	    	reply = JOptionPane.showConfirmDialog(null, BUNDLE_TEXT.getString(msg),
+	    		BUNDLE_TEXT.getString(title), JOptionPane.YES_NO_OPTION);
 	        if (logger != null) {
-	            logger.warning(BUNDLE.getString(msg));
+	            logger.warning(BUNDLE_TEXT.getString(msg));
 	        }
     	} catch (MissingResourceException e){
 	    	reply = JOptionPane.showConfirmDialog(null, msg, title, JOptionPane.YES_NO_OPTION);
@@ -221,5 +239,6 @@ public class Utils {
 
         return aux2;
     }
+
     
 }

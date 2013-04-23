@@ -31,21 +31,19 @@
 		<copy todir="${dist}">
 		    <fileset dir="config/" includes="text*.properties"/>			
 		</copy>
+		
 		<copy todir="${dist}/config">
 			<fileset dir="config/" includes="*.properties"/>
 		</copy>		
-		<delete file="${dist}/config/text.properties"/>
-		<delete file="${dist}/config/text_ca.properties"/>			
-		<delete file="${dist}/config/text_en.properties"/>
-		<copy todir="${dist}/shapes">
-			<fileset dir="shapes/" includes="**/**" />
-		</copy>
+
 		<copy todir="${dist}/inp">
 			<fileset dir="inp/" includes="*" />
 		</copy>		
+		
 		<copy todir="${dist}">
 			<fileset dir="lib/" includes="*.jar" />
 		</copy>
+		
 		<copy todir="${dist}/lib">
 			<fileset dir="lib/" includes="*.jar" />
 		</copy>		

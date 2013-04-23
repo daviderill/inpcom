@@ -21,16 +21,39 @@
 
 package com.tecnicsassociats.gvsig.inpcom;
 
+import javax.swing.JDialog;
+
+import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
+import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
+import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.model.ModelDbf;
+import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
+import com.tecnicsassociats.gvsig.inpcom.util.Utils;
+
+
 public class MainClass {
 
     public static void main(String[] args) {
-        
-        ModelPostgis modelPostgis = null;
-        modelPostgis = new ModelPostgis("SWMM_");        
 
-		modelPostgis.execute(Constants.EXEC_GVSIG);
+        // Create models
+        ModelDbf modelDbf = new ModelDbf("SWMM_", Constants.EXEC_CONSOLE);
+        ModelPostgis modelPostgis = new ModelPostgis("SWMM_", Constants.EXEC_CONSOLE);        
+
+        // Create form
+    	Form cmWindow = new Form();
+    	
+    	// Create controllers
+        new MainController(modelPostgis, cmWindow);
+        new DbfController(modelDbf, cmWindow);
+        
+        // Open form in a dialog box
+        JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog());
+        cmWindow.setDialog(dialog);  
+
+        //JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame());
+        //cmWindow.setFrame(frame);
+		//modelPostgis.execute(Constants.EXEC_CONSOLE, true);
         //modelPostgis.execute(Constants.EXEC_CONSOLE, args[0], args[1], args[2]);
-        //System.out.println(args[0] + " " + args[1] + " " + args[2]);
 
     }
     
