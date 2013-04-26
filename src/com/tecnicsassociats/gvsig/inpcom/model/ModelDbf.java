@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
@@ -47,9 +46,8 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 public class ModelDbf extends Model{
 
-	//private File fDbf[];
 	private Map<Integer, File> dbfFiles;
-	
+
 	
     public ModelDbf(String export, String execType) {
     	this.sExport = export;
@@ -57,6 +55,7 @@ public class ModelDbf extends Model{
     	init();
     }   	
 
+    
     public ModelDbf() {
     	init();
     }   	
@@ -81,19 +80,19 @@ public class ModelDbf extends Model{
     
     
 	// Read content of the DBF file and saved it in an Array
-	public ArrayList<Map<String, String>> readDBF(File file) {
+	public ArrayList<LinkedHashMap<String, String>> readDBF(File file) {
 
 		FileChannel in;
 		Row row;
-		ArrayList<Map<String, String>> mAux = null;
-		Map<String, String> mDades;
+		ArrayList<LinkedHashMap<String, String>> mAux = null;
+		LinkedHashMap<String, String> mDades;
 		try {
-			mAux = new ArrayList<Map<String, String>>();
+			mAux = new ArrayList<LinkedHashMap<String, String>>();
 			in = new FileInputStream(file).getChannel();
 			DbaseFileReader r = new DbaseFileReader(in);
 			int fields = r.getHeader().getNumFields();
 			while (r.hasNext()) {
-				mDades = new HashMap<String, String>();
+				mDades = new LinkedHashMap<String, String>();
 				row = r.readRow();
 				for (int i = 0; i < fields; i++) {
 					String field = r.getHeader().getFieldName(i).toLowerCase();
@@ -201,7 +200,7 @@ public class ModelDbf extends Model{
 		}
 		rs.close();
 
-		ListIterator<Map<String, String>> it = this.lMapDades.listIterator();
+		ListIterator<LinkedHashMap<String, String>> it = this.lMapDades.listIterator();
 		Map<String, String> m;   // Current DBF row data
 		int index = 0;
 		String sValor = null;

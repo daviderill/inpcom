@@ -87,7 +87,7 @@ public class Utils {
 	    f.add(view, BorderLayout.CENTER);
 	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
 	    f.pack();
-	    f.setBounds(100, 200, 700, 600);
+	    f.setSize(700, 600);
 	    f.setLocationRelativeTo(null);   
 	    f.setVisible(true);		
 	    f.setResizable(false);
@@ -99,12 +99,25 @@ public class Utils {
 	    f.add(view, BorderLayout.CENTER);
 	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
 	    f.pack();
-	    f.setBounds(100, 200, 700, 600);
+	    f.setSize(510, 400);
 	    f.setLocationRelativeTo(null);   
 	    f.setVisible(true);		
 	    f.setModal(true);
 	    return f;
 	}     
+	
+	public static JDialog openDialogForm(JPanel view){
+		JDialog f = new JDialog();
+	    f.setLayout(new BorderLayout());
+	    f.add(view, BorderLayout.CENTER);
+	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
+	    f.pack();
+	    f.setSize(700, 600);
+	    f.setLocationRelativeTo(null);   
+	    f.setVisible(true);		
+	    f.setModal(true);
+	    return f;
+	} 
 	
     public static String getCurrentTimeStamp() {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");

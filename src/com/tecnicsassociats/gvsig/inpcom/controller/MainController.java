@@ -20,16 +20,21 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Method;
+import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.gui.Options;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
@@ -107,9 +112,24 @@ public class MainController{
 			method = this.getClass().getMethod(actionCommand);
 			method.invoke(this);	
 		} catch (Exception e) {
-			Utils.getLogger().warning(e.getMessage());
+			Utils.getLogger().warning("Method not found: " + actionCommand);
 		}
 	}	
+	
+	
+	public void schemaChanged(){
+        modelPostgis.setSchema(view.getCboSchema());
+	}
+	
+	
+	public void showOptions(){
+		ResultSet rs = modelPostgis.getOptions();
+		Options options = new Options(rs);
+        // Open form in a dialog box
+        JDialog dialog = Utils.openDialogForm(options);
+        //options.setDialog(dialog);  
+        		
+	}
 	
 
     public void chooseFileInp() {
@@ -173,7 +193,7 @@ public class MainController{
         //view.resetStatus();
         
         // Get schema from view
-        this.modelPostgis.schema = view.getCboSchema();
+        modelPostgis.setSchema(view.getCboSchema());
         
         // Which checks are selected?
         exportChecked = view.isExportChecked();
@@ -242,5 +262,8 @@ public class MainController{
     public void closeView(){
 		view.close();
 	}
+
+
+
 	
 }

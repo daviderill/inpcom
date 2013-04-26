@@ -34,7 +34,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,20 +44,15 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.tecnicsassociats.gvsig.inpcom.RptTarget;
-import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
-import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
-import com.tecnicsassociats.gvsig.inpcom.gui.Form;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
 public class ModelPostgis extends Model {
 
-    protected static Connection connectionPostgis;   	
+	public static Connection connectionPostgis;   	
     private String insertSql;
 	private ArrayList<String> tokens;
 	private ArrayList<ArrayList<String>> tokensList;	
@@ -67,6 +61,7 @@ public class ModelPostgis extends Model {
 	private int lineNumber;   // Number of lines read
 	private ArrayList<String> pollutants;
 	private boolean isForm = false;
+	
 	
     public ModelPostgis(String export, String execType) {
     	this.sExport = export;
@@ -146,10 +141,10 @@ public class ModelPostgis extends Model {
 
 
     // Read content of the table saved it in an Array
-    private ArrayList<Map<String, String>> getTableData(String tableName) {
+    private ArrayList<LinkedHashMap<String, String>> getTableData(String tableName) {
 
-        Map<String, String> mDades;
-        ArrayList<Map<String, String>> mAux = new ArrayList<Map<String, String>>();
+    	LinkedHashMap<String, String> mDades;
+        ArrayList<LinkedHashMap<String, String>> mAux = new ArrayList<LinkedHashMap<String, String>>();
         String sql = "SELECT * FROM sewnet." + tableName;
         PreparedStatement ps;
         try {
@@ -164,7 +159,7 @@ public class ModelPostgis extends Model {
             }
             String value;
             while (rs.next()) {
-                mDades = new HashMap<String, String>();
+                mDades = new LinkedHashMap<String, String>();
                 for (int i = 0; i < fields; i++) {
                     Object o = rs.getObject(i + 1);
                     if (o != null) {
@@ -207,17 +202,21 @@ public class ModelPostgis extends Model {
             raf.setLength(0);
 
             // Get content of target table
-            //sql = "SELECT target.id as target_id, target.name as target_name, lines, main.name as table_name "
-            	//	+ "FROM drivers.swmm_inp_target as target INNER JOIN drivers.swmm_inp_table as main ON target.table_id = main.id";
-            sql = "SELECT target.id as target_id, target.name as target_name, lines, main.name as table_name "
+            sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
             		+ "FROM " + schemaDrivers + ".swmm_inp_target as target " 
             		+ "INNER JOIN " + schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";            
             Statement stat = connectionPostgis.createStatement();            
-            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
                 //System.out.println(rs.getInt("target_id") + "  " + rs.getString("table_name"));
-                processTarget(rs.getInt("target_id"), rs.getString("table_name"), rs.getInt("lines"));
+            	Integer optionsTable = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_TABLE"));
+            	Integer reportTable = Integer.parseInt(iniProperties.getProperty("INP_REPORT_TABLE"));
+            	if (rs.getInt("main_id") == optionsTable || rs.getInt("main_id") == reportTable){
+            		processTarget2(rs.getInt("target_id"), rs.getString("table_name"), rs.getInt("lines"));
+            	}
+            	else{
+            		processTarget(rs.getInt("target_id"), rs.getString("table_name"), rs.getInt("lines"));
+            	}
             }
             rs.close();
             rat.close();
@@ -269,8 +268,8 @@ public class ModelPostgis extends Model {
         }
         rs.close();
 
-        ListIterator<Map<String, String>> it = this.lMapDades.listIterator();
-        Map<String, String> m; // Current Postgis row data
+        ListIterator<LinkedHashMap<String, String>> it = this.lMapDades.listIterator();
+        LinkedHashMap<String, String> m; // Current Postgis row data
         //int index = 0;
         String sValor = null;
         int size = 0;
@@ -304,7 +303,55 @@ public class ModelPostgis extends Model {
 
     }
 
+    
+    // Process target options or target report
+    private void processTarget2(int id, String tableName, int lines) throws IOException, SQLException {
 
+        // Go to the first line of the target
+        for (int i = 1; i <= lines; i++) {
+            String line = rat.readLine();
+            raf.writeBytes(line + "\r\n");
+        }
+
+        // If table is null or doesn't exit then exit function
+        if (!checkTable(tableName) && !checkView(tableName)) {
+            return;
+        }
+
+        // Get data of the specified Postgis table
+        ArrayList<LinkedHashMap<String, String>> options = getTableData(tableName);
+        if (options.isEmpty()) {
+            return;
+        }
+
+        ListIterator<LinkedHashMap<String, String>> it = options.listIterator();
+        LinkedHashMap<String, String> m; // Current Postgis row data
+        //int index = 0;
+        String sValor = null;
+        int size = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_SIZE"));
+        // Iterate over Postgis table (only one element)
+        while (it.hasNext()) {
+            m = it.next();
+            Set<String> set = m.keySet();
+            Iterator<String> itKey = set.iterator();
+            // Iterate over fields and write 
+            while (itKey.hasNext()) {
+                // Write to the output file (one per row)
+            	String sKey = (String) itKey.next();
+                sValor = (String) m.get(sKey);
+                raf.writeBytes(sKey.toUpperCase());
+                // Complete spaces with empty values
+                for (int j = sKey.length(); j <= size; j++) {
+                    raf.writeBytes(" ");
+                }
+                raf.writeBytes(sValor);
+                raf.writeBytes("\r\n");                
+            }
+        }
+
+    }    
+
+    
     // Check if the table exists
     private boolean checkTable(String tableName) {
         String sql = "SELECT * FROM pg_tables WHERE lower(tablename) = '" + tableName + "'";
@@ -812,7 +859,6 @@ public class ModelPostgis extends Model {
 	public List<String> getSchemas(){
 
         String sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name <> 'information_schema' ORDER BY schema_name";
-          //and schema_name !~ E'^pg_'        
     	List<String> elems = new ArrayList<String>();
         try {
     		connectionPostgis.setAutoCommit(false);        	
@@ -828,6 +874,23 @@ public class ModelPostgis extends Model {
             return elems;
         }
 		
+	}
+
+	
+	public ResultSet getOptions() {
+		
+        //String sql = "SELECT * FROM " + schema + ".inp_options";
+		String sql = "SELECT * FROM " + schema + ".aa";
+        ResultSet rs = null;        
+        try {
+            connectionPostgis.setAutoCommit(true);
+        	Statement stat = connectionPostgis.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            rs = stat.executeQuery(sql);
+        } catch (SQLException e) {
+            Utils.showError(e.getMessage(), "", "inp_descr");
+        }
+        return rs;   
+        
 	}
 	
 }

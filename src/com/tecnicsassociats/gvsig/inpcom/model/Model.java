@@ -31,6 +31,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -50,7 +51,7 @@ public class Model {
     private File fSqlite;
     protected String folderConfig;
     protected File fileTemplate;
-    protected ArrayList<Map<String, String>> lMapDades;
+    protected ArrayList<LinkedHashMap<String, String>> lMapDades;
 	protected Map<String, Integer> mHeader;
     protected int default_size;
     protected RandomAccessFile rat;
@@ -80,6 +81,11 @@ public class Model {
 
     }
 
+    
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+	
     
     // Get Properties Files
     protected boolean enabledPropertiesFile() {

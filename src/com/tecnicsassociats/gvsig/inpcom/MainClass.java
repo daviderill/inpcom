@@ -21,6 +21,8 @@
 
 package com.tecnicsassociats.gvsig.inpcom;
 
+import java.util.Locale;
+
 import javax.swing.JDialog;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
@@ -34,6 +36,9 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 public class MainClass {
 
     public static void main(String[] args) {
+    	
+    	// English language
+    	Locale.setDefault(Locale.ENGLISH);
 
         // Create models
         ModelDbf modelDbf = new ModelDbf("SWMM_", Constants.EXEC_CONSOLE);
