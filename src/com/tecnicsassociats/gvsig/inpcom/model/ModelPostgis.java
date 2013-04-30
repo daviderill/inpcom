@@ -88,9 +88,9 @@ public class ModelPostgis extends Model {
         logger = Utils.getLogger();
             
         // Get Postgis connection
-        if (!enabledPostgis()) {
-            return;
-        }
+//        if (!enabledPostgis()) {
+//            return;
+//        }
         
     }
 
@@ -139,6 +139,26 @@ public class ModelPostgis extends Model {
         
     }
 
+    
+    public boolean setConnectionPostgis(String host, String port, String db, String user, String password) {
+    	
+        //String connectionString = iniProperties.getProperty("POSTGIS_CONNECTION_STRING");
+    	//jdbc\:postgresql\://176.31.185.134\:5432/demo_mtvo?user\=tecnics&password\=XavierTorret
+        String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + db + "?user=" + user + "&password=" + password;
+        try {
+            connectionPostgis = DriverManager.getConnection(connectionString);
+        } catch (SQLException e) {
+            try {
+                connectionPostgis = DriverManager.getConnection(connectionString);
+            } catch (SQLException e1) {
+                Utils.showError(e1.getMessage(), "", "inp_descr");
+                return false;
+            }   		
+        }
+        return true;
+        
+    }
+    
 
     // Read content of the table saved it in an Array
     private ArrayList<LinkedHashMap<String, String>> getTableData(String tableName) {
@@ -467,7 +487,8 @@ public class ModelPostgis extends Model {
         
         // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + schemaDrivers + "." + sExport.toLowerCase() + "rpt_target ORDER BY id";
+        String sql = "SELECT * FROM " + schemaDrivers + "." + sExport.toLowerCase() + "rpt_target " +
+        		"WHERE type <> 0 ORDER BY id";
         try {
     		connectionPostgis.setAutoCommit(false);        	
             Statement stat = connectionPostgis.createStatement();
@@ -493,9 +514,11 @@ public class ModelPostgis extends Model {
 	    			sql = "DELETE FROM " + schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
 	    			executeSql(sql, false);
 	    		}
-				if (!executeSql(insertSql, false)){
-					return false;
-				}
+	    		if (!insertSql.equals("")){
+		    		if (!executeSql(insertSql, false)){
+						return false;
+					}
+	    		}
         	} else{
         		logger.info("Target not found: " + rpt.getId() + " - " + rpt.getDescription());
         	}
@@ -503,7 +526,7 @@ public class ModelPostgis extends Model {
         
         // Ending process
         if (exists){
-    		sql = "UPDATE " + schema + ".rpt_result_id SET exec_date = Now()";
+    		sql = "UPDATE " + schema + ".rpt_result_id SET exec_date = Now() WHERE result_id = '" + projectName + "'";
         } else{
     		sql = "INSERT INTO " + schema + ".rpt_result_id VALUES ('" + projectName + "')";
         }
@@ -540,6 +563,7 @@ public class ModelPostgis extends Model {
 		String aux;
 		
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
+		System.out.println("lineNumber: " + lineNumber);
 		
 		while (!found){
 			lineNumber++;
@@ -547,6 +571,7 @@ public class ModelPostgis extends Model {
 				// If pointer has reached EOF, return to first position
 				if (rat.getFilePointer() >= rat.length()){
 					rat.seek(0);
+					lineNumber = 0;
 					return false;
 				}
 				line = rat.readLine().trim();
@@ -578,8 +603,14 @@ public class ModelPostgis extends Model {
 		// Read following lines until blank line is found
 		tokensList = new ArrayList<ArrayList<String>>();		
 		parseLines(rpt);
-		if (rpt.getType() == 2 || rpt.getType() == 3){
-			processTokens(rpt);				
+//		if (rpt.getType() == 2 || rpt.getType() == 3){
+//			processTokens(rpt);
+//		}
+		if (rpt.getType() == 2){
+			processTokens(rpt);
+		}
+		else if (rpt.getType() == 3){
+			processTokens3(rpt);
 		}
 		
 		return true;
@@ -604,8 +635,10 @@ public class ModelPostgis extends Model {
 		try {		
 			if (rpt.getType() == 3){			
 				for (int i = 1; i < lineNumber - 1; i++) {
-					System.out.println(rat.readLine().trim());
+					//System.out.println(rat.readLine().trim());
+					rat.readLine().trim();
 				}
+				System.out.println("");
 				line = rat.readLine().trim();		
 				lineNumber--;
 			} else{
@@ -624,6 +657,7 @@ public class ModelPostgis extends Model {
 						scanner.next();						
 					}
 				}
+				// Get pollutant name
 				parseLine1(scanner, rpt, false);		
 				pollutants = new ArrayList<String>();	
 				for (int i = 0; i < tokens.size(); i++) {
@@ -778,6 +812,52 @@ public class ModelPostgis extends Model {
 		insertSql += sql;
 		
 	}
+	
+	
+	private void processTokens3(RptTarget rpt) {
+
+		String sql = "SELECT * FROM " + schema + "." + rpt.getTable();
+		try {
+	        PreparedStatement ps = connectionPostgis.prepareStatement(sql);
+	        ResultSet rs = ps.executeQuery();
+	        ResultSetMetaData rsmd = rs.getMetaData();	
+	        rs.close();
+
+			// Iterate over pollutants
+			for (int i = 0; i < pollutants.size(); i++) {
+				String fields = "result_id, poll_id, ";
+				String values = "'" + projectName + "', '" + pollutants.get(i) + "', ";
+				// Iterate over fields
+				for (int j = 0; j < tokensList.size(); j++) {
+					String value = tokensList.get(j).get(i);
+		        	switch (rsmd.getColumnType(j + 3)) {
+					case Types.NUMERIC:
+					case Types.DOUBLE:
+					case Types.INTEGER:
+						values += value + ", ";
+						break;					
+					case Types.VARCHAR:
+						values += "'" + value + "', ";
+						break;					
+					default:
+						values += "'" + value + "', ";
+						break;
+					}
+					fields += rsmd.getColumnName(j + 3) + ", ";        	
+				}
+				fields = fields.substring(0, fields.length() - 2);
+				values = values.substring(0, values.length() - 2);
+				sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+				insertSql += sql;				
+	        }
+			
+		} catch (SQLException e) {
+			Utils.showError(e.getMessage(), sql, "inp_descr");
+		} catch (Exception e) {
+			Utils.showError(e.getMessage(), "", "inp_descr");
+		}
+		
+	}		
 		
 	
 	private void processTokens5(RptTarget rpt) {
@@ -858,7 +938,9 @@ public class ModelPostgis extends Model {
 	
 	public List<String> getSchemas(){
 
-        String sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name <> 'information_schema' ORDER BY schema_name";
+        String sql = "SELECT schema_name FROM information_schema.schemata " +
+        		"WHERE schema_name <> 'information_schema' AND schema_name !~ E'^pg_'" +
+        		"ORDER BY schema_name";
     	List<String> elems = new ArrayList<String>();
         try {
     		connectionPostgis.setAutoCommit(false);        	
@@ -892,5 +974,6 @@ public class ModelPostgis extends Model {
         return rs;   
         
 	}
-	
+
+
 }

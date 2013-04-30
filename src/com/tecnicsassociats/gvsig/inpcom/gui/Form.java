@@ -1,5 +1,6 @@
 package com.tecnicsassociats.gvsig.inpcom.gui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -16,31 +17,34 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
 
 import net.miginfocom.swing.MigLayout;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
+import com.tecnicsassociats.gvsig.inpcom.controller.OptionsController;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
-//import org.eclipse.wb.swing.FocusTraversalOnArray;
-import java.awt.Component;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
 
 
 public class Form extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = -2576460232916596200L;
 	private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("form"); //$NON-NLS-1$
+	
 	private JFrame f;
 	private JDialog dialog;
 	private MainController controller;
 	private DbfController dbfController;
+	private OptionsController optionsController;
+
+	private String status;	
+	
 	private JTextField txtProject;
 	private JTextField txtSchema;
 	private JTextArea txtFileRpt;
@@ -63,7 +67,6 @@ public class Form extends JPanel implements ActionListener{
 	private JButton btnFileInp3;
 	private JButton btnAccept3;
 	
-	private String status;
 	private JLabel lblStatus2;
 	private JButton btnCatchSelection;
 	private JButton btnOptions;
@@ -82,14 +85,16 @@ public class Form extends JPanel implements ActionListener{
 	private JPasswordField txtPassword;
 	private JPanel panel_5;
 	private JLabel lblNewLabel_1;
-	private JTextField txtSchema1;
 	private JLabel lblResultId;
 	private JComboBox cboResultId;
 	private JScrollPane scrollPane;
 	private JTextArea txtInput;
 	private JButton btnTest;
-	private JCheckBox chkPassword;
+	private JCheckBox chkRemember;
 	private JButton btnRaingage;
+	private JComboBox cboSchema1;
+	private JPanel panel_4;
+	private JTabbedPane tabbedPane;
 
 
 	public Form() {
@@ -101,6 +106,7 @@ public class Form extends JPanel implements ActionListener{
 		}
 	}
 
+
 	public void setControl(MainController nodeController) {
 		this.controller = nodeController;
 	}	
@@ -108,6 +114,10 @@ public class Form extends JPanel implements ActionListener{
 	public void setControl(DbfController dbfController) {
 		this.dbfController = dbfController;
 	}
+	
+	public void setControl(OptionsController optionsController) {
+		this.optionsController = optionsController;
+	}	
 	
 	public JFrame getFrame() {
 		return new JFrame();
@@ -125,6 +135,16 @@ public class Form extends JPanel implements ActionListener{
 		this.dialog = dialog;
 	}
 
+//	public void enablePanels(boolean enable) {
+//		//panel_4.setEnabled(enable);
+//		if (enable){
+//			tabbedPane.setSelectedIndex(3);
+//		}
+//		else{
+//			tabbedPane.setSelectedIndex(0);			
+//		}
+//	}
+	
 	// Add info 
 //	public void logStatus(String log) {
 //		this.status += log;
@@ -139,6 +159,53 @@ public class Form extends JPanel implements ActionListener{
 //		this.repaint();
 //		this.validate();
 //	}
+
+	// Panel Databse Options
+	public String getHost() {
+		return txtIP.getText().trim();
+	}
+	
+	public void setHost(String text) {
+		txtIP.setText(text);
+	}
+	
+	public String getPort() {
+		return txtPort.getText().trim();
+	}
+	
+	public void setPort(String text) {
+		txtPort.setText(text);
+	}
+	
+	public String getDatabase() {
+		return txtDatabase.getText().trim();
+	}
+	
+	public void setDatabase(String text) {
+		txtDatabase.setText(text);
+	}
+	
+	public String getUser() {
+		return txtUser.getText().trim();
+	}
+	
+	public void setUser(String text) {
+		txtUser.setText(text);
+	}
+	
+	public String getPassword() {
+		return txtPassword.getText();
+		//return txtPassword.getPassword();
+	}	
+	
+	public void setPassword(String path) {
+		txtPassword.setText(path);
+	}
+
+	public boolean getRemember() {
+		return chkRemember.isSelected();
+	}
+	
 	
 	// Panel DBF
 	public void setFolderShp(String path) {
@@ -152,6 +219,7 @@ public class Form extends JPanel implements ActionListener{
 	public String getTxtFileOut() {
 		return txtFileOut.getText().trim();
 	}	
+	
 	
 	// Panel Postgis
 	public void setFileRpt(String path) {
@@ -169,8 +237,14 @@ public class Form extends JPanel implements ActionListener{
 	public String getProjectName() {
 		return txtProject.getText().trim();
 	}
+	
+	public void setDefaultSchema() {
+		if (cboSchema.getItemCount() > 0){
+			cboSchema.setSelectedIndex(cboSchema.getItemCount() - 1);
+		}
+	}
 
-	public void setCboSchema(List<String> elems) {
+	public void setSchemas(List<String> elems) {
 		DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel<String>) cboSchema.getModel();
 		theModel.removeAllElements();
 		for (int i = 0; i < elems.size() ; i++) {
@@ -178,9 +252,12 @@ public class Form extends JPanel implements ActionListener{
 		}
 	}
 	
-	public String getCboSchema() {
-		String elem = cboSchema.getSelectedItem().toString();
-		return elem;
+	public String getSchema() {
+		String elem = "";
+		if (cboSchema.getSelectedIndex() != -1){
+			elem = cboSchema.getSelectedItem().toString();
+		}
+		return elem;		
 	}
 
 	public boolean isExportChecked() {
@@ -200,6 +277,7 @@ public class Form extends JPanel implements ActionListener{
 		f.dispose();
 	}
 
+	
 	private void initConfig() throws MissingResourceException{
 
 		setLayout(new MigLayout("", "[8.00][500][64.00]", "[5][35][12.00][390.00][12][88.00][40]"));
@@ -209,7 +287,7 @@ public class Form extends JPanel implements ActionListener{
 		lbl_title.setFont(new Font("Tahoma", Font.BOLD, 14));
 		add(lbl_title, "cell 1 1,alignx center");
 
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setFont(new Font("Tahoma", Font.BOLD, 11));
 		add(tabbedPane, "cell 1 3,grow");
 
@@ -271,10 +349,12 @@ public class Form extends JPanel implements ActionListener{
 		txtPassword.setText("");
 		panel.add(txtPassword, "cell 3 6,growx");
 		
-		chkPassword = new JCheckBox(BUNDLE.getString("Form.chckbxNewCheckBox.text")); //$NON-NLS-1$
-		panel.add(chkPassword, "cell 3 7,aligny baseline");
+		chkRemember = new JCheckBox(BUNDLE.getString("Form.chckbxNewCheckBox.text")); //$NON-NLS-1$
+		chkRemember.setSelected(true);
+		panel.add(chkRemember, "cell 3 7,aligny baseline");
 		
 		btnTest = new JButton(BUNDLE.getString("Form.btnTest.text")); //$NON-NLS-1$
+		btnTest.setActionCommand(BUNDLE.getString("Form.btnTest.actionCommand")); //$NON-NLS-1$
 		panel.add(btnTest, "cell 5 7,alignx right");
 		//panel.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{lblNewLabel, comboBox, lblIp, txtIP, lblPort, txtPort, lblDatabase}));
 		
@@ -286,10 +366,10 @@ public class Form extends JPanel implements ActionListener{
 		lblNewLabel_1 = new JLabel(BUNDLE.getString("Form.lblNewLabel_1.text")); //$NON-NLS-1$
 		panel_5.add(lblNewLabel_1, "cell 1 1");
 		
-		txtSchema1 = new JTextField();
-		txtSchema1.setText("");
-		txtSchema1.setColumns(10);
-		panel_5.add(txtSchema1, "cell 3 1,growx");
+		cboSchema1 = new JComboBox();
+		cboSchema1.setPreferredSize(new Dimension(24, 20));
+		cboSchema1.setMinimumSize(new Dimension(29, 20));
+		panel_5.add(cboSchema1, "cell 3 1,growx");
 		
 		lblResultId = new JLabel(BUNDLE.getString("Form.lblResultId.text")); //$NON-NLS-1$
 		panel_5.add(lblResultId, "cell 1 2");
@@ -395,7 +475,7 @@ public class Form extends JPanel implements ActionListener{
 		panel_3.add(btnAccept3, "cell 3 5,alignx right");
 
 		// Panel 4
-		JPanel panel_4 = new JPanel();
+		panel_4 = new JPanel();
 		tabbedPane.addTab(BUNDLE.getString("Form.panel_3.title"), null, panel_4, null); //$NON-NLS-1$
 		panel_4.setLayout(new MigLayout("", "[10.00][22][][5][100px:300.00px][10][100]", "[10][][10][24][44.00][5][24][44px][5][24][][15][]"));
 
@@ -495,7 +575,9 @@ public class Form extends JPanel implements ActionListener{
         // Select Postgis panel by default
 		tabbedPane.setSelectedIndex(3);
 		//setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{lbl_title, panel_1, tabbedPane, panel, lblNewLabel, comboBox, lblIp, txtIP, lblPort, txtPort, lblDatabase, txtDatabase, lblUser, txtUser, lblPassword, txtPassword, chkPassword, btnTest, panel_5, lblNewLabel_1, txtSchema1, lblResultId, cboResultId, panel_2, lblInput, scrollPane, txtInput, btnFolderShp, lblFolderOut, txtExportTo, btnFolderOut, lblFileName, txtFileOut, btnHelp, btnAccept2, btnCancel2, panel_3, lblSchemaName, txtSchema, label_3, txtFileInp3, btnFileInp3, btnAccept3, panel_4, lblSelectSchema, cboSchema, chkExport, btnOptions, label, txtFileInp, btnFileInp, chkExec, label_1, txtFileRpt, btnFileRpt, chkImport, label_2, txtProject, btnAccept, btnCancel, btnCatchSelection, lblStatus2}));
-
+		panel_4.setEnabled(false);
+		panel_4.setVisible(false);
+		
 		setupListeners();
 		
 	}
@@ -503,37 +585,40 @@ public class Form extends JPanel implements ActionListener{
 	
 	// Setup component's listener
 	private void setupListeners(){
+		
+		// Panel Database options
+		btnTest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				optionsController.action(e.getActionCommand());
+			}
+		});				
 
 		// Panel Dbf		
 		btnFolderShp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dbfController.action(e.getActionCommand());				
+				dbfController.action(e.getActionCommand());
 			}
-		});
-
+		});		
 		btnFolderOut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dbfController.action(e.getActionCommand());					
+				dbfController.action(e.getActionCommand());
 			}
-		});
-		
+		});		
 		btnHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dbfController.action(e.getActionCommand());					
+				dbfController.action(e.getActionCommand());
 			}
-		});		
-		
+		});				
 		btnAccept2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dbfController.action(e.getActionCommand());	
-			}
-		});
-		
-		btnCancel2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.action(e.getActionCommand());	
+				dbfController.action(e.getActionCommand());
 			}
 		});		
+		btnCancel2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dbfController.action(e.getActionCommand());
+			}
+		});				
 		
 		// Panel INP to Database
 		btnFileInp3.addActionListener(new ActionListener() {

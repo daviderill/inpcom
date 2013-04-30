@@ -24,9 +24,12 @@ package com.tecnicsassociats.gvsig.inpcom;
 import java.util.Locale;
 
 import javax.swing.JDialog;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
+import com.tecnicsassociats.gvsig.inpcom.controller.OptionsController;
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelDbf;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
@@ -47,9 +50,25 @@ public class MainClass {
         // Create form
     	Form cmWindow = new Form();
     	
+    	//String className = Utils.getLookAndFeelClassName("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+    	String className = "com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel";
+    	try {
+			UIManager.setLookAndFeel(className);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}     	
+    	
     	// Create controllers
         new MainController(modelPostgis, cmWindow);
         new DbfController(modelDbf, cmWindow);
+        OptionsController op = new OptionsController(modelPostgis, cmWindow);
+        //op.testConnection();
         
         // Open form in a dialog box
         JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog());

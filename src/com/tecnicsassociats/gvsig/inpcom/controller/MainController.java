@@ -20,8 +20,6 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
@@ -36,6 +34,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
 import com.tecnicsassociats.gvsig.inpcom.gui.Options;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
+import com.tecnicsassociats.gvsig.inpcom.util.Encryption;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
@@ -82,7 +81,7 @@ public class MainController{
     
     private void setDefaultValues(){
     	
-    	setSchemas();
+    	//setSchemas();
     	
     	fileInp = new File(prop.getProperty("FILE_INP", userHomeFolder));
 		if (fileInp.exists()) {
@@ -98,11 +97,18 @@ public class MainController{
 		projectName = prop.getProperty("PROJECT_NAME");
 		view.setProjectName(projectName);
 		
+		// Get parameters connection 
+		view.setHost(prop.getProperty("POSTGIS_HOST", "localhost"));
+		view.setPort(prop.getProperty("POSTGIS_PORT", "5432"));
+		view.setDatabase(prop.getProperty("POSTGIS_DATABASE", ""));
+		view.setUser(prop.getProperty("POSTGIS_USER", ""));
+		view.setPassword(Encryption.decrypt(prop.getProperty("POSTGIS_PASSWORD", "")));
+	
     }
    
-	private void setSchemas() {
-		view.setCboSchema(modelPostgis.getSchemas());
-	}
+//	private void setSchemas() {
+//		view.setCboSchema(modelPostgis.getSchemas());
+//	}
 
 
 	public void action(String actionCommand) {
@@ -118,8 +124,9 @@ public class MainController{
 	
 	
 	public void schemaChanged(){
-        modelPostgis.setSchema(view.getCboSchema());
+		modelPostgis.setSchema(view.getSchema());
 	}
+	
 	
 	
 	public void showOptions(){
@@ -128,7 +135,6 @@ public class MainController{
         // Open form in a dialog box
         JDialog dialog = Utils.openDialogForm(options);
         //options.setDialog(dialog);  
-        		
 	}
 	
 
@@ -193,7 +199,12 @@ public class MainController{
         //view.resetStatus();
         
         // Get schema from view
-        modelPostgis.setSchema(view.getCboSchema());
+        String schema = view.getSchema();
+        if (schema.equals("")){
+            Utils.showError("Any schema selected", "", "inp_descr");
+            return;
+        }
+        modelPostgis.setSchema(schema);
         
         // Which checks are selected?
         exportChecked = view.isExportChecked();

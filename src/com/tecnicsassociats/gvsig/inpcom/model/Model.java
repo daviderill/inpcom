@@ -86,7 +86,11 @@ public class Model {
 		this.schema = schema;
 	}
 	
-    
+	
+	public void setSchemaDrivers(String schemaDrivers) {
+		this.schemaDrivers = schemaDrivers;
+	}
+	
     // Get Properties Files
     protected boolean enabledPropertiesFile() {
 
@@ -154,7 +158,7 @@ public class Model {
 
 
     // Connect to sqlite Database
-    // May still be useful for DBF procedures!
+    // Still useful for DBF procedures!
     public boolean connectDB(String fileName) {
 
         try {
