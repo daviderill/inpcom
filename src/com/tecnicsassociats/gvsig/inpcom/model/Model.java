@@ -48,6 +48,7 @@ public class Model {
     protected static Properties iniProperties = new Properties();
     protected static String appPath;
     protected static Connection connectionSqlite;
+    
     private File fSqlite;
     protected String folderConfig;
     protected File fileTemplate;
@@ -59,8 +60,6 @@ public class Model {
     public String sExport;   // "EPANET_" o "SWMM_"
     public File fileHelp;
     protected String execType = Constants.EXEC_GVSIG;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG
-    public String schema;
-	public String schemaDrivers = "drivers";	
 
 
     public static Properties getPropertiesFile() {
@@ -81,15 +80,6 @@ public class Model {
 
     }
 
-    
-	public void setSchema(String schema) {
-		this.schema = schema;
-	}
-	
-	
-	public void setSchemaDrivers(String schemaDrivers) {
-		this.schemaDrivers = schemaDrivers;
-	}
 	
     // Get Properties Files
     protected boolean enabledPropertiesFile() {
@@ -126,11 +116,13 @@ public class Model {
 
         // Get schema data
         String schemaProp = sExport + "SCHEMA_" + "ACTUAL";       
-    	this.schema = iniProperties.getProperty(schemaProp);     	
+    	//this.schema = iniProperties.getProperty(schemaProp);     	
+        MainDao.schema = iniProperties.getProperty(schemaProp);
 
         // Get schema drivers
         schemaProp = sExport + "SCHEMA_" + "DRIVERS";       
-    	this.schemaDrivers = iniProperties.getProperty(schemaProp);     	
+    	//this.schemaDrivers = iniProperties.getProperty(schemaProp);
+    	MainDao.schemaDrivers = iniProperties.getProperty(schemaProp);     	    	
     	
         // Get INP folder
         folderConfig = iniProperties.getProperty("FOLDER_CONFIG");
@@ -182,6 +174,6 @@ public class Model {
         }
 
     }
-    
+
     
 }

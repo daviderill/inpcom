@@ -24,13 +24,13 @@ public class Encryption {
 	}
 
 	public static String encrypt(String property) {
-		
+
 		SecretKeyFactory keyFactory;
 		try {
 			keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
 			SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
 			Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
-			pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+			pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT,	20));
 			return base64Encode(pbeCipher.doFinal(property.getBytes("UTF-8")));
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
@@ -38,22 +38,21 @@ public class Encryption {
 			e.printStackTrace();
 		}
 		return null;
-		
+
 	}
 
-	
 	public static String decrypt(String property) {
-		
+
 		SecretKeyFactory keyFactory;
 		try {
 			keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
 			SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
 			Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
-			pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+			pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT,	20));
 			String aux = new String(pbeCipher.doFinal(base64Decode(property)), "UTF-8");
 			return aux;
 		} catch (IllegalBlockSizeException e) {
-			Utils.getLogger().warning("Input length must be multiple of 8 when decrypting with padded cipher");			
+			Utils.getLogger().warning("Input length must be multiple of 8 when decrypting with padded cipher");
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -63,13 +62,14 @@ public class Encryption {
 
 	}
 
-	
-	private static String base64Encode(byte[] bytes) throws IllegalBlockSizeException{
+	private static String base64Encode(byte[] bytes)
+			throws IllegalBlockSizeException {
 		// NB: This class is internal, and you probably should use another impl
 		return new BASE64Encoder().encode(bytes);
 	}
 
-	private static byte[] base64Decode(String property) throws IllegalBlockSizeException, IOException {
+	private static byte[] base64Decode(String property)
+			throws IllegalBlockSizeException, IOException {
 		// NB: This class is internal, and you probably should use another impl
 		return new BASE64Decoder().decodeBuffer(property);
 	}

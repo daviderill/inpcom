@@ -84,42 +84,38 @@ public class Utils {
     	return BUNDLE_TEXT;
 	}    
     
-	public static JFrame openForm(JPanel view, JFrame f){
+	
+	public static JFrame openForm(JPanel view, JFrame f, int width, int height){
 	    f.setLayout(new BorderLayout());
 	    f.add(view, BorderLayout.CENTER);
-	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
+	    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	    
 	    f.pack();
-	    f.setSize(700, 600);
+	    f.setSize(width, height);
 	    f.setLocationRelativeTo(null);   
 	    f.setVisible(true);		
 	    f.setResizable(false);
 	    return f;
 	}       
 
-	public static JDialog openDialogForm(JPanel view, JDialog f){
+	
+	public static JDialog openDialogForm(JPanel view, JDialog f, int width, int height){
+		f.setModal(true);
 	    f.setLayout(new BorderLayout());
 	    f.add(view, BorderLayout.CENTER);
 	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
 	    f.pack();
-	    f.setSize(510, 400);
+	    f.setSize(width, height);
 	    f.setLocationRelativeTo(null);   
 	    f.setVisible(true);		
-	    f.setModal(true);
 	    return f;
 	}     
+
 	
-	public static JDialog openDialogForm(JPanel view){
+	public static JDialog openDialogForm(JPanel view, int width, int height){
 		JDialog f = new JDialog();
-	    f.setLayout(new BorderLayout());
-	    f.add(view, BorderLayout.CENTER);
-	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
-	    f.pack();
-	    f.setSize(700, 600);
-	    f.setLocationRelativeTo(null);   
-	    f.setVisible(true);		
-	    f.setModal(true);
-	    return f;
+		return openDialogForm(view, f, width, height);
 	} 
+	
 	
     public static String getCurrentTimeStamp() {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyyMMdd");
@@ -226,15 +222,13 @@ public class Utils {
      *
      * @return a string representation of the object with quotes.
      */
-    protected String addQuotes(Object value) {
+    public String addQuotes(Object value) {
         String retString;
-
         if (value != null) {
             retString = "'" + doubleQuote(value) + "'";
         } else {
             retString = "null";
         }
-
         return retString;
     }
 
@@ -272,5 +266,24 @@ public class Utils {
         }
         return null;
     }    
+    
+    
+//    public static JComboBox<String> fillComboBox(JComboBox<String> comboBox, List<String> list){
+//    	DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel<String>) comboBox.getModel();
+//    	theModel.removeAllElements();    	
+//    	for (int i = 0; i < list.size(); i++) {
+//			comboBox.addItem(list.get(i));
+//		}
+//    	return comboBox;
+//    }
+//    
+//    public static MyComboBoxRenderer fillComboBox(MyComboBoxRenderer comboBox, List<String> list){
+//    	DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel) comboBox.getModel();
+//    	theModel.removeAllElements();    	
+//    	for (int i = 0; i < list.size(); i++) {
+//			comboBox.addItem(list.get(i));
+//		}
+//    	return comboBox;
+//    }    
     
 }

@@ -2,8 +2,10 @@ package com.tecnicsassociats.gvsig.inpcom.controller;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.Vector;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Encryption;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
@@ -15,7 +17,6 @@ public class OptionsController {
     private Properties prop;
     
 	private boolean isConnected = false;
-	private boolean showInfo = true;
 	
 	
 	public OptionsController(ModelPostgis modelPostgis, Form cmWindow) {
@@ -44,7 +45,20 @@ public class OptionsController {
 	}	
 	
 	
-	public void testConnection(){
+	public void schemaResultChanged(){
+		String schema = view.getSchemaResult();
+		Vector<String> v = MainDao.getTable("rpt_result_id", schema);
+		view.setResultCombo(v);
+	}
+	
+	
+	public void resultChanged(){
+		String result = view.getResult();
+		MainDao.setResultSelect(view.getSchemaResult(), "result_selection", result);
+	}	
+	
+	
+	public void testConnection(boolean showInfo){
 		
 		String host, port, db, user, password;
 		
@@ -58,8 +72,9 @@ public class OptionsController {
 		isConnected  = modelPostgis.setConnectionPostgis(host, port, db, user, password);
 		
 		if (isConnected){
-			view.setSchemas(modelPostgis.getSchemas());
+			view.setSchemas(MainDao.getSchemas());
 			view.setDefaultSchema();
+			view.setSoftware(MainDao.getSoftware());
 			prop.put("POSTGIS_HOST", host);
 			prop.put("POSTGIS_PORT", port);
 			prop.put("POSTGIS_DATABASE", db);

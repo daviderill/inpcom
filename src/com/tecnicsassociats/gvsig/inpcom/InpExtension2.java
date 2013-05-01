@@ -21,8 +21,6 @@
 
 package com.tecnicsassociats.gvsig.inpcom;
 
-import javax.swing.JDialog;
-
 import com.iver.andami.plugins.Extension;
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
@@ -51,8 +49,9 @@ public class InpExtension2 extends Extension {
         new DbfController(modelDbf, cmWindow);
         
         // Open form in a dialog box
-        JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog());
-        cmWindow.setDialog(dialog);  
+        Utils.openDialogForm(cmWindow, cmWindow.getDialog(), 510, 400);
+        //JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog(), 510, 400);
+        //cmWindow.setDialog(dialog);  
         
 	}
 

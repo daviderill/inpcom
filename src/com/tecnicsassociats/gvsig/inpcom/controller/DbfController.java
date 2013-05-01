@@ -1,8 +1,6 @@
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
-import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Properties;
@@ -28,18 +26,20 @@ public class DbfController {
 	private File dirOut;
 
 	private String userHomeFolder;
-	private ResourceBundle bundleForm;
+	//private ResourceBundle bundleForm;
 	private ResourceBundle bundleText;
 
+	
 	public DbfController(ModelDbf modelDbf, Form view) {
 
 		this.view = view;
 		this.modelDbf = modelDbf;
 		this.prop = Model.getPropertiesFile();
 		view.setControl(this);
+		view.setSoftwareDbf(null);
 
 		userHomeFolder = System.getProperty("user.home");
-		this.bundleForm = Utils.getBundleForm();
+		//this.bundleForm = Utils.getBundleForm();
 		this.bundleText = Utils.getBundleText();
 
 		dirShp = new File(prop.getProperty("FOLDER_SHP", userHomeFolder));
@@ -114,15 +114,6 @@ public class DbfController {
 
 	}
 
-	public void openHelp() {
-		if (this.modelDbf.fileHelp != null) {
-			try {
-				Desktop.getDesktop().open(this.modelDbf.fileHelp);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	public void executeDbf() {
 
@@ -152,5 +143,11 @@ public class DbfController {
 		this.modelDbf.processAll(dirOut.getAbsolutePath(), sFileOut);
 
 	}
+	
+	
+    public void closeView(){
+		view.close();
+	}
+    
 
 }

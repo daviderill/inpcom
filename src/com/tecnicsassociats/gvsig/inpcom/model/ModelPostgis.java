@@ -26,7 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -36,7 +35,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,7 +58,6 @@ public class ModelPostgis extends Model {
 	private String projectName;
 	private int lineNumber;   // Number of lines read
 	private ArrayList<String> pollutants;
-	private boolean isForm = false;
 	
 	
     public ModelPostgis(String export, String execType) {
@@ -86,20 +83,9 @@ public class ModelPostgis extends Model {
         
         // Get log file
         logger = Utils.getLogger();
-            
-        // Get Postgis connection
-//        if (!enabledPostgis()) {
-//            return;
-//        }
         
     }
 
-    
-//    public void execute(String execType, boolean isForm) {
-//    	this.isForm = isForm;
-//        this.execute(execType, "0", "0", "0");
-//    }
-    
     
     public void execute(String execType, String export, String exec, String import_) {
 
@@ -120,43 +106,10 @@ public class ModelPostgis extends Model {
     }
 
     
-    private boolean enabledPostgis() {
-    	
-        if (connectionPostgis == null) {
-            String connectionString = iniProperties.getProperty("POSTGIS_CONNECTION_STRING");    	
-            try {
-                connectionPostgis = DriverManager.getConnection(connectionString);
-            } catch (SQLException e) {
-                try {
-                    connectionPostgis = DriverManager.getConnection(connectionString);
-                } catch (SQLException e1) {
-                    Utils.showError(e1.getMessage(), "", "inp_descr");
-                    return false;
-                }   		
-            }
-        }
-        return true;
-        
-    }
-
-    
     public boolean setConnectionPostgis(String host, String port, String db, String user, String password) {
-    	
-        //String connectionString = iniProperties.getProperty("POSTGIS_CONNECTION_STRING");
-    	//jdbc\:postgresql\://176.31.185.134\:5432/demo_mtvo?user\=tecnics&password\=XavierTorret
-        String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + db + "?user=" + user + "&password=" + password;
-        try {
-            connectionPostgis = DriverManager.getConnection(connectionString);
-        } catch (SQLException e) {
-            try {
-                connectionPostgis = DriverManager.getConnection(connectionString);
-            } catch (SQLException e1) {
-                Utils.showError(e1.getMessage(), "", "inp_descr");
-                return false;
-            }   		
-        }
-        return true;
-        
+    	boolean isConnected = MainDao.setConnectionPostgis(host, port, db, user, password);
+    	connectionPostgis = MainDao.connectionPostgis;
+    	return isConnected;
     }
     
 
@@ -223,8 +176,8 @@ public class ModelPostgis extends Model {
 
             // Get content of target table
             sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
-            		+ "FROM " + schemaDrivers + ".swmm_inp_target as target " 
-            		+ "INNER JOIN " + schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";            
+            		+ "FROM " + MainDao.schemaDrivers + ".swmm_inp_target as target " 
+            		+ "INNER JOIN " + MainDao.schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";            
             Statement stat = connectionPostgis.createStatement();            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
@@ -268,7 +221,7 @@ public class ModelPostgis extends Model {
         }
 
         // If table is null or doesn't exit then exit function
-        if (!checkTable(tableName) && !checkView(tableName)) {
+        if (!MainDao.checkTable(tableName) && !MainDao.checkView(tableName)) {
             return;
         }
 
@@ -280,7 +233,7 @@ public class ModelPostgis extends Model {
 
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
-        String sql = "SELECT name, space FROM " + schemaDrivers + ".swmm_inp_target_fields WHERE target_id = " + id + " ORDER BY pos";
+        String sql = "SELECT name, space FROM " + MainDao.schemaDrivers + ".swmm_inp_target_fields WHERE target_id = " + id + " ORDER BY pos";
         Statement stat = connectionPostgis.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
@@ -334,7 +287,7 @@ public class ModelPostgis extends Model {
         }
 
         // If table is null or doesn't exit then exit function
-        if (!checkTable(tableName) && !checkView(tableName)) {
+        if (!MainDao.checkTable(tableName) && !MainDao.checkView(tableName)) {
             return;
         }
 
@@ -372,34 +325,6 @@ public class ModelPostgis extends Model {
     }    
 
     
-    // Check if the table exists
-    private boolean checkTable(String tableName) {
-        String sql = "SELECT * FROM pg_tables WHERE lower(tablename) = '" + tableName + "'";
-        try {
-            Statement stat = connectionPostgis.createStatement();
-            ResultSet rs = stat.executeQuery(sql);
-            return (rs.next());
-        } catch (SQLException e) {
-            logger.severe(e.getMessage());
-            return false;
-        }
-    }
-    
-    
-    // Check if the view exists
-    private boolean checkView(String viewName) {
-        String sql = "SELECT * FROM pg_views WHERE lower(viewname) = '" + viewName + "'";
-        try {
-            Statement stat = connectionPostgis.createStatement();
-            ResultSet rs = stat.executeQuery(sql);
-            return (rs.next());
-        } catch (SQLException e) {
-            logger.severe(e.getMessage());
-            return false;
-        }
-    }    
-    
-
     // Exec SWMM
     public boolean execSWMM(File fileInp, File fileRpt) {
 
@@ -487,7 +412,7 @@ public class ModelPostgis extends Model {
         
         // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + schemaDrivers + "." + sExport.toLowerCase() + "rpt_target " +
+        String sql = "SELECT * FROM " + MainDao.schemaDrivers + "." + sExport.toLowerCase() + "rpt_target " +
         		"WHERE type <> 0 ORDER BY id";
         try {
     		connectionPostgis.setAutoCommit(false);        	
@@ -511,11 +436,13 @@ public class ModelPostgis extends Model {
             RptTarget rpt = mapEntry.getValue();
         	if (processRpt(rpt)){
 	    		if (exists){
-	    			sql = "DELETE FROM " + schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
-	    			executeSql(sql, false);
+	    			sql = "DELETE FROM " + MainDao.schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
+	    			logger.info(sql);
+	    			MainDao.executeSql(sql, false);
 	    		}
 	    		if (!insertSql.equals("")){
-		    		if (!executeSql(insertSql, false)){
+	    			logger.info(insertSql);	    			
+		    		if (!MainDao.executeSql(insertSql, false)){
 						return false;
 					}
 	    		}
@@ -526,11 +453,12 @@ public class ModelPostgis extends Model {
         
         // Ending process
         if (exists){
-    		sql = "UPDATE " + schema + ".rpt_result_id SET exec_date = Now() WHERE result_id = '" + projectName + "'";
+    		sql = "UPDATE " + MainDao.schema + ".rpt_result_id SET exec_date = Now() WHERE result_id = '" + projectName + "'";
         } else{
-    		sql = "INSERT INTO " + schema + ".rpt_result_id VALUES ('" + projectName + "')";
+    		sql = "INSERT INTO " + MainDao.schema + ".rpt_result_id VALUES ('" + projectName + "')";
         }
-		executeSql(sql, true);
+		logger.info(sql);        
+        MainDao.executeSql(sql, true);
 		
         // Ending message
         Utils.showMessage("import_end", "", "inp_descr");                
@@ -542,7 +470,7 @@ public class ModelPostgis extends Model {
 
 	private boolean existsProjectName() {
 		
-		String sql = "SELECT * FROM " + schema + ".rpt_result_id WHERE result_id = '" + projectName + "'";
+		String sql = "SELECT * FROM " + MainDao.schema + ".rpt_result_id WHERE result_id = '" + projectName + "'";
 		try {
 			PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -778,7 +706,7 @@ public class ModelPostgis extends Model {
 
 		String fields = "result_id, ";
 		String values = "'" + projectName + "', ";
-		String sql = "SELECT * FROM " + schema + "." + rpt.getTable();
+		String sql = "SELECT * FROM " + MainDao.schema + "." + rpt.getTable();
 		try {
 	        PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -808,7 +736,7 @@ public class ModelPostgis extends Model {
 	
 		fields = fields.substring(0, fields.length() - 2);
 		values = values.substring(0, values.length() - 2);
-		sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 		insertSql += sql;
 		
 	}
@@ -816,7 +744,7 @@ public class ModelPostgis extends Model {
 	
 	private void processTokens3(RptTarget rpt) {
 
-		String sql = "SELECT * FROM " + schema + "." + rpt.getTable();
+		String sql = "SELECT * FROM " + MainDao.schema + "." + rpt.getTable();
 		try {
 	        PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -847,7 +775,7 @@ public class ModelPostgis extends Model {
 				}
 				fields = fields.substring(0, fields.length() - 2);
 				values = values.substring(0, values.length() - 2);
-				sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+				sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 				insertSql += sql;				
 	        }
 			
@@ -872,7 +800,7 @@ public class ModelPostgis extends Model {
 			for (int i = 0; i < pollutants.size(); i++) {
 				units = Double.valueOf(tokens.get(i + 1));
 				values = fixedValues + "'" + pollutants.get(i) + "', " + units;
-				sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+				sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 				insertSql += sql;		        
 			}
 		}
@@ -900,7 +828,7 @@ public class ModelPostgis extends Model {
 			values += tokens.get(j) + ", ";
 		}
 		values = values.substring(0, values.length() - 2);		
-		sql = "INSERT INTO " + schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 		insertSql += sql;				
 		
 		// Iterate over pollutants
@@ -908,72 +836,14 @@ public class ModelPostgis extends Model {
 			int j = i + 5;
 			units = Double.valueOf(tokens.get(j));
 			values = fixedValues + "'" + pollutants.get(i) + "', " + units;
-			sql = "DELETE FROM " + schema + ".rpt_outfallload_sum " +
+			sql = "DELETE FROM " + MainDao.schema + ".rpt_outfallload_sum " +
 				"WHERE result_id = '" + projectName + "' AND node_id = '"  + tokens.get(0) + "' AND poll_id = '" + pollutants.get(i) + "';\n";
 			insertSql += sql;	
-			sql = "INSERT INTO " + schema + ".rpt_outfallload_sum (" + fields2 + ") VALUES (" + values + ");\n";
+			sql = "INSERT INTO " + MainDao.schema + ".rpt_outfallload_sum (" + fields2 + ") VALUES (" + values + ");\n";
 			insertSql += sql;		        
 		}
 		
 	}		
 	
-	
-	private boolean executeSql(String sql, boolean commit) {
-		try {
-			Statement ps = connectionPostgis.createStatement();
-	        ps.executeUpdate(sql);
-	        if (logger != null){
-	        	logger.info(sql);
-	        }
-	        if (commit){
-	        	connectionPostgis.commit();
-	        }
-			return true;
-		} catch (SQLException e) {
-			Utils.showError(e.getMessage(), "", "inp_descr");
-			return false;
-		}
-	}
-		
-	
-	public List<String> getSchemas(){
-
-        String sql = "SELECT schema_name FROM information_schema.schemata " +
-        		"WHERE schema_name <> 'information_schema' AND schema_name !~ E'^pg_'" +
-        		"ORDER BY schema_name";
-    	List<String> elems = new ArrayList<String>();
-        try {
-    		connectionPostgis.setAutoCommit(false);        	
-            Statement stat = connectionPostgis.createStatement();
-            ResultSet rs = stat.executeQuery(sql);
-            while (rs.next()) {
-            	elems.add(rs.getString(1));
-            }
-            rs.close();
-    		return elems;	            
-        } catch (SQLException e) {
-            Utils.showError(e.getMessage(), "", "inp_descr");
-            return elems;
-        }
-		
-	}
-
-	
-	public ResultSet getOptions() {
-		
-        //String sql = "SELECT * FROM " + schema + ".inp_options";
-		String sql = "SELECT * FROM " + schema + ".aa";
-        ResultSet rs = null;        
-        try {
-            connectionPostgis.setAutoCommit(true);
-        	Statement stat = connectionPostgis.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            rs = stat.executeQuery(sql);
-        } catch (SQLException e) {
-            Utils.showError(e.getMessage(), "", "inp_descr");
-        }
-        return rs;   
-        
-	}
-
 
 }

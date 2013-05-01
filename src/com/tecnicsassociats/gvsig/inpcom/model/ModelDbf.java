@@ -80,6 +80,7 @@ public class ModelDbf extends Model{
     
     
 	// Read content of the DBF file and saved it in an Array
+	@SuppressWarnings("resource")
 	public ArrayList<LinkedHashMap<String, String>> readDBF(File file) {
 
 		FileChannel in;
@@ -202,7 +203,6 @@ public class ModelDbf extends Model{
 
 		ListIterator<LinkedHashMap<String, String>> it = this.lMapDades.listIterator();
 		Map<String, String> m;   // Current DBF row data
-		int index = 0;
 		String sValor = null;
 		int size = 0;
 		// Iterate over DBF content

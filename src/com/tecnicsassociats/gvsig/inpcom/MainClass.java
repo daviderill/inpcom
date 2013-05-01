@@ -23,9 +23,8 @@ package com.tecnicsassociats.gvsig.inpcom;
 
 import java.util.Locale;
 
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
@@ -43,6 +42,14 @@ public class MainClass {
     	// English language
     	Locale.setDefault(Locale.ENGLISH);
 
+    	// Look&Feel
+    	String className = "com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel";
+    	try {
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+    	
         // Create models
         ModelDbf modelDbf = new ModelDbf("SWMM_", Constants.EXEC_CONSOLE);
         ModelPostgis modelPostgis = new ModelPostgis("SWMM_", Constants.EXEC_CONSOLE);        
@@ -50,33 +57,24 @@ public class MainClass {
         // Create form
     	Form cmWindow = new Form();
     	
-    	//String className = Utils.getLookAndFeelClassName("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-    	String className = "com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel";
-    	try {
-			UIManager.setLookAndFeel(className);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}     	
-    	
     	// Create controllers
-        new MainController(modelPostgis, cmWindow);
+        @SuppressWarnings("unused")
+		MainController mc = new MainController(modelPostgis, cmWindow);
         new DbfController(modelDbf, cmWindow);
         OptionsController op = new OptionsController(modelPostgis, cmWindow);
-        //op.testConnection();
+        
+        // TODO: Borrar
+        op.testConnection(false);
+        //mc.setSoftware();
         
         // Open form in a dialog box
-        JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog());
-        cmWindow.setDialog(dialog);  
+        //JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog(), 510, 400);
+        //cmWindow.setDialog(dialog);  
 
-        //JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame());
-        //cmWindow.setFrame(frame);
-		//modelPostgis.execute(Constants.EXEC_CONSOLE, true);
+        JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame(), 550, 400);
+        cmWindow.setFrame(frame);
+		
+        //modelPostgis.execute(Constants.EXEC_CONSOLE, true);
         //modelPostgis.execute(Constants.EXEC_CONSOLE, args[0], args[1], args[2]);
 
     }

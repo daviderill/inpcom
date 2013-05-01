@@ -140,6 +140,7 @@ public class Dbf2PgSql extends Thread{
 	}
 	
 	
+	@SuppressWarnings("resource")
 	public void main() throws Exception {
 		
 		System.out.println("Dbf to PostgreSql");

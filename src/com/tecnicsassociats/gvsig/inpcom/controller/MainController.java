@@ -20,19 +20,22 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
-import com.tecnicsassociats.gvsig.inpcom.gui.Options;
+import com.tecnicsassociats.gvsig.inpcom.gui.TableWindow;
+import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Encryption;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
@@ -56,7 +59,7 @@ public class MainController{
     private boolean importChecked;
     
     private String userHomeFolder;
-    private ResourceBundle bundleForm;
+    //private ResourceBundle bundleForm;
     private ResourceBundle bundleText;
 
     
@@ -66,11 +69,9 @@ public class MainController{
         this.modelPostgis = modelPostgis;    	
         this.prop = ModelPostgis.getPropertiesFile();
 	    view.setControl(this);        
-        //String schemaProp = this.modelPostgis.sExport + "SCHEMA_ACTUAL";       
-    	//this.modelPostgis.schema = prop.getProperty(schemaProp);
     	
     	userHomeFolder = System.getProperty("user.home");
-    	this.bundleForm = Utils.getBundleForm();
+    	//this.bundleForm = Utils.getBundleForm();
     	this.bundleText = Utils.getBundleText();
     	
     	// Set default values
@@ -80,8 +81,6 @@ public class MainController{
 
     
     private void setDefaultValues(){
-    	
-    	//setSchemas();
     	
     	fileInp = new File(prop.getProperty("FILE_INP", userHomeFolder));
 		if (fileInp.exists()) {
@@ -106,10 +105,6 @@ public class MainController{
 	
     }
    
-//	private void setSchemas() {
-//		view.setCboSchema(modelPostgis.getSchemas());
-//	}
-
 
 	public void action(String actionCommand) {
 		Method method;
@@ -124,19 +119,33 @@ public class MainController{
 	
 	
 	public void schemaChanged(){
-		modelPostgis.setSchema(view.getSchema());
+		MainDao.setSchema(view.getSchema());
 	}
 	
 	
 	
 	public void showOptions(){
-		ResultSet rs = modelPostgis.getOptions();
-		Options options = new Options(rs);
-        // Open form in a dialog box
-        JDialog dialog = Utils.openDialogForm(options);
+		ResultSet rs = MainDao.getTableResultset("inp_options");
+		TableWindow tableWindow = new TableWindow(rs, "inp_options");
+        Utils.openDialogForm(tableWindow, 900, 250);
         //options.setDialog(dialog);  
 	}
 	
+
+	public void showCatchment(){
+		ResultSet rs = MainDao.getTableResultset("catch_selection");
+		TableWindow tableWindow = new TableWindow(rs, "catch_selection");
+        Utils.openDialogForm(tableWindow, 500, 300);
+	}	
+	
+	
+	public void showRaingage(){
+		ResultSet rs = MainDao.getTableResultset("raingage");
+		TableWindow tableWindow = new TableWindow(rs, "raingage");
+        Utils.openDialogForm(tableWindow, 700, 300);
+	}	
+		
+		
 
     public void chooseFileInp() {
 
@@ -204,7 +213,7 @@ public class MainController{
             Utils.showError("Any schema selected", "", "inp_descr");
             return;
         }
-        modelPostgis.setSchema(schema);
+        MainDao.setSchema(schema);
         
         // Which checks are selected?
         exportChecked = view.isExportChecked();
@@ -269,12 +278,27 @@ public class MainController{
 
     }
     
+    
+	public void openHelp() {
+		if (this.modelPostgis.fileHelp != null) {
+			try {
+				Desktop.getDesktop().open(this.modelPostgis.fileHelp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}    
+	
 	
     public void closeView(){
 		view.close();
 	}
 
 
+	public void setSoftware() {
+		List<String> list = MainDao.getSoftware();
+		view.setSoftware(list);
+	}
 
 	
 }
