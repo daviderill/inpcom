@@ -1,3 +1,23 @@
+/*
+ * This file is part of INPcom
+ * Copyright (C) 2012  Tecnics Associats
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Author:
+ *   David Erill <daviderill79@gmail.com>
+ */
 package com.tecnicsassociats.gvsig.inpcom.model;
 
 import java.sql.Connection;
@@ -47,7 +67,7 @@ public class MainDao {
 	        }
 			return true;
 		} catch (SQLException e) {
-			Utils.showError(e.getMessage(), "", "inp_descr");
+			Utils.showError(e, sql);
 			return false;
 		}
 	}	
@@ -99,7 +119,8 @@ public class MainDao {
 	public static List<String> getSchemas(){
 
         String sql = "SELECT schema_name FROM information_schema.schemata " +
-        		"WHERE schema_name <> 'information_schema' AND schema_name !~ E'^pg_'" +
+        		"WHERE schema_name <> 'information_schema' AND schema_name !~ E'^pg_' " +
+        		"AND schema_name <> 'drivers' AND schema_name <> 'public' " +
         		"ORDER BY schema_name";
     	List<String> elems = new ArrayList<String>();
         try {
@@ -203,7 +224,15 @@ public class MainDao {
 	}
 
 
+	public static void deleteSchema(String schemaName) {
+		String sql = "DROP schema IF EXISTS " + schemaName + " CASCADE;";
+		executeSql(sql, true);		
+	}
 
 
-
+	public static void createSchema(String schemaName) {
+		String sql = "CREATE schema " + schemaName;
+		executeSql(sql, true);		
+	}
+	
 }

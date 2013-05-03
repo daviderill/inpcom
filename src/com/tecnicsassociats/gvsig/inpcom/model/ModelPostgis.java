@@ -18,7 +18,6 @@
  * Author:
  *   David Erill <daviderill79@gmail.com>
  */
-
 package com.tecnicsassociats.gvsig.inpcom.model;
 
 import java.io.File;
@@ -144,7 +143,7 @@ public class ModelPostgis extends Model {
             }
             rs.close();
         } catch (SQLException e) {
-        	Utils.showError(e.getMessage(), sql, "inp_descr");
+        	Utils.showError(e, sql);
         }
         return mAux;
 
@@ -201,10 +200,10 @@ public class ModelPostgis extends Model {
             return true;
 
         } catch (IOException e) {
-            Utils.showError("inp_error_io", e.getMessage(), "inp_descr");
+            Utils.showError(e);
             return false;
         } catch (SQLException e) {
-            Utils.showError(e.getMessage(), sql, "inp_descr");
+            Utils.showError(e, sql);
             return false;
         }
 
@@ -405,6 +404,7 @@ public class ModelPostgis extends Model {
 		// Open RPT file
 		try {
 			rat = new RandomAccessFile(fileRpt, "r");
+			lineNumber = 0;
 		} catch (FileNotFoundException e) {
 			Utils.showError("inp_error_notfound", fileRpt.getAbsolutePath(), "inp_descr");
 			return false;
@@ -424,7 +424,7 @@ public class ModelPostgis extends Model {
             }
             rs.close();
         } catch (SQLException e) {
-            Utils.showError(e.getMessage(), "", "inp_descr");
+            Utils.showError(e, sql);
             return false;
         }
         
@@ -447,19 +447,17 @@ public class ModelPostgis extends Model {
 					}
 	    		}
         	} else{
-        		logger.info("Target not found: " + rpt.getId() + " - " + rpt.getDescription());
+           		logger.info("Target not found: " + rpt.getId() + " - " + rpt.getDescription());
         	}
         }
         
-        // Ending process
-        if (exists){
-    		sql = "UPDATE " + MainDao.schema + ".rpt_result_id SET exec_date = Now() WHERE result_id = '" + projectName + "'";
-        } else{
-    		sql = "INSERT INTO " + MainDao.schema + ".rpt_result_id VALUES ('" + projectName + "')";
-        }
-		logger.info(sql);        
-        MainDao.executeSql(sql, true);
-		
+        // Commit transaction ONLY if everything ok
+        try {
+			connectionPostgis.commit();
+		} catch (SQLException e) {
+            Utils.showError(e, sql);
+		}
+        
         // Ending message
         Utils.showMessage("import_end", "", "inp_descr");                
 
@@ -470,13 +468,13 @@ public class ModelPostgis extends Model {
 
 	private boolean existsProjectName() {
 		
-		String sql = "SELECT * FROM " + MainDao.schema + ".rpt_result_id WHERE result_id = '" + projectName + "'";
+		String sql = "SELECT * FROM " + MainDao.schema + ".rpt_result_cat WHERE result_id = '" + projectName + "'";
 		try {
 			PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
 	        return rs.next();
 		} catch (SQLException e) {
-            Utils.showError(e.getMessage(), "", "inp_descr");
+            Utils.showError(e, sql);
 			return false;
 		}
 		
@@ -491,10 +489,19 @@ public class ModelPostgis extends Model {
 		String aux;
 		
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
-		System.out.println("lineNumber: " + lineNumber);
+		
+		if (rpt.getId() == 10){
+			for (int i = 0; i < 13; i++) {
+				try {
+					lineNumber++;							
+					line = rat.readLine().trim();
+				} catch (IOException e) {
+					Utils.showError(e);
+				}
+			}
+		}
 		
 		while (!found){
-			lineNumber++;
 			try {
 				// If pointer has reached EOF, return to first position
 				if (rat.getFilePointer() >= rat.length()){
@@ -502,15 +509,17 @@ public class ModelPostgis extends Model {
 					lineNumber = 0;
 					return false;
 				}
+				lineNumber++;				
 				line = rat.readLine().trim();
 				if (line.length() >= rpt.getDescription().length()){
 					aux = line.substring(0, rpt.getDescription().length());
 					if (aux.equals(rpt.getDescription())){
 						found = true;
+						logger.info("Target line number: " + lineNumber);						
 					}
 				}
 			} catch (IOException e) {
-				Utils.showError("inp_error_io", "", "inp_descr");
+				Utils.showError(e);
 			}
 		}
 		
@@ -523,6 +532,10 @@ public class ModelPostgis extends Model {
 			try {
 				lineNumber++;
 				line = rat.readLine();
+				// TODO: Check if we have reached next Target
+				if (line.contains("No ")){
+					return false;
+				}				
 			} catch (IOException e) {
 				Utils.showError("inp_error_io", "", "inp_descr");
 			}
@@ -531,9 +544,6 @@ public class ModelPostgis extends Model {
 		// Read following lines until blank line is found
 		tokensList = new ArrayList<ArrayList<String>>();		
 		parseLines(rpt);
-//		if (rpt.getType() == 2 || rpt.getType() == 3){
-//			processTokens(rpt);
-//		}
 		if (rpt.getType() == 2){
 			processTokens(rpt);
 		}
@@ -571,9 +581,10 @@ public class ModelPostgis extends Model {
 				lineNumber--;
 			} else{
 				jumpLines = (rpt.getType() == 5) ? 4 : 5;
-				for (int i = 1; i <= jumpLines; i++) {				
+				for (int i = 1; i <= jumpLines; i++) {		
+					lineNumber++;					
 					line = rat.readLine().trim();
-					System.out.println(line);
+					//System.out.println(line);
 				}
 			}
 			boolean blankLine = (line.length() == 0);
@@ -731,7 +742,7 @@ public class ModelPostgis extends Model {
 				fields += rsmd.getColumnName(j) + ", ";        	
 	        }
 		} catch (SQLException e) {
-			Utils.showError(e.getMessage(), sql, "inp_descr");
+			Utils.showError(e, sql);
 		}
 	
 		fields = fields.substring(0, fields.length() - 2);
@@ -780,9 +791,9 @@ public class ModelPostgis extends Model {
 	        }
 			
 		} catch (SQLException e) {
-			Utils.showError(e.getMessage(), sql, "inp_descr");
+			Utils.showError(e, sql);
 		} catch (Exception e) {
-			Utils.showError(e.getMessage(), "", "inp_descr");
+			Utils.showError(e);
 		}
 		
 	}		
@@ -795,6 +806,14 @@ public class ModelPostgis extends Model {
 		String sql;
 		String values;
 		Double units;
+		
+		// TODO: No permetre tipus String (peta a Subcatchment)
+		try{
+			Integer.parseInt(tokens.get(0));
+		} catch (NumberFormatException e){
+			return;
+		}
+		
 		// Iterate over pollutants
 		if (tokens.size() > pollutants.size()){
 			for (int i = 0; i < pollutants.size(); i++) {

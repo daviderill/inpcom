@@ -18,18 +18,18 @@
  * Author:
  *   David Erill <daviderill79@gmail.com>
  */
-
 package com.tecnicsassociats.gvsig.inpcom;
 
 import java.util.Locale;
 
-import javax.swing.JFrame;
 import javax.swing.UIManager;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
+import com.tecnicsassociats.gvsig.inpcom.controller.MenuController;
 import com.tecnicsassociats.gvsig.inpcom.controller.OptionsController;
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.gui.MainFrame;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelDbf;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
@@ -56,23 +56,27 @@ public class MainClass {
 
         // Create form
     	Form cmWindow = new Form();
+        MainFrame mainFrame = new MainFrame();    	
     	
     	// Create controllers
-        @SuppressWarnings("unused")
-		MainController mc = new MainController(modelPostgis, cmWindow);
+		new MainController(modelPostgis, cmWindow);
         new DbfController(modelDbf, cmWindow);
-        OptionsController op = new OptionsController(modelPostgis, cmWindow);
+        new OptionsController(modelPostgis, cmWindow);
+        new MenuController(mainFrame);
         
-        // TODO: Borrar
-        op.testConnection(false);
+        //MainController mc = new MainController(modelPostgis, cmWindow);        
+        //OptionsController op = new OptionsController(modelPostgis, cmWindow);        
+        //op.testConnection(false);
         //mc.setSoftware();
         
-        // Open form in a dialog box
-        //JDialog dialog = Utils.openDialogForm(cmWindow, cmWindow.getDialog(), 510, 400);
-        //cmWindow.setDialog(dialog);  
-
-        JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame(), 550, 400);
-        cmWindow.setFrame(frame);
+        // Open Main Frame
+        Utils.openForm(cmWindow, mainFrame, 520, 390);
+        cmWindow.setFrame(mainFrame);        
+        
+        // Open in a new Frame
+        //JFrame frame = Utils.openForm(cmWindow, cmWindow.getFrame(), 550, 400);
+        //frame.setTitle("INPcom control panel");
+        //cmWindow.setFrame(frame);
 		
         //modelPostgis.execute(Constants.EXEC_CONSOLE, true);
         //modelPostgis.execute(Constants.EXEC_CONSOLE, args[0], args[1], args[2]);

@@ -18,7 +18,6 @@
  * Author:
  *   David Erill <daviderill79@gmail.com>
  */
-
 package com.tecnicsassociats.gvsig.inpcom.model;
 
 import java.io.File;
@@ -58,7 +57,7 @@ public class Model {
     protected RandomAccessFile rat;
     protected RandomAccessFile raf;
     public String sExport;   // "EPANET_" o "SWMM_"
-    public File fileHelp;
+    public static File fileHelp;
     protected String execType = Constants.EXEC_GVSIG;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG
 
 

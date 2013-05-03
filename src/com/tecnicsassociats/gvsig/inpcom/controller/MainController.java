@@ -20,11 +20,13 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -112,8 +114,10 @@ public class MainController{
 			Utils.getLogger().info(actionCommand);
 			method = this.getClass().getMethod(actionCommand);
 			method.invoke(this);	
+			view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));			
 		} catch (Exception e) {
-			Utils.getLogger().warning("Method not found: " + actionCommand);
+			view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));			
+			Utils.logError(e, actionCommand);
 		}
 	}	
 	
@@ -128,7 +132,6 @@ public class MainController{
 		ResultSet rs = MainDao.getTableResultset("inp_options");
 		TableWindow tableWindow = new TableWindow(rs, "inp_options");
         Utils.openDialogForm(tableWindow, 900, 250);
-        //options.setDialog(dialog);  
 	}
 	
 
@@ -202,7 +205,6 @@ public class MainController{
 
     public void executePostgis() {
 
-        boolean anySelected = false;
         boolean continueExec = true;
 
         //view.resetStatus();
@@ -220,24 +222,25 @@ public class MainController{
         execChecked = view.isExecChecked();
         importChecked = view.isImportChecked();        
         
+        if (!exportChecked && !execChecked && !importChecked){
+            Utils.showError("select_option", "", "inp_descr");
+        }
+        
+        view.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        
         // Export to INP
         if (exportChecked) {
-            anySelected = true;
             if (!readyFileInp) {
                 Utils.showError("file_inp_not_selected", "", "inp_descr");
                 return;
             }            
-//            String status = "Export to INP\n" + bundleText.getString("processing") + "\n";            
-//            view.logStatus(status);     
+            //String status = "Export to INP\n" + bundleText.getString("processing") + "\n";            
             continueExec = this.modelPostgis.processAll(fileInp);
-//            status = bundleText.getString("completed") + ": " + fileInp.getAbsolutePath();
-//            view.logStatus(status);
-//            view.repaint();
+            //status = bundleText.getString("completed") + ": " + fileInp.getAbsolutePath();
         }
 
         // Run SWMM
         if (execChecked && continueExec) {
-            anySelected = true;
             if (!readyFileInp) {
                 Utils.showError("file_inp_not_selected", "", "inp_descr");
                 return;
@@ -247,15 +250,11 @@ public class MainController{
                 return;
             }            
             //String status = "Run SWMM\n" + bundleText.getString("processing") + "\n";          
-            //view.logStatus(status);                
             continueExec = this.modelPostgis.execSWMM(fileInp, fileRpt);
-            //status = bundleText.getString("completed") + ": " + fileRpt.getAbsolutePath() + "\n";
-            //view.logStatus(status);            
         }
 
         // Import RPT to Postgis
         if (importChecked && continueExec) {
-            anySelected = true;
             if (!readyFileRpt) {
                 Utils.showError("file_rpt_not_selected", "", "inp_descr");
                 return;
@@ -264,25 +263,25 @@ public class MainController{
             if (projectName.equals("")){
                 Utils.showError("project_name", "", "inp_descr");
             } else{
-//                String status = "Import RPT to Postgis\n" + bundleText.getString("processing") + "\n";
-//                view.logStatus(status);                    
+                //String status = "Import RPT to Postgis\n" + bundleText.getString("processing") + "\n";
             	continueExec = this.modelPostgis.importRpt(fileRpt, projectName);
-//                status = bundleText.getString("completed");
-//                view.logStatus(status);                 	
+            	if (!continueExec){
+            		try {
+						ModelPostgis.connectionPostgis.rollback();
+					} catch (SQLException e) {
+	    	            Utils.showError(e);
+					}
+            	}
             }
         }
-
-        if (!anySelected) {
-            Utils.showError("select_option", "", "inp_descr");
-        }
-
+        
     }
     
     
 	public void openHelp() {
-		if (this.modelPostgis.fileHelp != null) {
+		if (ModelPostgis.fileHelp != null) {
 			try {
-				Desktop.getDesktop().open(this.modelPostgis.fileHelp);
+				Desktop.getDesktop().open(ModelPostgis.fileHelp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

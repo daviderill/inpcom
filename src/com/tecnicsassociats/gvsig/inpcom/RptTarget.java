@@ -18,7 +18,6 @@
  * Author:
  *   David Erill <daviderill79@gmail.com>
  */
-
 package com.tecnicsassociats.gvsig.inpcom;
 
 import java.sql.ResultSet;

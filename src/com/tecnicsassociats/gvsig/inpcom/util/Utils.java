@@ -18,7 +18,6 @@
  * Author:
  *   David Erill <daviderill79@gmail.com>
  */
-
 package com.tecnicsassociats.gvsig.inpcom.util;
 
 import java.awt.BorderLayout;
@@ -84,6 +83,13 @@ public class Utils {
     	return BUNDLE_TEXT;
 	}    
     
+	public static String getBundleString(ResourceBundle bundle, String key){
+		try{
+			return bundle.getString(key);
+		} catch (Exception e){
+			return key;	
+		}
+	}
 	
 	public static JFrame openForm(JPanel view, JFrame f, int width, int height){
 	    f.setLayout(new BorderLayout());
@@ -187,11 +193,59 @@ public class Utils {
     	} catch (MissingResourceException e){
     		JOptionPane.showMessageDialog(null, msg + "\n" + param,	title, JOptionPane.WARNING_MESSAGE);
     		if (logger != null) {
-    			logger.info(msg + "\n" + param);
+    			logger.warning(msg + "\n" + param);
     		}    		
     	}        
     }
 
+    
+    public static void showError(Exception e) {
+    	String errorInfo = getErrorInfo();
+    	try{
+    		JOptionPane.showMessageDialog(null, e.getMessage(), BUNDLE_TEXT.getString("inp_descr"), JOptionPane.WARNING_MESSAGE);
+    		if (logger != null) {
+    			//logger.warning(e.getMessage() + "\n" + e.toString() + "\n" + errorInfo);
+    			logger.warning(e.toString() + "\n" + errorInfo);
+    		}
+    	} catch (MissingResourceException e1){
+    		JOptionPane.showMessageDialog(null, e.getMessage(), "Error information", JOptionPane.WARNING_MESSAGE);
+    		if (logger != null) {
+    			logger.warning(e.toString() + "\n" + errorInfo);
+    		}    		
+    	}   
+    }    
+    
+    
+    public static void showError(Exception e, String param) {
+    	String errorInfo = getErrorInfo();
+    	try{
+    		JOptionPane.showMessageDialog(null, e.getMessage(), BUNDLE_TEXT.getString("inp_descr"), JOptionPane.WARNING_MESSAGE);
+    		if (logger != null) {
+    			logger.warning(e.toString() + "\n" + errorInfo + "\n" + param);
+    		}
+    	} catch (MissingResourceException e1){
+    		JOptionPane.showMessageDialog(null, e.getMessage(), "Error information", JOptionPane.WARNING_MESSAGE);
+    		if (logger != null) {
+    			logger.warning(e.toString() + "\n" + errorInfo + "\n" + param);
+    		}    		
+    	}        
+    }     
+    
+    
+    public static void logError(Exception e, String param) {
+    	String errorInfo = getErrorInfo();
+		if (logger != null) {
+			logger.warning(e.toString() + "\n" + errorInfo + "\n" + param);
+		}
+    }         
+    
+    
+    private static String getErrorInfo(){
+    	StackTraceElement[] ste = Thread.currentThread().getStackTrace();
+    	String aux = ste[3].toString();
+    	return aux;
+    }
+    
     
     public static int confirmDialog(String msg, String title) {
     	int reply;
@@ -266,24 +320,6 @@ public class Utils {
         }
         return null;
     }    
-    
-    
-//    public static JComboBox<String> fillComboBox(JComboBox<String> comboBox, List<String> list){
-//    	DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel<String>) comboBox.getModel();
-//    	theModel.removeAllElements();    	
-//    	for (int i = 0; i < list.size(); i++) {
-//			comboBox.addItem(list.get(i));
-//		}
-//    	return comboBox;
-//    }
-//    
-//    public static MyComboBoxRenderer fillComboBox(MyComboBoxRenderer comboBox, List<String> list){
-//    	DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel) comboBox.getModel();
-//    	theModel.removeAllElements();    	
-//    	for (int i = 0; i < list.size(); i++) {
-//			comboBox.addItem(list.get(i));
-//		}
-//    	return comboBox;
-//    }    
+
     
 }
