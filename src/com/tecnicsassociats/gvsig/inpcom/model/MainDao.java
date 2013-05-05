@@ -72,7 +72,19 @@ public class MainDao {
 		}
 	}	
 	
+	
+	public static boolean executeSql(String sql) {
+		try {
+			Statement ps = connectionPostgis.createStatement();
+	        ps.executeUpdate(sql);
+			return true;
+		} catch (SQLException e) {
+			Utils.showError(e, sql);
+			return false;
+		}
+	}		
     
+	
     // Check if the table exists
 	public static boolean checkTable(String tableName) {
         String sql = "SELECT * FROM pg_tables WHERE lower(tablename) = '" + tableName + "'";
@@ -140,13 +152,13 @@ public class MainDao {
 	}
 	
 	
-	public static ResultSet getTableResultset(String table) {
+	private static ResultSet getResultset(String sql){
 		
-        String sql = "SELECT * FROM " + schema + "." + table;
         ResultSet rs = null;        
         try {
             connectionPostgis.setAutoCommit(true);
-        	Statement stat = connectionPostgis.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        	Statement stat = connectionPostgis.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 
+        			ResultSet.CONCUR_UPDATABLE);
             rs = stat.executeQuery(sql);
         } catch (SQLException e) {
             Utils.showError(e.getMessage(), "", "inp_descr");
@@ -154,6 +166,18 @@ public class MainDao {
         return rs;   
         
 	}
+	
+	public static ResultSet getTableResultset(String table) {
+        String sql = "SELECT * FROM " + schema + "." + table;
+        return getResultset(sql);
+	}
+	
+	
+	public static ResultSet getRaingageResultset(String table) {
+        String sql = "SELECT rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units" +
+        		" FROM " + schema + "." + table;
+        return getResultset(sql);
+	}	
 
 	
     public static List<String> getSoftware(){
@@ -182,6 +206,7 @@ public class MainDao {
 	public static Vector<String> getTable(String table, String schemaParam) {
         
         Vector<String> vector = new Vector<String>();
+        vector.add("");
         
 		if (schemaParam == null){
 			schemaParam = schema;
@@ -208,9 +233,9 @@ public class MainDao {
 	
 	public static void setResultSelect(String schema, String table, String result) {
 		String sql = "DELETE FROM " + schema + "." + table;
-		executeSql(sql, true);
+		executeSql(sql);
 		sql = "INSERT INTO " + schema + "." + table + " VALUES ('" + result + "')";
-		executeSql(sql, true);
+		executeSql(sql);
 	}
 	
 	
@@ -226,13 +251,13 @@ public class MainDao {
 
 	public static void deleteSchema(String schemaName) {
 		String sql = "DROP schema IF EXISTS " + schemaName + " CASCADE;";
-		executeSql(sql, true);		
+		executeSql(sql);		
 	}
 
 
 	public static void createSchema(String schemaName) {
 		String sql = "CREATE schema " + schemaName;
-		executeSql(sql, true);		
+		executeSql(sql);		
 	}
 	
 }

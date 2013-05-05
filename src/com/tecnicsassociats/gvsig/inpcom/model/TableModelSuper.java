@@ -108,7 +108,6 @@ public class TableModelSuper extends AbstractTableModel {
 		}
 		rows_data.addElement(rowData);
 		this.fireTableChanged(null);
-		//this.fireTableRowsInserted(firstRow, lastRow);
 	}
 	
 	

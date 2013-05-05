@@ -33,7 +33,7 @@ import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Encryption;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
-public class OptionsController {
+public class DatabaseController {
 
 	private Form view;
 	private ModelPostgis modelPostgis;
@@ -43,7 +43,7 @@ public class OptionsController {
 	private ResourceBundle bundleText;
 	
 	
-	public OptionsController(ModelPostgis modelPostgis, Form cmWindow) {
+	public DatabaseController(ModelPostgis modelPostgis, Form cmWindow) {
 		
 		this.view = cmWindow;
 		this.modelPostgis = modelPostgis;		

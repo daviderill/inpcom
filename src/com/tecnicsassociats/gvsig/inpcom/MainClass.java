@@ -27,7 +27,7 @@ import javax.swing.UIManager;
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MenuController;
-import com.tecnicsassociats.gvsig.inpcom.controller.OptionsController;
+import com.tecnicsassociats.gvsig.inpcom.controller.DatabaseController;
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
 import com.tecnicsassociats.gvsig.inpcom.gui.MainFrame;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelDbf;
@@ -61,7 +61,7 @@ public class MainClass {
     	// Create controllers
 		new MainController(modelPostgis, cmWindow);
         new DbfController(modelDbf, cmWindow);
-        new OptionsController(modelPostgis, cmWindow);
+        new DatabaseController(modelPostgis, cmWindow);
         new MenuController(mainFrame);
         
         //MainController mc = new MainController(modelPostgis, cmWindow);        
@@ -70,7 +70,7 @@ public class MainClass {
         //mc.setSoftware();
         
         // Open Main Frame
-        Utils.openForm(cmWindow, mainFrame, 520, 390);
+        Utils.openForm(cmWindow, mainFrame, 535, 405);
         cmWindow.setFrame(mainFrame);        
         
         // Open in a new Frame

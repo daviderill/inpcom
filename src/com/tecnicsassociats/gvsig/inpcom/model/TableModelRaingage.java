@@ -59,4 +59,9 @@ public class TableModelRaingage extends TableModelSuper {
 	}
 	
 	
+	public void setValueAt(Object value, int row, int col) {
+		super.setValueAt(value, row, col);
+		setCombos();
+	}	
+	
 }

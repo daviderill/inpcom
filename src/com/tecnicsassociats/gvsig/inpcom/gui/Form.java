@@ -50,7 +50,7 @@ import net.miginfocom.swing.MigLayout;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
-import com.tecnicsassociats.gvsig.inpcom.controller.OptionsController;
+import com.tecnicsassociats.gvsig.inpcom.controller.DatabaseController;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -64,7 +64,7 @@ public class Form extends JPanel implements ActionListener {
 	private JFrame f;
 	private MainController controller;
 	private DbfController dbfController;
-	private OptionsController optionsController;
+	private DatabaseController databaseController;
 
 	private JTextField txtProject;
 	private JTextField txtSchema;
@@ -86,8 +86,6 @@ public class Form extends JPanel implements ActionListener {
 	private JTextArea txtExportTo;
 	private JButton btnFileInp3;
 	private JButton btnAccept3;
-
-	private JLabel lblStatus2;
 	private JButton btnCatchSelection;
 	private JButton btnOptions;
 	private JPanel panel;
@@ -122,6 +120,9 @@ public class Form extends JPanel implements ActionListener {
 	private JPanel panel_2;
 	private JButton btnCreateSchema;
 	private JButton btnDeleteSchema;
+	private JScrollPane scrollPane_1;
+	private JScrollPane scrollPane_2;
+	private JScrollPane scrollPane_3;
 
 	
 	public Form() {
@@ -141,8 +142,8 @@ public class Form extends JPanel implements ActionListener {
 		this.dbfController = dbfController;
 	}
 
-	public void setControl(OptionsController optionsController) {
-		this.optionsController = optionsController;
+	public void setControl(DatabaseController databaseController) {
+		this.databaseController = databaseController;
 	}
 
 	public JFrame getFrame() {
@@ -326,7 +327,7 @@ public class Form extends JPanel implements ActionListener {
 	
 	private void initConfig() throws MissingResourceException {
 
-		setLayout(new MigLayout("", "[8.00][500][40.00]", "[10px][410.00][12][40px][88.00][40]"));
+		setLayout(new MigLayout("", "[8.00][:531px:531px][40.00]", "[10px][410.00][12]"));
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -440,7 +441,7 @@ public class Form extends JPanel implements ActionListener {
 		panel_2 = new JPanel();
 		tabbedPane.addTab(
 				BUNDLE.getString("Form.panel_2.title"), null, panel_2, null); //$NON-NLS-1$
-		panel_2.setLayout(new MigLayout("", "[10][80][280px,grow][]", "[5px][24px][24][50][5][15][50][5][][5][]"));
+		panel_2.setLayout(new MigLayout("", "[10px][80][308.00px][]", "[5px][24px][24][50][15][50][5px][][5px][]"));
 		
 		lblEpaSoftware_1 = new JLabel(BUNDLE.getString("Form.lblEpaSoftware_1.text")); //$NON-NLS-1$
 		panel_2.add(lblEpaSoftware_1, "cell 1 1,alignx left,aligny center");
@@ -469,42 +470,46 @@ public class Form extends JPanel implements ActionListener {
 		panel_2.add(btnFolderShp, "cell 3 3,alignx right");
 
 		JLabel lblFolderOut = new JLabel(BUNDLE.getString("Form.lblFolderOut.text")); //$NON-NLS-1$
-		panel_2.add(lblFolderOut, "cell 1 5");
+		panel_2.add(lblFolderOut, "cell 1 4");
+		
+		scrollPane_1 = new JScrollPane();
+		panel_2.add(scrollPane_1, "cell 1 5 2 1,grow");
 
 		txtExportTo = new JTextArea();
+		scrollPane_1.setViewportView(txtExportTo);
 		txtExportTo.setText("");
 		txtExportTo.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		panel_2.add(txtExportTo, "cell 1 6 2 1,grow");
 
 		btnFolderOut = new JButton();
 		btnFolderOut.setText("...");
 		btnFolderOut.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnFolderOut.setActionCommand(BUNDLE.getString("Form.btnFolderOut.actionCommand")); //$NON-NLS-1$
-		panel_2.add(btnFolderOut, "cell 3 6,alignx right");
+		panel_2.add(btnFolderOut, "cell 3 5,alignx right");
 
 		JLabel lblFileName = new JLabel(BUNDLE.getString("Form.lblFileName.text")); //$NON-NLS-1$
-		panel_2.add(lblFileName, "cell 1 8,alignx trailing");
+		panel_2.add(lblFileName, "cell 1 7,alignx trailing");
 
 		txtFileOut = new JTextField();
 		txtFileOut.setText("");
-		panel_2.add(txtFileOut, "cell 2 8,growx");
+		panel_2.add(txtFileOut, "cell 2 7,growx");
 		txtFileOut.setColumns(10);
 
 		btnAccept2 = new JButton();
 		btnAccept2.setText(BUNDLE.getString("Form.btnAccept.text")); //$NON-NLS-1$
 		btnAccept2.setName("btn_accept_postgis");
 		btnAccept2.setActionCommand(BUNDLE.getString("Form.btnAccept2.actionCommand")); //$NON-NLS-1$
-		panel_2.add(btnAccept2, "flowx,cell 2 10,alignx right");
+		panel_2.add(btnAccept2, "flowx,cell 2 9,alignx right");
 
 		btnCancel2 = new JButton();
 		btnCancel2.setText(BUNDLE.getString("Form.btnCancel.text")); //$NON-NLS-1$
 		btnCancel2.setName("Cancel");
 		btnCancel2.setActionCommand("closeView");
-		panel_2.add(btnCancel2, "cell 2 10,alignx right");
+		panel_2.add(btnCancel2, "cell 2 9,alignx right");
 
 		// Panel 3
 		JPanel panel_3 = new JPanel();
-		tabbedPane.addTab(BUNDLE.getString("Form.panel_4.title"), null, panel_3, null); //$NON-NLS-1$
+		panel_3.setVisible(false);
+		//tabbedPane.addTab(BUNDLE.getString("Form.panel_4.title"), null, panel_3, null); //$NON-NLS-1$
 		panel_3.setLayout(new MigLayout("",	"[10.00][][10.00][300.00][10.00][]", "[10][][10][45][15][]"));
 
 		JLabel lblSchemaName = new JLabel(BUNDLE.getString("Form.lblSchemaName.text")); //$NON-NLS-1$
@@ -538,9 +543,7 @@ public class Form extends JPanel implements ActionListener {
 		// Panel 4
 		panel_4 = new JPanel();
 		tabbedPane.addTab(BUNDLE.getString("Form.panel_3.title"), null, panel_4, null); //$NON-NLS-1$
-		panel_4.setLayout(new MigLayout("",
-				"[10.00][22][][5][100px:300.00px][10][100]",
-				"[5px][24px][24px][30px][44.00][5][24][44px][5][24][][15][]"));
+		panel_4.setLayout(new MigLayout("", "[5px][22][][320.00px][110]", "[5px][24px][24px][30px][44.00][24][44px][24][][5px][]"));
 
 		lblEpaSoftware = new JLabel(BUNDLE.getString("Form.lblEpaSoftware.text")); //$NON-NLS-1$
 		panel_4.add(lblEpaSoftware, "cell 2 1");
@@ -549,7 +552,7 @@ public class Form extends JPanel implements ActionListener {
 		cboSoftware.setPreferredSize(new Dimension(24, 20));
 		cboSoftware.setMinimumSize(new Dimension(150, 20));
 		cboSoftware.setActionCommand(BUNDLE.getString("Form.cboSoftware.actionCommand")); //$NON-NLS-1$
-		panel_4.add(cboSoftware, "cell 4 1,alignx left");
+		panel_4.add(cboSoftware, "cell 3 1,alignx left");
 
 		JLabel lblSelectSchema = new JLabel(BUNDLE.getString("Form.lblSelectSchema.text")); //$NON-NLS-1$
 		panel_4.add(lblSelectSchema, "cell 2 2");
@@ -558,93 +561,99 @@ public class Form extends JPanel implements ActionListener {
 		cboSchema.setPreferredSize(new Dimension(24, 20));
 		cboSchema.setActionCommand(BUNDLE.getString("Form.cboSchema.actionCommand")); //$NON-NLS-1$
 		cboSchema.setMinimumSize(new Dimension(150, 20));
-		panel_4.add(cboSchema, "cell 4 2,alignx left");
+		panel_4.add(cboSchema, "cell 3 2,alignx left");
 
 		chkExport = new JCheckBox();
 		chkExport.setText(BUNDLE.getString("Form.checkBox.text")); //$NON-NLS-1$
 		panel_4.add(chkExport, "cell 1 3 2 1");
 
 		btnOptions = new JButton(BUNDLE.getString("Form.btnOptions.text")); //$NON-NLS-1$
+		btnOptions.setMinimumSize(new Dimension(110, 23));
+		btnOptions.setPreferredSize(new Dimension(110, 23));
 		btnOptions.setActionCommand(BUNDLE.getString("Form.btnOptions.actionCommand")); //$NON-NLS-1$
-		panel_4.add(btnOptions, "flowx,cell 4 3");
+		panel_4.add(btnOptions, "flowx,cell 3 3");
 
 		JLabel label = new JLabel();
 		label.setText(BUNDLE.getString("Form.label.text")); //$NON-NLS-1$
 		panel_4.add(label, "cell 2 4");
+		
+		scrollPane_2 = new JScrollPane();
+		panel_4.add(scrollPane_2, "cell 3 4,grow");
 
 		txtFileInp = new JTextArea();
+		scrollPane_2.setViewportView(txtFileInp);
 		txtFileInp.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		txtFileInp.setLineWrap(true);
-		panel_4.add(txtFileInp, "cell 4 4,grow");
 
 		btnFileInp = new JButton();
 		btnFileInp.setActionCommand(BUNDLE.getString("Form.btnFileInp.actionCommand")); //$NON-NLS-1$
 		btnFileInp.setText("...");
 		btnFileInp.setFont(new Font("Tahoma", Font.BOLD, 12));
-		panel_4.add(btnFileInp, "cell 6 4,alignx right");
+		panel_4.add(btnFileInp, "cell 4 4,alignx left");
 
 		chkExec = new JCheckBox();
 		chkExec.setText(BUNDLE.getString("Form.checkBox_1.text")); //$NON-NLS-1$
 		chkExec.setName("chk_exec");
 		chkExec.setActionCommand("Exportaci\u00F3n a INP");
-		panel_4.add(chkExec, "cell 1 6 4 1,alignx left");
+		panel_4.add(chkExec, "cell 1 5 3 1,alignx left");
 
 		JLabel label_1 = new JLabel();
 		label_1.setText(BUNDLE.getString("Form.label_1.text")); //$NON-NLS-1$
-		panel_4.add(label_1, "cell 2 7");
+		panel_4.add(label_1, "cell 2 6");
+		
+		scrollPane_3 = new JScrollPane();
+		panel_4.add(scrollPane_3, "cell 3 6,grow");
 
 		txtFileRpt = new JTextArea();
+		scrollPane_3.setViewportView(txtFileRpt);
 		txtFileRpt.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		txtFileRpt.setLineWrap(true);
-		panel_4.add(txtFileRpt, "cell 4 7,grow");
 
 		btnFileRpt = new JButton();
 		btnFileRpt.setActionCommand(BUNDLE.getString("Form.btnFileRpt.actionCommand")); //$NON-NLS-1$
 		btnFileRpt.setText("...");
 		btnFileRpt.setFont(new Font("Tahoma", Font.BOLD, 12));
-		panel_4.add(btnFileRpt, "cell 6 7,alignx right");
+		panel_4.add(btnFileRpt, "cell 4 6,alignx left");
 
 		chkImport = new JCheckBox();
 		chkImport.setText(BUNDLE.getString("Form.chkImport.text")); //$NON-NLS-1$
 		chkImport.setName("chk_import");
 		chkImport.setActionCommand("Exportaci\u00F3n a INP");
-		panel_4.add(chkImport, "cell 1 9 2 1");
+		panel_4.add(chkImport, "cell 1 7 2 1");
 
 		JLabel label_2 = new JLabel();
 		label_2.setText(BUNDLE.getString("Form.label_2.text")); //$NON-NLS-1$
 		label_2.setName("lbl_project");
-		panel_4.add(label_2, "cell 2 10");
+		panel_4.add(label_2, "cell 2 8");
 
 		txtProject = new JTextField();
 		txtProject.setName("txt_project");
-		panel_4.add(txtProject, "cell 4 10,growx,aligny top");
+		panel_4.add(txtProject, "cell 3 8,growx,aligny top");
 
 		btnAccept = new JButton();
 		btnAccept.setText(BUNDLE.getString("Form.btnAccept.text")); //$NON-NLS-1$
 		btnAccept.setName("btn_accept_postgis");
 		btnAccept.setActionCommand(BUNDLE.getString("Form.btnAccept.actionCommand")); //$NON-NLS-1$
-		panel_4.add(btnAccept, "flowx,cell 4 12,alignx right");
+		panel_4.add(btnAccept, "flowx,cell 3 10,alignx right");
 
 		btnCancel = new JButton();
 		btnCancel.setText(BUNDLE.getString("Form.btnCancel.text")); //$NON-NLS-1$
 		btnCancel.setName(BUNDLE.getString("Form.btnCancel.text")); //$NON-NLS-1$
 		btnCancel.setActionCommand(BUNDLE
 				.getString("Form.btnCancel.actionCommand")); //$NON-NLS-1$
-		panel_4.add(btnCancel, "cell 4 12");
+		panel_4.add(btnCancel, "cell 3 10");
 
 		btnCatchSelection = new JButton(BUNDLE.getString("Form.btnCatchSelection.text")); //$NON-NLS-1$
+		btnCatchSelection.setMaximumSize(new Dimension(110, 23));
 		btnCatchSelection.setActionCommand(BUNDLE
 				.getString("Form.btnCatchSelection.actionCommand")); //$NON-NLS-1$
-		panel_4.add(btnCatchSelection, "cell 4 3");
+		panel_4.add(btnCatchSelection, "cell 3 3");
 
 		btnRaingage = new JButton(BUNDLE.getString("Form.btnNewButton.text")); //$NON-NLS-1$
+		btnRaingage.setPreferredSize(new Dimension(110, 23));
+		btnRaingage.setMaximumSize(new Dimension(110, 23));
 		btnRaingage.setActionCommand(BUNDLE.getString("Form.btnRaingage.actionCommand")); //$NON-NLS-1$
-		panel_4.add(btnRaingage, "cell 4 3,aligny baseline");
-
-		// Status info
-		lblStatus2 = new JLabel("");
-		lblStatus2.setIgnoreRepaint(true);
-		add(lblStatus2, "cell 1 4");
+		panel_4.add(btnRaingage, "cell 3 3,aligny baseline");
 
 		// Select Database Options by default
 		tabbedPane.setSelectedIndex(0);
@@ -661,31 +670,31 @@ public class Form extends JPanel implements ActionListener {
 		// Panel Database options
 		cboSchema1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				optionsController.action(e.getActionCommand());				
+				databaseController.action(e.getActionCommand());				
 			}
 		});
 
 		cboResultId.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				optionsController.action(e.getActionCommand());					
+				databaseController.action(e.getActionCommand());					
 			}
 		});
 		
 		btnTest.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				optionsController.action(e.getActionCommand());
+				databaseController.action(e.getActionCommand());
 			}
 		});
 		
 		btnCreateSchema.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				optionsController.action(e.getActionCommand());				
+				databaseController.action(e.getActionCommand());				
 			}
 		});
 		
 		btnDeleteSchema.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				optionsController.action(e.getActionCommand());				
+				databaseController.action(e.getActionCommand());				
 			}
 		});		
 

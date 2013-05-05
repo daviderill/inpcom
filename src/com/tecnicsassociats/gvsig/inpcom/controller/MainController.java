@@ -36,6 +36,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.gui.OptionsDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.TableWindow;
 import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
@@ -130,8 +131,15 @@ public class MainController{
 	
 	public void showOptions(){
 		ResultSet rs = MainDao.getTableResultset("inp_options");
-		TableWindow tableWindow = new TableWindow(rs, "inp_options");
-        Utils.openDialogForm(tableWindow, 900, 250);
+//		TableWindow tableWindow = new TableWindow(rs, "inp_options");
+//      Utils.openDialogForm(tableWindow, 900, 250);
+		OptionsDialog optionsDialog = new OptionsDialog();
+		InpOptionsController inp = new InpOptionsController(optionsDialog, rs);
+		inp.setComponents();
+		optionsDialog.setModal(true);
+		//optionsDialog.setSize(400, 800);
+		optionsDialog.setLocationRelativeTo(null);   
+		optionsDialog.setVisible(true);		
 	}
 	
 
@@ -143,7 +151,7 @@ public class MainController{
 	
 	
 	public void showRaingage(){
-		ResultSet rs = MainDao.getTableResultset("raingage");
+		ResultSet rs = MainDao.getRaingageResultset("raingage");
 		TableWindow tableWindow = new TableWindow(rs, "raingage");
         Utils.openDialogForm(tableWindow, 700, 300);
 	}	

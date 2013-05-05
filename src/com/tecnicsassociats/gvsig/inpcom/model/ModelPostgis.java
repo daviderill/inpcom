@@ -438,11 +438,11 @@ public class ModelPostgis extends Model {
 	    		if (exists){
 	    			sql = "DELETE FROM " + MainDao.schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
 	    			logger.info(sql);
-	    			MainDao.executeSql(sql, false);
+	    			MainDao.executeSql(sql);
 	    		}
 	    		if (!insertSql.equals("")){
 	    			logger.info(insertSql);	    			
-		    		if (!MainDao.executeSql(insertSql, false)){
+		    		if (!MainDao.executeSql(insertSql)){
 						return false;
 					}
 	    		}
@@ -490,16 +490,16 @@ public class ModelPostgis extends Model {
 		
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
 		
-		if (rpt.getId() == 10){
-			for (int i = 0; i < 13; i++) {
-				try {
-					lineNumber++;							
-					line = rat.readLine().trim();
-				} catch (IOException e) {
-					Utils.showError(e);
-				}
-			}
-		}
+//		if (rpt.getId() == 10){
+//			for (int i = 0; i < 13; i++) {
+//				try {
+//					lineNumber++;							
+//					line = rat.readLine().trim();
+//				} catch (IOException e) {
+//					Utils.showError(e);
+//				}
+//			}
+//		}
 		
 		while (!found){
 			try {
@@ -532,7 +532,7 @@ public class ModelPostgis extends Model {
 			try {
 				lineNumber++;
 				line = rat.readLine();
-				// TODO: Check if we have reached next Target
+				// Check if we have reached next Target
 				if (line.contains("No ")){
 					return false;
 				}				
@@ -584,7 +584,6 @@ public class ModelPostgis extends Model {
 				for (int i = 1; i <= jumpLines; i++) {		
 					lineNumber++;					
 					line = rat.readLine().trim();
-					//System.out.println(line);
 				}
 			}
 			boolean blankLine = (line.length() == 0);

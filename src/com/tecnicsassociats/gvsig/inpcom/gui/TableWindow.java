@@ -35,7 +35,6 @@ import javax.swing.ScrollPaneConstants;
 import net.miginfocom.swing.MigLayout;
 
 import com.tecnicsassociats.gvsig.inpcom.model.TableModelCatchment;
-import com.tecnicsassociats.gvsig.inpcom.model.TableModelOptions;
 import com.tecnicsassociats.gvsig.inpcom.model.TableModelRaingage;
 
 
@@ -45,7 +44,6 @@ public class TableWindow extends JPanel {
 	private JTable table;
 	private JButton btnInsert;
 
-	private TableModelOptions tableModelOptions;
 	private TableModelCatchment tableModelCatchment;
 	private TableModelRaingage tableModelRaingage;
 	private JButton btnDelete;
@@ -60,33 +58,22 @@ public class TableWindow extends JPanel {
 	
 		initConfig();
 		
-		if (tableName.equals("inp_options")){
-			tableModelOptions = new TableModelOptions(rs);
-			tableModelOptions.setTable(table);
-			table.setModel(tableModelOptions);
-			// Mostrem columnes que tenen FK amb desplegables
-			tableModelOptions.setCombos();			
-			btnInsert.setVisible(false);
-		}
-		else if(tableName.equals("catch_selection")){
+		if(tableName.equals("catch_selection")){
 			tableModelCatchment = new TableModelCatchment(rs);
 			tableModelCatchment.setTable(table);
 			table.setModel(tableModelCatchment);
-			// Mostrem columnes que tenen FK amb desplegables
-			tableModelCatchment.setCombos();			
+			tableModelCatchment.setCombos();
+			btnInsert.setVisible(true);
+			btnDelete.setVisible(true);			
 		}
 		else if(tableName.equals("raingage")){
 			tableModelRaingage = new TableModelRaingage(rs);
 			tableModelRaingage.setTable(table);
 			table.setModel(tableModelRaingage);
-			// Mostrem columnes que tenen FK amb desplegables
 			tableModelRaingage.setCombos();		
 			btnInsert.setVisible(false);			
+			btnDelete.setVisible(false);	
 		}
-		
-		//tableModel.addTableModelListener(tableModel);
-		//MyTableModelListener lis = new MyTableModelListener(tableOptions, rs);
-		//tableOptions.getModel().addTableModelListener(lis);
 		
 	}
 
