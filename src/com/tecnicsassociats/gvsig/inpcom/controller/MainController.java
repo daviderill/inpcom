@@ -110,16 +110,24 @@ public class MainController{
    
 
 	public void action(String actionCommand) {
+		
 		Method method;
 		try {
-			Utils.getLogger().info(actionCommand);
+			if (Utils.getLogger() != null){
+				Utils.getLogger().info(actionCommand);
+			}
 			method = this.getClass().getMethod(actionCommand);
 			method.invoke(this);	
 			view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));			
 		} catch (Exception e) {
-			view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));			
-			Utils.logError(e, actionCommand);
+			view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			if (Utils.getLogger() != null){			
+				Utils.logError(e, actionCommand);
+			} else{
+				Utils.showError(e, actionCommand);
+			}
 		}
+		
 	}	
 	
 	

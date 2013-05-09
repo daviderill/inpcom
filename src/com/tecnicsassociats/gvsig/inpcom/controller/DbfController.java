@@ -78,21 +78,19 @@ public class DbfController {
 	public void action(String actionCommand) {
 
 		Method method;
-		Utils.getLogger().info(actionCommand);
 		try {
+			if (Utils.getLogger() != null){
+				Utils.getLogger().info(actionCommand);
+			}
 			method = this.getClass().getMethod(actionCommand);
-			method.invoke(this);
-		} catch (NoSuchMethodException e) {
-			Utils.getLogger().warning(e.getMessage());
-		} catch (SecurityException e) {
-			Utils.getLogger().warning(e.getMessage());
-		} catch (IllegalAccessException e) {
-			Utils.getLogger().warning(e.getMessage());
-		} catch (IllegalArgumentException e) {
-			Utils.getLogger().warning(e.getMessage());
-		} catch (InvocationTargetException e) {
-			Utils.getLogger().warning(e.getMessage());
-		}
+			method.invoke(this);	
+		} catch (Exception e) {
+			if (Utils.getLogger() != null){			
+				Utils.logError(e, actionCommand);
+			} else{
+				Utils.showError(e, actionCommand);
+			}
+		}		
 
 	}
 	

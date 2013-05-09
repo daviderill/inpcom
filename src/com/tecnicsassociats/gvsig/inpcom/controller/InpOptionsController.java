@@ -27,8 +27,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
@@ -36,7 +34,6 @@ import javax.swing.JTextField;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.OptionsDialog;
 import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
-import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
@@ -44,19 +41,12 @@ public class InpOptionsController {
 
 	private OptionsDialog view;
     private ResultSet rs;
-    private Properties prop;
-	private ResourceBundle bundleText;
 	
 	
 	public InpOptionsController(OptionsDialog dialog, ResultSet rs) {
-		
 		this.view = dialog;
         this.rs = rs;
-		this.prop = ModelPostgis.getPropertiesFile();
 	    view.setControl(this);        
-    	
-    	//this.bundleText = Utils.getBundleText();
-    	
 	}
 	
 	

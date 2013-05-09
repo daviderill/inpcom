@@ -59,7 +59,11 @@ public class Utils {
             try {
             	String folderRoot = new File(".").getCanonicalPath() + File.separator;            	
                 String folder = folderRoot + LOG_FOLDER;
-                (new File(folder)).mkdirs();
+                File folderFile = new File(folder);
+                folderFile.mkdirs();
+                if (!folderFile.exists()){
+                    JOptionPane.showMessageDialog(null, "Could not create log folder", "Log creation", JOptionPane.ERROR_MESSAGE);                	
+                }
                 String logFile = folder + "log_" + getCurrentTimeStamp() + ".log";
                 FileHandler fh = new FileHandler(logFile, true);
                 LogFormatter lf = new LogFormatter();
@@ -67,7 +71,9 @@ public class Utils {
                 logger = Logger.getLogger(logFile);
                 logger.addHandler(fh);
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage(), "Error al crear el fitxer de log", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Log creation: IOException", JOptionPane.ERROR_MESSAGE);
+            } catch (SecurityException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Log creation: SecurityException", JOptionPane.ERROR_MESSAGE);
             }
         }
         return logger;

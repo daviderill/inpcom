@@ -58,14 +58,22 @@ public class DatabaseController {
 	
 	
 	public void action(String actionCommand) {
+		
 		Method method;
 		try {
-			Utils.getLogger().info(actionCommand);
+			if (Utils.getLogger() != null){
+				Utils.getLogger().info(actionCommand);
+			}
 			method = this.getClass().getMethod(actionCommand);
 			method.invoke(this);	
 		} catch (Exception e) {
-			Utils.logError(e, actionCommand);
+			if (Utils.getLogger() != null){			
+				Utils.logError(e, actionCommand);
+			} else{
+				Utils.showError(e, actionCommand);
+			}
 		}
+		
 	}	
 	
 	

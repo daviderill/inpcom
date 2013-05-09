@@ -25,6 +25,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -74,6 +75,8 @@ public class MainFrame extends JFrame {
 	
 	private void initConfig(){
 
+		ImageIcon image = new ImageIcon("images/imago.png");
+		setIconImage(image.getImage());
 		setTitle("INPcom control panel");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -85,6 +88,7 @@ public class MainFrame extends JFrame {
 		menuBar.add(mnWelcome);
 		
 		mntmWelcome = new JMenuItem("Welcome");
+		mntmWelcome.setActionCommand("showWelcome");
 		mnWelcome.add(mntmWelcome);
 		
 		mntmHelp = new JMenuItem("Help");
@@ -118,6 +122,12 @@ public class MainFrame extends JFrame {
 	
 	private void setupListeners(){
 
+		mntmWelcome.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuController.action(e.getActionCommand());				
+			}
+		});
+		
 		mntmHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				menuController.action(e.getActionCommand());				
@@ -129,6 +139,18 @@ public class MainFrame extends JFrame {
 				menuController.action(e.getActionCommand());
 			}
 		});
+
+		mntmLicense.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuController.action(e.getActionCommand());				
+			}
+		});		
+		
+		mntmAgreements.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuController.action(e.getActionCommand());				
+			}
+		});		
 		
 	}
 

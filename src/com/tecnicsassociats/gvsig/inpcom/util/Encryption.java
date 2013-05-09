@@ -72,7 +72,7 @@ public class Encryption {
 			String aux = new String(pbeCipher.doFinal(base64Decode(property)), "UTF-8");
 			return aux;
 		} catch (IllegalBlockSizeException e) {
-			Utils.getLogger().warning("Input length must be multiple of 8 when decrypting with padded cipher");
+			e.printStackTrace();
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

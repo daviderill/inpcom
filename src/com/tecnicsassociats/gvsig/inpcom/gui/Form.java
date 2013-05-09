@@ -685,7 +685,7 @@ public class Form extends JPanel implements ActionListener {
 				databaseController.action(e.getActionCommand());
 			}
 		});
-		
+				
 		btnCreateSchema.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				databaseController.action(e.getActionCommand());				

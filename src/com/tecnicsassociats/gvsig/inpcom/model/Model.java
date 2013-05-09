@@ -113,14 +113,8 @@ public class Model {
     // Sets initial configuration files
     protected boolean configIni() {
 
-        // Get schema data
-        String schemaProp = sExport + "SCHEMA_" + "ACTUAL";       
-    	//this.schema = iniProperties.getProperty(schemaProp);     	
-        MainDao.schema = iniProperties.getProperty(schemaProp);
-
         // Get schema drivers
-        schemaProp = sExport + "SCHEMA_" + "DRIVERS";       
-    	//this.schemaDrivers = iniProperties.getProperty(schemaProp);
+        String schemaProp = sExport + "SCHEMA_" + "DRIVERS";       
     	MainDao.schemaDrivers = iniProperties.getProperty(schemaProp);     	    	
     	
         // Get INP folder
