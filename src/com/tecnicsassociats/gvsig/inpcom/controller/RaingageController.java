@@ -32,18 +32,18 @@ import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import com.tecnicsassociats.gvsig.inpcom.gui.OptionsDialog;
+import com.tecnicsassociats.gvsig.inpcom.gui.RaingageDialog;
 import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 
-public class InpOptionsController {
+public class RaingageController {
 
-	private OptionsDialog view;
+	private RaingageDialog view;
     private ResultSet rs;
 	
 	
-	public InpOptionsController(OptionsDialog dialog, ResultSet rs) {
+	public RaingageController(RaingageDialog dialog, ResultSet rs) {
 		this.view = dialog;
         this.rs = rs;
 	    view.setControl(this);        
@@ -83,30 +83,15 @@ public class InpOptionsController {
 
 		Vector<String> values = null;
 		String tableName = "";
-		if (comboName.equals("flow_units")){
-			tableName = "inp_value_options_fu";
+		if (comboName.equals("form_type")){
+			tableName = "inp_value_raingage";
 		}
-		else if (comboName.equals("infiltration")){
-			tableName = "inp_value_options_in";
+		else if (comboName.equals("timser_id")){
+			tableName = "inp_timser_id";
 		}
-		else if (comboName.equals("force_main_equation")){
-			tableName = "inp_value_options_fme";
+		else if (comboName.equals("rgage_type")){
+			tableName = "inp_typevalue_raingage";
 		}
-		else if (comboName.equals("flow_routing")){
-			tableName = "inp_value_options_fr";
-		}
-		else if (comboName.equals("inertial_damping")){
-			tableName = "inp_value_options_id";
-		}
-		else if (comboName.equals("link_offsets")){
-			tableName = "inp_value_options_lo";
-		}
-		else if (comboName.equals("normal_flow_limited")){
-			tableName = "inp_value_options_nfl";
-		}
-		else{
-			tableName = "inp_value_yesno";
-		}				
 		values = MainDao.getTable(tableName, "sewnet");
 		
 		return values;

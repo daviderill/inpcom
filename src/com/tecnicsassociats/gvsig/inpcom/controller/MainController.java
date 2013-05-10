@@ -37,6 +37,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
 import com.tecnicsassociats.gvsig.inpcom.gui.OptionsDialog;
+import com.tecnicsassociats.gvsig.inpcom.gui.RaingageDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.TableWindow;
 import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
@@ -139,15 +140,12 @@ public class MainController{
 	
 	public void showOptions(){
 		ResultSet rs = MainDao.getTableResultset("inp_options");
-//		TableWindow tableWindow = new TableWindow(rs, "inp_options");
-//      Utils.openDialogForm(tableWindow, 900, 250);
-		OptionsDialog optionsDialog = new OptionsDialog();
-		InpOptionsController inp = new InpOptionsController(optionsDialog, rs);
+		OptionsDialog dialog = new OptionsDialog();
+		InpOptionsController inp = new InpOptionsController(dialog, rs);
 		inp.setComponents();
-		optionsDialog.setModal(true);
-		//optionsDialog.setSize(400, 800);
-		optionsDialog.setLocationRelativeTo(null);   
-		optionsDialog.setVisible(true);		
+		dialog.setModal(true);
+		dialog.setLocationRelativeTo(null);   
+		dialog.setVisible(true);		
 	}
 	
 
@@ -159,9 +157,16 @@ public class MainController{
 	
 	
 	public void showRaingage(){
-		ResultSet rs = MainDao.getRaingageResultset("raingage");
-		TableWindow tableWindow = new TableWindow(rs, "raingage");
-        Utils.openDialogForm(tableWindow, 700, 300);
+//		ResultSet rs = MainDao.getRaingageResultset("raingage");
+//		TableWindow tableWindow = new TableWindow(rs, "raingage");
+//        Utils.openDialogForm(tableWindow, 700, 300);
+		ResultSet rs = MainDao.getTableResultset("raingage");
+		RaingageDialog dialog = new RaingageDialog();
+		RaingageController inp = new RaingageController(dialog, rs);
+		inp.setComponents();
+		dialog.setModal(true);
+		dialog.setLocationRelativeTo(null);   
+		dialog.setVisible(true);		        
 	}	
 		
 		

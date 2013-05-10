@@ -20,7 +20,6 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
-import java.awt.Cursor;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.lang.reflect.Method;

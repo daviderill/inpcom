@@ -176,11 +176,12 @@ public class ModelPostgis extends Model {
             // Get content of target table
             sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
             		+ "FROM " + MainDao.schemaDrivers + ".swmm_inp_target as target " 
-            		+ "INNER JOIN " + MainDao.schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";            
+            		+ "INNER JOIN " + MainDao.schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";      
+            logger.info(sql);
             Statement stat = connectionPostgis.createStatement();            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
-                //System.out.println(rs.getInt("target_id") + "  " + rs.getString("table_name"));
+            	logger.info("INP target: " + rs.getInt("target_id") + " - " + rs.getString("table_name") + " - " + rs.getInt("lines"));
             	Integer optionsTable = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_TABLE"));
             	Integer reportTable = Integer.parseInt(iniProperties.getProperty("INP_REPORT_TABLE"));
             	if (rs.getInt("main_id") == optionsTable || rs.getInt("main_id") == reportTable){
@@ -196,7 +197,6 @@ public class ModelPostgis extends Model {
 
             // Ending message
             Utils.showMessage("inp_end", fileInp.getAbsolutePath(), "inp_descr");
-            logger.info(fileInp.getAbsolutePath());
             return true;
 
         } catch (IOException e) {
@@ -217,6 +217,7 @@ public class ModelPostgis extends Model {
         for (int i = 1; i <= lines; i++) {
             String line = rat.readLine();
             raf.writeBytes(line + "\r\n");
+            logger.info(line);
         }
 
         // If table is null or doesn't exit then exit function
@@ -227,12 +228,14 @@ public class ModelPostgis extends Model {
         // Get data of the specified Postgis table
         this.lMapDades = getTableData(tableName);
         if (this.lMapDades.isEmpty()) {
+        	logger.info("Empty table: " + tableName);
             return;
         }
 
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
         String sql = "SELECT name, space FROM " + MainDao.schemaDrivers + ".swmm_inp_target_fields WHERE target_id = " + id + " ORDER BY pos";
+        logger.info(sql);
         Statement stat = connectionPostgis.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
@@ -241,10 +244,11 @@ public class ModelPostgis extends Model {
         rs.close();
 
         ListIterator<LinkedHashMap<String, String>> it = this.lMapDades.listIterator();
-        LinkedHashMap<String, String> m; // Current Postgis row data
+        LinkedHashMap<String, String> m;   // Current Postgis row data
         //int index = 0;
         String sValor = null;
         int size = 0;
+        
         // Iterate over Postgis table
         while (it.hasNext()) {
             m = it.next();
@@ -283,6 +287,7 @@ public class ModelPostgis extends Model {
         for (int i = 1; i <= lines; i++) {
             String line = rat.readLine();
             raf.writeBytes(line + "\r\n");
+            logger.info(line);            
         }
 
         // If table is null or doesn't exit then exit function
@@ -297,10 +302,11 @@ public class ModelPostgis extends Model {
         }
 
         ListIterator<LinkedHashMap<String, String>> it = options.listIterator();
-        LinkedHashMap<String, String> m; // Current Postgis row data
+        LinkedHashMap<String, String> m;   // Current Postgis row data
         //int index = 0;
         String sValor = null;
         int size = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_SIZE"));
+        
         // Iterate over Postgis table (only one element)
         while (it.hasNext()) {
             m = it.next();

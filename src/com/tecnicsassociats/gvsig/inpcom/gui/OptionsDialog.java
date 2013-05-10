@@ -1,6 +1,28 @@
+/*
+ * This file is part of INPcom
+ * Copyright (C) 2012  Tecnics Associats
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Author:
+ *   David Erill <daviderill79@gmail.com>
+ */
 package com.tecnicsassociats.gvsig.inpcom.gui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -14,12 +36,16 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
 
 import com.tecnicsassociats.gvsig.inpcom.controller.InpOptionsController;
 
+@SuppressWarnings("rawtypes")
 public class OptionsDialog extends JDialog {
 
 	private static final long serialVersionUID = -6349825417550216902L;
@@ -27,7 +53,6 @@ public class OptionsDialog extends JDialog {
 	public HashMap<String, JComboBox> componentMap;
 	public HashMap<String, JTextField> textMap;
 	private JTextField textField;
-	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
@@ -43,6 +68,8 @@ public class OptionsDialog extends JDialog {
 	private JTextField textField_14;
 	private JTextField textField_16;
 	private JTextField textField_18;
+	private JTextField textField_1;
+	
 	
 	public OptionsDialog() {
 		initConfig();
@@ -57,29 +84,16 @@ public class OptionsDialog extends JDialog {
 	
 	public void setTextField(JTextField textField, Object value) {
 		if (value!=null){
-			//JTextField component = (JTextField) getComponentByName(textName);
 			textField.setText(value.toString());
 		}
 	}	
 	
 	
-	public void setComboModel(JComboBox combo, Vector<String> items) {
+	public void setComboModel(JComboBox<String> combo, Vector<String> items) {
 		if (items != null){
 			ComboBoxModel<String> cbm = new DefaultComboBoxModel<String>(items);
-			//JComboBox combo = (JComboBox) getComponentByName(comboName);
 			combo.setModel(cbm);
 		}
-	}	
-	
-	
-	private Component getComponentByName(String name) {
-        if (componentMap.containsKey(name)) {
-        	return (Component) componentMap.get(name);
-        }
-        else if (textMap.containsKey(name)) {
-        	return (Component) textMap.get(name);
-        }        
-        else return null;
 	}	
 	
 	
@@ -107,262 +121,275 @@ public class OptionsDialog extends JDialog {
 	}
 
 	
-
-	
-	
 	private void initConfig(){
 
 		setTitle("Options Table");
-		setBounds(100, 100, 682, 515);
-		getContentPane().setLayout(new MigLayout("", "[5px][][200.00][10px][][200px]", "[10px][][][][][][][][5px][][][][][10px][][][][][][5px][]"));
+		setBounds(100, 100, 680, 600);
+		getContentPane().setLayout(new MigLayout("", "[90.00][200px]", "[][][][36.00]"));
+		
+		JPanel panelGeneral = new JPanel();
+		panelGeneral.setFont(new Font("Tahoma", Font.BOLD, 14));
+		panelGeneral.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "GENERAL", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		getContentPane().add(panelGeneral, "cell 0 0 2 1,grow");
+		panelGeneral.setLayout(new MigLayout("", "[90.00][200.00][10px][100px][200px]", "[][][][][][]"));
 
-		JLabel lblFlowUnits = new JLabel("Flow Units:");
-		getContentPane().add(lblFlowUnits, "cell 1 1,alignx trailing");
+		JLabel lblFlowUnits = new JLabel("Flow units:");
+		panelGeneral.add(lblFlowUnits, "cell 0 0,alignx trailing");
 
 		JComboBox flow_units = new JComboBox();
+		panelGeneral.add(flow_units, "cell 1 0,growx");
 		flow_units.setName("flow_units");
-		getContentPane().add(flow_units, "cell 2 1,growx");
 		
-		JLabel lblIgnoreRainfall = new JLabel("Ignore Rainfall:");
-		getContentPane().add(lblIgnoreRainfall, "cell 4 1,alignx trailing");
+		JLabel lblIgnoreRainfall = new JLabel("Ignore rainfall:");
+		panelGeneral.add(lblIgnoreRainfall, "cell 3 0,alignx trailing");
 		
 		JComboBox comboBox_2 = new JComboBox();
+		panelGeneral.add(comboBox_2, "cell 4 0,growx");
 		comboBox_2.setName("ignore_rainfall");
-		getContentPane().add(comboBox_2, "cell 5 1,growx");
 
 		JLabel lblInfiltration = new JLabel("Infiltration:");
-		getContentPane().add(lblInfiltration, "cell 1 2,alignx trailing");
+		panelGeneral.add(lblInfiltration, "cell 0 1,alignx trailing");
 
 		JComboBox infiltration = new JComboBox();
+		panelGeneral.add(infiltration, "cell 1 1,growx");
 		infiltration.setName("infiltration");
-		getContentPane().add(infiltration, "cell 2 2,growx");
 		
-		JLabel lblIgnoreSnowmelt = new JLabel("Ignore Snowmelt:");
-		getContentPane().add(lblIgnoreSnowmelt, "cell 4 2,alignx trailing");
+		JLabel lblIgnoreSnowmelt = new JLabel("Ignore snowmelt:");
+		panelGeneral.add(lblIgnoreSnowmelt, "cell 3 1,alignx trailing");
 		
 		JComboBox comboBox_3 = new JComboBox();
+		panelGeneral.add(comboBox_3, "cell 4 1,growx");
 		comboBox_3.setName("ignore_snowmelt");
-		getContentPane().add(comboBox_3, "cell 5 2,growx");
 
-		JLabel lblFlowRouting = new JLabel("Flow Routing:");
-		getContentPane().add(lblFlowRouting, "cell 1 3,alignx trailing");
+		JLabel lblFlowRouting = new JLabel("Flow routing:");
+		panelGeneral.add(lblFlowRouting, "cell 0 2,alignx trailing");
 
 		JComboBox flow_routing = new JComboBox();
+		panelGeneral.add(flow_routing, "cell 1 2,growx");
 		flow_routing.setName("flow_routing");
-		getContentPane().add(flow_routing, "cell 2 3,growx");
 		
-		JLabel lblIgnoreGroundwater = new JLabel("Ignore Groundwater:");
-		getContentPane().add(lblIgnoreGroundwater, "cell 4 3,alignx trailing");
+		JLabel lblIgnoreGroundwater = new JLabel("Ignore groundwater:");
+		panelGeneral.add(lblIgnoreGroundwater, "cell 3 2,alignx trailing");
 		
 		JComboBox comboBox_4 = new JComboBox();
+		panelGeneral.add(comboBox_4, "cell 4 2,growx");
 		comboBox_4.setName("ignore_groundwater");
-		getContentPane().add(comboBox_4, "cell 5 3,growx");
 		
-		JLabel lblLinkOffsets = new JLabel("Link Offsets");
+		JLabel lblLinkOffsets = new JLabel("Link offsets:");
+		panelGeneral.add(lblLinkOffsets, "cell 0 3,alignx trailing");
 		lblLinkOffsets.setName("link_offsets");
-		getContentPane().add(lblLinkOffsets, "cell 1 4,alignx trailing");
 		
 		JComboBox comboBox = new JComboBox();
+		panelGeneral.add(comboBox, "cell 1 3,growx");
 		comboBox.setName("link_offsets");
-		getContentPane().add(comboBox, "cell 2 4,growx");
 		
-		JLabel lblIgnoreRouting = new JLabel("Ignore Routing:");
-		getContentPane().add(lblIgnoreRouting, "cell 4 4,alignx trailing");
+		JLabel lblIgnoreRouting = new JLabel("Ignore routing:");
+		panelGeneral.add(lblIgnoreRouting, "cell 3 3,alignx trailing");
 		
 		JComboBox comboBox_5 = new JComboBox();
+		panelGeneral.add(comboBox_5, "cell 4 3,growx");
 		comboBox_5.setName("ignore_routing");
-		getContentPane().add(comboBox_5, "cell 5 4,growx");
 		
-		JLabel lblNewLabel = new JLabel("Force Main Equation");
-		getContentPane().add(lblNewLabel, "cell 1 5,alignx trailing");
-		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setName("force_main_equation");
-		getContentPane().add(comboBox_1, "cell 2 5,growx");
-		
-		JLabel lblIgnoreQuality = new JLabel("Ignore Quality:");
-		getContentPane().add(lblIgnoreQuality, "cell 4 5,alignx trailing");
-		
-		JComboBox comboBox_6 = new JComboBox();
-		comboBox_6.setName("ignore_quality");
-		getContentPane().add(comboBox_6, "cell 5 5,growx");
-		
-		JLabel label = new JLabel("Dry days:");
-		label.setName("");
-		getContentPane().add(label, "cell 1 6,alignx trailing");
-		
-		textField_9 = new JTextField();
-		textField_9.setName("dry_days");
-		textField_9.setColumns(10);
-		getContentPane().add(textField_9, "cell 2 6,growx");
-		
-		JLabel lblNewLabel_1 = new JLabel("Skip Steady State:");
-		getContentPane().add(lblNewLabel_1, "cell 4 6,alignx trailing");
-		
-		JComboBox comboBox_7 = new JComboBox();
-		comboBox_7.setName("skip_steady_state");
-		getContentPane().add(comboBox_7, "cell 5 6,growx,aligny top");
-		
-		JLabel lblAllowPonding = new JLabel("Allow Ponding:");
-		getContentPane().add(lblAllowPonding, "cell 4 7,alignx trailing");
+		JLabel lblAllowPonding = new JLabel("Allow ponding:");
+		panelGeneral.add(lblAllowPonding, "cell 0 4,alignx trailing");
 		
 		JComboBox comboBox_10 = new JComboBox();
+		panelGeneral.add(comboBox_10, "cell 1 4,growx");
 		comboBox_10.setName("allow_ponding");
-		getContentPane().add(comboBox_10, "cell 5 7,growx");
 		
-		JLabel lblStartDate = new JLabel("Start date:");
-		getContentPane().add(lblStartDate, "cell 1 9,alignx trailing");
+		JLabel lblIgnoreQuality = new JLabel("Ignore quality:");
+		panelGeneral.add(lblIgnoreQuality, "cell 3 4,alignx trailing");
 		
-		textField = new JTextField();
-		textField.setName("start_date");
-		getContentPane().add(textField, "cell 2 9,growx");
-		textField.setColumns(10);
+		JComboBox comboBox_6 = new JComboBox();
+		panelGeneral.add(comboBox_6, "cell 4 4,growx");
+		comboBox_6.setName("ignore_quality");
 		
-		JLabel lblStartTime = new JLabel("Start time:");
-		getContentPane().add(lblStartTime, "cell 4 9,alignx trailing");
-		
-		textField_2 = new JTextField();
-		textField_2.setName("start_time");
-		textField_2.setColumns(10);
-		getContentPane().add(textField_2, "cell 5 9,growx");
-		
-		JLabel lblEndDate = new JLabel("End date:");
-		getContentPane().add(lblEndDate, "cell 1 10,alignx trailing");
-		
-		textField_1 = new JTextField();
-		textField_1.setName("end_date");
-		textField_1.setColumns(10);
-		getContentPane().add(textField_1, "cell 2 10,growx");
-		
-		JLabel lblEndTime = new JLabel("End time:");
-		getContentPane().add(lblEndTime, "cell 4 10,alignx trailing");
-		
-		textField_3 = new JTextField();
-		textField_3.setName("end_time");
-		textField_3.setColumns(10);
-		getContentPane().add(textField_3, "cell 5 10,growx");
-		
-		JLabel lblReportStartDate = new JLabel("Report Start Date:");
-		getContentPane().add(lblReportStartDate, "cell 1 11,alignx trailing");
-		
-		textField_4 = new JTextField();
-		textField_4.setName("report_start_date");
-		textField_4.setColumns(10);
-		getContentPane().add(textField_4, "cell 2 11,growx");
-		
-		JLabel lblReportStartTime = new JLabel("Report Start Time:");
-		getContentPane().add(lblReportStartTime, "cell 4 11,alignx trailing");
-		
-		textField_5 = new JTextField();
-		textField_5.setName("report_start_time");
-		textField_5.setColumns(10);
-		getContentPane().add(textField_5, "cell 5 11,growx");
-		
-		JLabel lblSweepstart = new JLabel("Sweep Start:");
-		lblSweepstart.setName("");
-		getContentPane().add(lblSweepstart, "cell 1 12,alignx trailing");
-		
-		textField_6 = new JTextField();
-		textField_6.setName("sweep_start");
-		textField_6.setColumns(10);
-		getContentPane().add(textField_6, "cell 2 12,growx");
-		
-		JLabel lblSweepEnd = new JLabel("Sweep End:");
-		lblSweepEnd.setName("sweep_start");
-		getContentPane().add(lblSweepEnd, "cell 4 12,alignx trailing");
-		
-		textField_7 = new JTextField();
-		textField_7.setName("sweep_end");
-		textField_7.setColumns(10);
-		getContentPane().add(textField_7, "cell 5 12,growx");
-		
-		JLabel lblDryDays = new JLabel("Report Step:");
-		lblDryDays.setName("");
-		getContentPane().add(lblDryDays, "cell 1 14,alignx trailing");
-		
-		textField_8 = new JTextField();
-		textField_8.setName("report_step");
-		textField_8.setColumns(10);
-		getContentPane().add(textField_8, "cell 2 14,growx");
-		
-		JLabel lblWetSteps = new JLabel("Wet Step:");
-		lblWetSteps.setName("");
-		getContentPane().add(lblWetSteps, "cell 4 14,alignx trailing");
-		
-		textField_12 = new JTextField();
-		textField_12.setName("wet_step");
-		textField_12.setColumns(10);
-		getContentPane().add(textField_12, "cell 5 14,growx");
-		
-		JLabel lblDrySteps = new JLabel("Dry Step:");
-		lblDrySteps.setName("dry_step");
-		getContentPane().add(lblDrySteps, "cell 1 15,alignx trailing");
-		
-		textField_10 = new JTextField();
-		textField_10.setName("dry_step");
-		textField_10.setColumns(10);
-		getContentPane().add(textField_10, "cell 2 15,growx");
-		
-		JLabel lblRoutingSteps = new JLabel("Routing Step:");
-		lblRoutingSteps.setName("");
-		getContentPane().add(lblRoutingSteps, "cell 4 15,alignx trailing");
-		
-		textField_13 = new JTextField();
-		textField_13.setName("routing_step");
-		textField_13.setColumns(10);
-		getContentPane().add(textField_13, "cell 5 15,growx");
-		
-		JLabel lblLengtheningSteps = new JLabel("Lengthening Step:");
-		lblLengtheningSteps.setName("");
-		getContentPane().add(lblLengtheningSteps, "cell 1 16,alignx trailing");
-		
-		textField_11 = new JTextField();
-		textField_11.setName("lengthening_step");
-		textField_11.setColumns(10);
-		getContentPane().add(textField_11, "cell 2 16,growx");
-		
-		JLabel lblVariableSteps = new JLabel("Variable Step:");
-		lblVariableSteps.setName("");
-		getContentPane().add(lblVariableSteps, "cell 4 16,alignx trailing");
-		
-		textField_14 = new JTextField();
-		textField_14.setName("variable_step");
-		textField_14.setColumns(10);
-		getContentPane().add(textField_14, "cell 5 16,growx");
-		
-		JLabel lblInertialdamping = new JLabel("Inertial Damping:");
-		lblInertialdamping.setName("");
-		getContentPane().add(lblInertialdamping, "cell 1 17,alignx trailing");
-		
-		JComboBox comboBox_8 = new JComboBox();
-		comboBox_8.setName("inertial_damping");
-		getContentPane().add(comboBox_8, "cell 2 17,growx");
-		
-		JLabel lblNormalflowlimited = new JLabel("Normal Flow Limited");
-		lblNormalflowlimited.setName("");
-		getContentPane().add(lblNormalflowlimited, "cell 4 17,alignx trailing");
-		
-		JComboBox comboBox_9 = new JComboBox();
-		comboBox_9.setName("normal_flow_limited");
-		getContentPane().add(comboBox_9, "cell 5 17,growx");
-		
-		JLabel lblMinSurfarea = new JLabel("Min Surfarea:");
-		lblMinSurfarea.setName("");
-		getContentPane().add(lblMinSurfarea, "cell 1 18,alignx trailing");
-		
-		textField_16 = new JTextField();
-		textField_16.setName("min_surfarea");
-		textField_16.setColumns(10);
-		getContentPane().add(textField_16, "cell 2 18,growx");
-		
-		JLabel lblMinSlope = new JLabel("Min Slope:");
+		JLabel lblMinSlope = new JLabel("Min slope:");
+		panelGeneral.add(lblMinSlope, "cell 0 5,alignx trailing");
 		lblMinSlope.setName("");
-		getContentPane().add(lblMinSlope, "cell 4 18,alignx trailing");
 		
 		textField_18 = new JTextField();
+		panelGeneral.add(textField_18, "cell 1 5,growx");
 		textField_18.setName("min_slope");
 		textField_18.setColumns(10);
-		getContentPane().add(textField_18, "cell 5 18,growx");
+		
+		JLabel lblNewLabel_1 = new JLabel("Skip steady state:");
+		panelGeneral.add(lblNewLabel_1, "cell 3 5,alignx trailing");
+		
+		JComboBox comboBox_7 = new JComboBox();
+		panelGeneral.add(comboBox_7, "cell 4 5,growx,aligny top");
+		comboBox_7.setName("skip_steady_state");
+		
+		JPanel panelSteps = new JPanel();
+		panelSteps.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "DATE & TIME STEPS", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		getContentPane().add(panelSteps, "cell 0 1 2 1,grow");
+		panelSteps.setLayout(new MigLayout("", "[90px][200.00][10px][100.00px][200px]", "[][][][][][][]"));
+		
+		JLabel lblStartDate = new JLabel("Start date:");
+		panelSteps.add(lblStartDate, "cell 0 0,alignx trailing");
+		
+		textField = new JTextField();
+		panelSteps.add(textField, "cell 1 0,growx");
+		textField.setName("start_date");
+		textField.setColumns(10);
+		
+		JLabel lblWetSteps = new JLabel("Runoff wet step:");
+		panelSteps.add(lblWetSteps, "cell 3 0,alignx trailing");
+		lblWetSteps.setName("");
+		
+		textField_12 = new JTextField();
+		panelSteps.add(textField_12, "cell 4 0,growx");
+		textField_12.setName("wet_step");
+		textField_12.setColumns(10);
+		
+		JLabel lblStartTime = new JLabel("Start time:");
+		panelSteps.add(lblStartTime, "cell 0 1,alignx trailing");
+		
+		textField_2 = new JTextField();
+		panelSteps.add(textField_2, "cell 1 1,growx");
+		textField_2.setName("start_time");
+		textField_2.setColumns(10);
+		
+		JLabel lblDrySteps = new JLabel("Runoff dry step:");
+		panelSteps.add(lblDrySteps, "cell 3 1,alignx trailing");
+		lblDrySteps.setName("dry_step");
+		
+		textField_10 = new JTextField();
+		panelSteps.add(textField_10, "cell 4 1,growx");
+		textField_10.setName("dry_step");
+		textField_10.setColumns(10);
+		
+		JLabel label_1 = new JLabel("End date:");
+		panelSteps.add(label_1, "cell 0 2,alignx trailing");
+		
+		textField_1 = new JTextField();
+		panelSteps.add(textField_1, "cell 1 2,growx");
+		textField_1.setName("end_date");
+		textField_1.setColumns(10);
+		
+		JLabel lblRoutingSteps = new JLabel("Routing step:");
+		panelSteps.add(lblRoutingSteps, "cell 3 2,alignx trailing");
+		lblRoutingSteps.setName("");
+		
+		textField_13 = new JTextField();
+		panelSteps.add(textField_13, "cell 4 2,growx");
+		textField_13.setName("routing_step");
+		textField_13.setColumns(10);
+		
+		JLabel lblEndTime = new JLabel("End time:");
+		panelSteps.add(lblEndTime, "cell 0 3,alignx trailing");
+		
+		textField_3 = new JTextField();
+		panelSteps.add(textField_3, "cell 1 3,growx");
+		textField_3.setName("end_time");
+		textField_3.setColumns(10);
+		
+		JLabel lblReportStartDate = new JLabel("Report start date:");
+		panelSteps.add(lblReportStartDate, "cell 0 4,alignx trailing");
+		
+		textField_4 = new JTextField();
+		panelSteps.add(textField_4, "cell 1 4,growx");
+		textField_4.setName("report_start_date");
+		textField_4.setColumns(10);
+		
+		JLabel lblSweepstart = new JLabel("Sweep start:");
+		panelSteps.add(lblSweepstart, "cell 3 4,alignx trailing");
+		lblSweepstart.setName("");
+		
+		textField_6 = new JTextField();
+		panelSteps.add(textField_6, "cell 4 4,growx");
+		textField_6.setName("sweep_start");
+		textField_6.setColumns(10);
+		
+		JLabel lblReportStartTime = new JLabel("Report start time:");
+		panelSteps.add(lblReportStartTime, "cell 0 5,alignx trailing");
+		
+		textField_5 = new JTextField();
+		panelSteps.add(textField_5, "cell 1 5,growx");
+		textField_5.setName("report_start_time");
+		textField_5.setColumns(10);
+		
+		JLabel lblSweepEnd = new JLabel("Sweep end:");
+		panelSteps.add(lblSweepEnd, "cell 3 5,alignx trailing");
+		lblSweepEnd.setName("");
+		
+		textField_7 = new JTextField();
+		panelSteps.add(textField_7, "cell 4 5,growx");
+		textField_7.setName("sweep_end");
+		textField_7.setColumns(10);
+		
+		JLabel lblDryDays = new JLabel("Report step:");
+		panelSteps.add(lblDryDays, "cell 0 6,alignx trailing");
+		lblDryDays.setName("");
+		
+		textField_8 = new JTextField();
+		panelSteps.add(textField_8, "cell 1 6,growx");
+		textField_8.setName("report_step");
+		textField_8.setColumns(10);
+		
+		JLabel label = new JLabel("Dry days:");
+		panelSteps.add(label, "cell 3 6,alignx trailing");
+		label.setName("");
+		
+		textField_9 = new JTextField();
+		panelSteps.add(textField_9, "cell 4 6,growx");
+		textField_9.setName("dry_days");
+		textField_9.setColumns(10);
+		
+		JPanel panel = new JPanel();
+		panel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "DYNAMIC WAVE", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		getContentPane().add(panel, "cell 0 2 2 1,grow");
+		panel.setLayout(new MigLayout("", "[90.00][200.00][10px][100px][200px]", "[][][]"));
+		
+		JLabel lblNewLabel = new JLabel("Force main:");
+		panel.add(lblNewLabel, "cell 0 0,alignx trailing");
+		
+		JComboBox comboBox_1 = new JComboBox();
+		panel.add(comboBox_1, "cell 1 0,growx");
+		comboBox_1.setName("force_main_equation");
+		
+		JLabel lblVariableSteps = new JLabel("Variable step:");
+		panel.add(lblVariableSteps, "cell 3 0,alignx trailing");
+		lblVariableSteps.setName("");
+		
+		textField_14 = new JTextField();
+		panel.add(textField_14, "cell 4 0,growx");
+		textField_14.setName("variable_step");
+		textField_14.setColumns(10);
+		
+		JLabel lblNormalflowlimited = new JLabel("Normal flow limited");
+		panel.add(lblNormalflowlimited, "cell 0 1,alignx trailing");
+		lblNormalflowlimited.setName("");
+		
+		JComboBox comboBox_9 = new JComboBox();
+		panel.add(comboBox_9, "cell 1 1,growx");
+		comboBox_9.setName("normal_flow_limited");
+		
+		JLabel lblInertialdamping = new JLabel("Inertial damping:");
+		panel.add(lblInertialdamping, "cell 3 1,alignx trailing");
+		lblInertialdamping.setName("");
+		
+		JComboBox comboBox_8 = new JComboBox();
+		panel.add(comboBox_8, "cell 4 1,growx");
+		comboBox_8.setName("inertial_damping");
+		
+		JLabel lblLengtheningSteps = new JLabel("Lengthening step:");
+		panel.add(lblLengtheningSteps, "cell 0 2,alignx trailing");
+		lblLengtheningSteps.setName("");
+		
+		textField_11 = new JTextField();
+		panel.add(textField_11, "cell 1 2,growx");
+		textField_11.setName("lengthening_step");
+		textField_11.setColumns(10);
+		
+		JLabel lblMinSurfarea = new JLabel("Min surfarea:");
+		panel.add(lblMinSurfarea, "cell 3 2,alignx trailing");
+		lblMinSurfarea.setName("");
+		
+		textField_16 = new JTextField();
+		panel.add(textField_16, "cell 4 2,growx");
+		textField_16.setName("min_surfarea");
+		textField_16.setColumns(10);
 		
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
@@ -370,7 +397,7 @@ public class OptionsDialog extends JDialog {
 				controller.saveData();
 			}
 		});
-		getContentPane().add(btnSave, "cell 5 20,alignx right");
+		getContentPane().add(btnSave, "cell 1 3,alignx right");
 		
 		this.addWindowListener(new WindowAdapter(){
 			public void windowClosed(WindowEvent e){
