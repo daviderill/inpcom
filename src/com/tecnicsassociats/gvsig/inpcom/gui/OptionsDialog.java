@@ -106,17 +106,42 @@ public class OptionsDialog extends JDialog {
 		
         componentMap = new HashMap<String, JComboBox>();
         textMap = new HashMap<String, JTextField>();
-        Component[] components = getContentPane().getComponents();
-        for (int i=0; i < components.length; i++) {
-			if (components[i] instanceof JComboBox) {         	
-				//System.out.println("ComboBox: " + components[i].getName());
-				componentMap.put(components[i].getName(), (JComboBox) components[i]);
+     Component[] components = getContentPane().getComponents();
+    
+        JPanel panel = null;
+        Component[] comp;
+		panel = (JPanel) components[0];               
+        comp = panel.getComponents(); 		
+        for (int i=0; i < comp.length; i++) {
+			if (comp[i] instanceof JComboBox) {         	
+				componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
 			}
-			else if (components[i] instanceof JTextField) {      
-				//System.out.println("TextField: " + components[i].getName());				
-				textMap.put(components[i].getName(), (JTextField) components[i]);
+			else if (comp[i] instanceof JTextField) {      
+				textMap.put(comp[i].getName(), (JTextField) comp[i]);
 			}			
         }
+        
+		panel = (JPanel) components[1];               
+        comp = panel.getComponents(); 		
+        for (int i=0; i < comp.length; i++) {
+			if (comp[i] instanceof JComboBox) {         	
+				componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
+			}
+			else if (comp[i] instanceof JTextField) {      
+				textMap.put(comp[i].getName(), (JTextField) comp[i]);
+			}			
+        }
+        
+		panel = (JPanel) components[2];               
+        comp = panel.getComponents(); 		
+        for (int i=0; i < comp.length; i++) {
+			if (comp[i] instanceof JComboBox) {         	
+				componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
+			}
+			else if (comp[i] instanceof JTextField) {      
+				textMap.put(comp[i].getName(), (JTextField) comp[i]);
+			}			
+        }        
         
 	}
 
@@ -336,58 +361,58 @@ public class OptionsDialog extends JDialog {
 		textField_9.setName("dry_days");
 		textField_9.setColumns(10);
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "DYNAMIC WAVE", TitledBorder.CENTER, TitledBorder.TOP, null, null));
-		getContentPane().add(panel, "cell 0 2 2 1,grow");
-		panel.setLayout(new MigLayout("", "[90.00][200.00][10px][100px][200px]", "[][][]"));
+		JPanel panelDynamic = new JPanel();
+		panelDynamic.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "DYNAMIC WAVE", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		getContentPane().add(panelDynamic, "cell 0 2 2 1,grow");
+		panelDynamic.setLayout(new MigLayout("", "[90.00][200.00][10px][100px][200px]", "[][][]"));
 		
 		JLabel lblNewLabel = new JLabel("Force main:");
-		panel.add(lblNewLabel, "cell 0 0,alignx trailing");
+		panelDynamic.add(lblNewLabel, "cell 0 0,alignx trailing");
 		
 		JComboBox comboBox_1 = new JComboBox();
-		panel.add(comboBox_1, "cell 1 0,growx");
+		panelDynamic.add(comboBox_1, "cell 1 0,growx");
 		comboBox_1.setName("force_main_equation");
 		
 		JLabel lblVariableSteps = new JLabel("Variable step:");
-		panel.add(lblVariableSteps, "cell 3 0,alignx trailing");
+		panelDynamic.add(lblVariableSteps, "cell 3 0,alignx trailing");
 		lblVariableSteps.setName("");
 		
 		textField_14 = new JTextField();
-		panel.add(textField_14, "cell 4 0,growx");
+		panelDynamic.add(textField_14, "cell 4 0,growx");
 		textField_14.setName("variable_step");
 		textField_14.setColumns(10);
 		
 		JLabel lblNormalflowlimited = new JLabel("Normal flow limited");
-		panel.add(lblNormalflowlimited, "cell 0 1,alignx trailing");
+		panelDynamic.add(lblNormalflowlimited, "cell 0 1,alignx trailing");
 		lblNormalflowlimited.setName("");
 		
 		JComboBox comboBox_9 = new JComboBox();
-		panel.add(comboBox_9, "cell 1 1,growx");
+		panelDynamic.add(comboBox_9, "cell 1 1,growx");
 		comboBox_9.setName("normal_flow_limited");
 		
 		JLabel lblInertialdamping = new JLabel("Inertial damping:");
-		panel.add(lblInertialdamping, "cell 3 1,alignx trailing");
+		panelDynamic.add(lblInertialdamping, "cell 3 1,alignx trailing");
 		lblInertialdamping.setName("");
 		
 		JComboBox comboBox_8 = new JComboBox();
-		panel.add(comboBox_8, "cell 4 1,growx");
+		panelDynamic.add(comboBox_8, "cell 4 1,growx");
 		comboBox_8.setName("inertial_damping");
 		
 		JLabel lblLengtheningSteps = new JLabel("Lengthening step:");
-		panel.add(lblLengtheningSteps, "cell 0 2,alignx trailing");
+		panelDynamic.add(lblLengtheningSteps, "cell 0 2,alignx trailing");
 		lblLengtheningSteps.setName("");
 		
 		textField_11 = new JTextField();
-		panel.add(textField_11, "cell 1 2,growx");
+		panelDynamic.add(textField_11, "cell 1 2,growx");
 		textField_11.setName("lengthening_step");
 		textField_11.setColumns(10);
 		
 		JLabel lblMinSurfarea = new JLabel("Min surfarea:");
-		panel.add(lblMinSurfarea, "cell 3 2,alignx trailing");
+		panelDynamic.add(lblMinSurfarea, "cell 3 2,alignx trailing");
 		lblMinSurfarea.setName("");
 		
 		textField_16 = new JTextField();
-		panel.add(textField_16, "cell 4 2,growx");
+		panelDynamic.add(textField_16, "cell 4 2,growx");
 		textField_16.setName("min_surfarea");
 		textField_16.setColumns(10);
 		

@@ -20,6 +20,10 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.model;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -251,13 +255,48 @@ public class MainDao {
 
 	public static void deleteSchema(String schemaName) {
 		String sql = "DROP schema IF EXISTS " + schemaName + " CASCADE;";
-		executeSql(sql);		
+		executeSql(sql, true);		
 	}
 
 
 	public static void createSchema(String schemaName) {
+		
 		String sql = "CREATE schema " + schemaName;
-		executeSql(sql);		
+		executeSql(sql);	
+		sql = "SET search_path TO '" + schemaName + "'";
+		executeSql(sql);	
+		try {
+	    	String folderRoot = new File(".").getCanonicalPath() + File.separator;         		
+			String file = folderRoot + "inp/create_schema.sql";
+			File fileName = new File(file);			
+			RandomAccessFile rat = new RandomAccessFile(fileName, "r");
+			String line;
+			String content = "";
+			while ((line = rat.readLine()) != null){
+				content += line + "\n";
+			}
+			if (executeSql(content, true)){
+				rat.close();				
+				sql = "SET search_path TO '" + schemaName + "', 'public'";
+				executeSql(sql);					
+				file = folderRoot + "inp/create_schema_2.sql";
+				fileName = new File(file);			
+				rat = new RandomAccessFile(fileName, "r");
+				content = "";
+				while ((line = rat.readLine()) != null){
+					content += line + "\n";
+				}
+				if (executeSql(content, true)){
+					Utils.showMessage("Schema creation completed", "", "INPcom");							
+				}
+				rat.close();	
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 }

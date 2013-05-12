@@ -67,8 +67,8 @@ public class AboutDialog extends JDialog {
 		setIconImage(image.getImage());		
 		//setBounds(100, 100, 450, 300);
 		setTitle(title);
-		setSize(340, 220);
-		getContentPane().setLayout(new MigLayout("", "[100.00][173.00px,grow]", "[250.00][][][50px][50px]"));
+		setSize(340, 238);
+		getContentPane().setLayout(new MigLayout("", "[116.00][173.00px,grow]", "[125.00px][70px][][][50px][50px]"));
 
 		final ImageIcon backgroundImage = new ImageIcon("images/imago.png");
 		
@@ -92,7 +92,6 @@ public class AboutDialog extends JDialog {
                 return size;
             }
         };
-		
 		getContentPane().add(panelLogo, "cell 1 0,alignx center,growy");
 
 		class OpenUrlAction implements ActionListener {
@@ -111,7 +110,7 @@ public class AboutDialog extends JDialog {
 			e.printStackTrace();
 		}		
 		JButton button = new JButton();
-		button.setFont(new Font("Tahoma", Font.BOLD, 12));
+		button.setFont(new Font("Tahoma", Font.BOLD, 11));
 		button.setText("<HTML><FONT color=\"#000099\"><U>www.tecnicsassociats.com</U></FONT></HTML>");
 		button.setHorizontalAlignment(SwingConstants.LEFT);
 		button.setBorderPainted(false);
@@ -119,21 +118,26 @@ public class AboutDialog extends JDialog {
 		button.setBackground(Color.WHITE);
 		button.setToolTipText(uri.toString());
 		button.addActionListener(new OpenUrlAction());		
-		getContentPane().add(button, "cell 0 2 2 1,alignx center");
+		
+		String label = "<HTML><FONT size=6 color=\"#336600\">Tècnics</FONT><FONT size=6 color=\"#000000\">Associats</FONT></HTML>";
+		JLabel lblLogo = new JLabel(label);
+		lblLogo.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		getContentPane().add(lblLogo, "cell 0 1 2 1,alignx center");
+		getContentPane().add(button, "cell 0 3 2 1,alignx center");
 		
 		JLabel lblTcnicsassociats = new JLabel();
-		lblTcnicsassociats.setFont(new Font("Tahoma", Font.BOLD, 12));
-		// lblTcnicsassociats.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblTcnicsassociats.setText("<HTML><FONT color=\"#000000\">T\u00E8cnics</FONT><FONT color=\"#000000\">associats</br></br>\n engineering & geospatial solutions</FONT></HTML>");
-		getContentPane().add(lblTcnicsassociats, "cell 0 1 2 1,alignx center");
+		lblTcnicsassociats.setFont(new Font("Tahoma", Font.BOLD, 10));
+		//lblTcnicsassociats.setText("<HTML><FONT color=\"#000000\">engineering & geospatial solutions</FONT></HTML>");
+		lblTcnicsassociats.setText("engineering & geospatial solutions");
+		getContentPane().add(lblTcnicsassociats, "cell 0 2 2 1,alignx center");
 		
 		lblInfo = new JLabel("Developer: David Erill Carrera");
-		lblInfo.setFont(new Font("Tahoma", Font.BOLD, 11));
-		getContentPane().add(lblInfo, "cell 0 3 2 1,alignx center");	
+		lblInfo.setFont(new Font("Tahoma", Font.BOLD, 10));
+		getContentPane().add(lblInfo, "cell 0 4 2 1,alignx center");	
 		
 		JLabel lblNewLabel = new JLabel(version);
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
-		getContentPane().add(lblNewLabel, "cell 0 4 2 1,alignx center");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 10));
+		getContentPane().add(lblNewLabel, "cell 0 5 2 1,alignx center");
 	
 	}
 

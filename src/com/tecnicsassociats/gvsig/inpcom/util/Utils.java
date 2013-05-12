@@ -328,4 +328,39 @@ public class Utils {
     }    
 
     
+	public static void execProcess(String process){
+		try{    
+			//Process p = Runtime.getRuntime().exec(file);
+			Process p = Runtime.getRuntime().exec("cmd /c start " + process);				
+			p.waitFor();
+		}catch( IOException ex ){
+		    System.out.println("IOException Error");
+		}catch( InterruptedException ex ){
+		    System.out.println("InterruptedException Error");
+
+		}		
+	}
+	
+    
+	public static void openFile(String file){
+		try{    
+			//String file = "C:/gvSIG_1.11/bin/gvSIG/extensiones/org.gvsig.taGasNatural/exec_test.cmd";
+			File exec = new File(file);
+			if (exec.exists()){
+				//Process p = Runtime.getRuntime().exec(file);
+				Process p = Runtime.getRuntime().exec("cmd /c start " + file);				
+				p.waitFor();
+			} else{
+				Utils.showMessage("FILE_NOT_FOUND", file, "TITLE");
+			}
+
+		}catch( IOException ex ){
+		    System.out.println("IOException Error");
+
+		}catch( InterruptedException ex ){
+		    System.out.println("InterruptedException Error");
+
+		}		
+	}    
+    
 }

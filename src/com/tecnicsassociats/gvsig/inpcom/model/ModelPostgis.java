@@ -177,7 +177,6 @@ public class ModelPostgis extends Model {
             sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
             		+ "FROM " + MainDao.schemaDrivers + ".swmm_inp_target as target " 
             		+ "INNER JOIN " + MainDao.schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";      
-            logger.info(sql);
             Statement stat = connectionPostgis.createStatement();            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
@@ -217,7 +216,6 @@ public class ModelPostgis extends Model {
         for (int i = 1; i <= lines; i++) {
             String line = rat.readLine();
             raf.writeBytes(line + "\r\n");
-            logger.info(line);
         }
 
         // If table is null or doesn't exit then exit function
@@ -235,7 +233,6 @@ public class ModelPostgis extends Model {
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
         String sql = "SELECT name, space FROM " + MainDao.schemaDrivers + ".swmm_inp_target_fields WHERE target_id = " + id + " ORDER BY pos";
-        logger.info(sql);
         Statement stat = connectionPostgis.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
@@ -287,7 +284,6 @@ public class ModelPostgis extends Model {
         for (int i = 1; i <= lines; i++) {
             String line = rat.readLine();
             raf.writeBytes(line + "\r\n");
-            logger.info(line);            
         }
 
         // If table is null or doesn't exit then exit function
@@ -298,12 +294,12 @@ public class ModelPostgis extends Model {
         // Get data of the specified Postgis table
         ArrayList<LinkedHashMap<String, String>> options = getTableData(tableName);
         if (options.isEmpty()) {
+        	logger.info("Empty table: " + tableName);        	
             return;
         }
 
         ListIterator<LinkedHashMap<String, String>> it = options.listIterator();
         LinkedHashMap<String, String> m;   // Current Postgis row data
-        //int index = 0;
         String sValor = null;
         int size = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_SIZE"));
         
@@ -334,8 +330,6 @@ public class ModelPostgis extends Model {
     public boolean execSWMM(File fileInp, File fileRpt) {
 
         logger.info("execSWMM");
-
-//		file = folder + "swmm5.exe " + folder + "222.inp " + folder + "2.rpt " + folder + "2.out";
 
         String folder = iniProperties.getProperty("FOLDER_EPA_SWMM");
         String exe = iniProperties.getProperty("EXE_EPA_SWMM");
@@ -373,6 +367,7 @@ public class ModelPostgis extends Model {
 		try {
 			p = Runtime.getRuntime().exec(exeCmd);
 	        p.waitFor();			
+	        p.destroy();
 		} catch (IOException e) {
 			Utils.showError("inp_error_io", exeCmd, "inp_descr");
 			return false;
@@ -495,17 +490,6 @@ public class ModelPostgis extends Model {
 		String aux;
 		
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
-		
-//		if (rpt.getId() == 10){
-//			for (int i = 0; i < 13; i++) {
-//				try {
-//					lineNumber++;							
-//					line = rat.readLine().trim();
-//				} catch (IOException e) {
-//					Utils.showError(e);
-//				}
-//			}
-//		}
 		
 		while (!found){
 			try {

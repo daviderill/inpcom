@@ -20,6 +20,7 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
+import java.awt.Cursor;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -91,20 +92,29 @@ public class DatabaseController {
 	
 	
 	public void createSchema(){
+		
 		String schemaName = JOptionPane.showInputDialog(this.view, bundleText.getString("enter_schema_name"), "");
+		view.setCursor(new Cursor(Cursor.WAIT_CURSOR));		
 		MainDao.createSchema(schemaName.trim());
 		view.setSchemas(MainDao.getSchemas());		
+		view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		
 	}
 	
 	
 	public void deleteSchema(){
+		
 		String schemaName = view.getSchema1();
         int res = JOptionPane.showConfirmDialog(this.view, Utils.getBundleString(bundleText, "delete_schema_name") + "\n" + schemaName, 
         		"INPCom", JOptionPane.YES_NO_OPTION);
         if (res == 0){
+    		view.setCursor(new Cursor(Cursor.WAIT_CURSOR));	        	
         	MainDao.deleteSchema(schemaName);
-        	view.setSchemas(MainDao.getSchemas());        	
+        	view.setSchemas(MainDao.getSchemas());
+    		view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    		Utils.showMessage("Schema deleted", "", "INPcom");
         }
+        
 	}	
 	
 	

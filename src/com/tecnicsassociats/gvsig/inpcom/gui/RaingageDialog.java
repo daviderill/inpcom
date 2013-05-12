@@ -92,17 +92,18 @@ public class RaingageDialog extends JDialog {
 		
         componentMap = new HashMap<String, JComboBox>();
         textMap = new HashMap<String, JTextField>();
-        // TODO: Get panelGeneral
         Component[] components = getContentPane().getComponents();
-        for (int i=0; i < components.length; i++) {
-			if (components[i] instanceof JComboBox) {         	
-				componentMap.put(components[i].getName(), (JComboBox) components[i]);
-			}
-			else if (components[i] instanceof JTextField) {      
-				textMap.put(components[i].getName(), (JTextField) components[i]);
-			}			
+        JPanel panelGeneral = null;;
+		panelGeneral = (JPanel) components[0];            
+        Component[] comp = panelGeneral.getComponents();        
+        for (int i=0; i < comp.length; i++) {        
+        	if (comp[i] instanceof JComboBox) {         	
+        		componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
+        	}
+        	else if (comp[i] instanceof JTextField) {      
+        		textMap.put(comp[i].getName(), (JTextField) comp[i]);
+        	}
         }
-        
 	}
 
 
@@ -118,12 +119,12 @@ public class RaingageDialog extends JDialog {
 		getContentPane().add(panelGeneral, "cell 0 0 2 1,grow");
 		panelGeneral.setLayout(new MigLayout("", "[75.00][200.00,grow][10px][80px][200px,grow]", "[][][][][][]"));
 
-		JLabel lblFlowUnits = new JLabel("Flow type:");
+		JLabel lblFlowUnits = new JLabel("Form type:");
 		panelGeneral.add(lblFlowUnits, "cell 0 0,alignx trailing");
 
 		JComboBox flow_units = new JComboBox();
 		panelGeneral.add(flow_units, "cell 1 0,growx");
-		flow_units.setName("flow_type");
+		flow_units.setName("form_type");
 		
 		JLabel lblNewLabel_1 = new JLabel("Intvl:");
 		panelGeneral.add(lblNewLabel_1, "cell 3 0,alignx trailing");

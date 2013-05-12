@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.AboutDialog;
+import com.tecnicsassociats.gvsig.inpcom.gui.LicenseDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.MainFrame;
 import com.tecnicsassociats.gvsig.inpcom.gui.WelcomeDialog;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
@@ -101,9 +102,9 @@ public class MenuController {
 	public void showLicense() {
 		String title = "License";
 		String info = "This product as a whole is distributed under the GNU General Public License version 3";
-		String info2 = "<html><font size='2'>This tool has been funded wholly or in part by TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL. (hereafter TECNICSASSOCIATS). Mention of trade names or commercial products does not constitute endorsement or recommendation for use. Although It has been subjected to technical review before being released and although it has made a considerable effort to assure that the results obtained are correct, the computer programs are experimental. Therefore the author and TECNICSASSOCIATS are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from these programs, nor for any damages or litigation that result from the use of these programs for any purpose.</font></html>";
+		String info2 = "<html><font size='2'>This product has been funded wholly or in part by TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL. (hereafter TECNICSASSOCIATS). Mention of trade names or commercial products does not constitute endorsement or recommendation for use. Although It has been subjected to technical review before being released and although it has made a considerable effort to assure that the results obtained are correct, the computer programs are experimental. Therefore the author and TECNICSASSOCIATS are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from these programs, nor for any damages or litigation that result from the use of these programs for any purpose.</font></html>";
 		String info3 = "View license file";		
-		WelcomeDialog about = new WelcomeDialog(title, info, info2, info3);
+		LicenseDialog about = new LicenseDialog(title, info, info2, info3);
 		about.setModal(true);
 		about.setLocationRelativeTo(null);
 		about.setVisible(true);
@@ -112,7 +113,7 @@ public class MenuController {
 	public void showAgreements() {
 		String title = "Agreements";
 		String info = "Special thanks for his contribution to the project to:";
-		String info2 = "Carlos López Quintanilla, Andreu Rodríguez and Gemma Garcia";
+		String info2 = "Carlos López Quintanilla, Gemma García Ribot & Andrés Rodríguez Valero";
 		WelcomeDialog about = new WelcomeDialog(title, info, info2);
 		about.setModal(true);
 		about.setLocationRelativeTo(null);

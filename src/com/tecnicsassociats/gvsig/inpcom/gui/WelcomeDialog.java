@@ -20,20 +20,17 @@
  */
 package com.tecnicsassociats.gvsig.inpcom.gui;
 
-import java.awt.Color;
-import java.awt.Desktop;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Graphics;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -56,69 +53,52 @@ public class WelcomeDialog extends JDialog {
 		}
 	}
 
-
-	public WelcomeDialog(String title, String info, String info2) {
-		this(title, info, info2, "");
-	}
 	
 	
 	/**
 	 * @wbp.parser.constructor
 	 */
-	public WelcomeDialog(String title, String info, String info2, String info3) {
+	public WelcomeDialog(String title, String info, String info2) {
 		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 8));
-
-		try{
-			
-
+	
 		ImageIcon image = new ImageIcon("images/imago.png");
 		setIconImage(image.getImage());
-		//setBounds(100, 100, 450, 300);
+		setTitle(title);		
 		setSize(549, 231);
-		getContentPane().setLayout(new MigLayout("", "[150px,grow]", "[][50px][80.00px,grow][30.00]"));
+		getContentPane().setLayout(new MigLayout("", "[150px,grow]", "[10px][grow][30px][30.00px][30.00]"));
 
-		setTitle(title);
+		
+		final ImageIcon backgroundImage = new ImageIcon("images/imago.png");
+		
+        JPanel panelLogo = new JPanel(new BorderLayout()) {
+			private static final long serialVersionUID = 3096090575648819722L;
+
+			@Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundImage.getImage(), 0, 0, 90, 90, this);
+            }
+
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension size = super.getPreferredSize();
+                size.width = Math.max(backgroundImage.getIconWidth(), size.width);
+                size.height = Math.max(backgroundImage.getIconHeight(), size.height);
+                size.width = 90;
+                size.height = 90;  
+                return size;
+            }
+        };
+		getContentPane().add(panelLogo, "cell 0 1,alignx center,growy");
+		panelLogo.setLayout(new BorderLayout());
 		
 		JLabel lblInfo = new JLabel(info);
 		lblInfo.setFont(new Font("Tahoma", Font.BOLD, 12));
-		getContentPane().add(lblInfo, "cell 0 1,alignx center");	
+		getContentPane().add(lblInfo, "cell 0 2,alignx center");	
 		
 		JLabel lblInfo2 = new JLabel(info2);
 		lblInfo2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		getContentPane().add(lblInfo2, "cell 0 2,alignx center");
-		
-		if (!info3.equals("")){
-			
-			class OpenUrlAction implements ActionListener {
-			    @Override public void actionPerformed(ActionEvent e) {
-					try {
-						Desktop.getDesktop().open(file);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-			    }
-			}		
-	
-        	String folderRoot = new File(".").getCanonicalPath() + File.separator;   			
-			file = new File(folderRoot + "licensing.txt");
-			
-			JButton btngsdf = new JButton();
-			btngsdf.setFont(new Font("Tahoma", Font.BOLD, 12));
-			String text = "<HTML><FONT color=\"#000099\"><U>" + info3 + "</U></FONT></HTML>";
-			btngsdf.setText(text);
-			btngsdf.setHorizontalAlignment(SwingConstants.LEFT);
-			btngsdf.setBorderPainted(false);
-			btngsdf.setOpaque(false);
-			btngsdf.setBackground(Color.WHITE);
-			btngsdf.setToolTipText(file.toString());
-			btngsdf.addActionListener(new OpenUrlAction());		
-			getContentPane().add(btngsdf, "cell 0 3,alignx center");
-			
-		}
-			
-		} catch (Exception e2){
-			e2.printStackTrace();
-		}
+		getContentPane().add(lblInfo2, "cell 0 3,alignx center");
 		
 	}
 
