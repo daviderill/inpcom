@@ -21,13 +21,10 @@
 package com.tecnicsassociats.gvsig.inpcom.controller;
 
 import java.awt.Cursor;
-import java.awt.Desktop;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -40,6 +37,7 @@ import com.tecnicsassociats.gvsig.inpcom.gui.OptionsDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.RaingageDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.TableWindow;
 import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
+import com.tecnicsassociats.gvsig.inpcom.model.Model;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
 import com.tecnicsassociats.gvsig.inpcom.util.Encryption;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
@@ -49,10 +47,7 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 public class MainController{
 
 	private Form view;
-    private ModelPostgis modelPostgis;
     private Properties prop;
-
-    // Postgis
     private File fileInp;
     private File fileRpt;
     private String projectName;
@@ -63,19 +58,16 @@ public class MainController{
     private boolean importChecked;
     
     private String userHomeFolder;
-    //private ResourceBundle bundleForm;
     private ResourceBundle bundleText;
 
     
-    public MainController(ModelPostgis modelPostgis, Form view) {
+    public MainController(Form view) {
     	
-    	this.view = view;
-        this.modelPostgis = modelPostgis;    	
-        this.prop = ModelPostgis.getPropertiesFile();
+    	this.view = view;	
+        this.prop = MainDao.getPropertiesFile();
 	    view.setControl(this);        
     	
     	userHomeFolder = System.getProperty("user.home");
-    	//this.bundleForm = Utils.getBundleForm();
     	this.bundleText = Utils.getBundleText();
     	
     	// Set default values
@@ -157,9 +149,6 @@ public class MainController{
 	
 	
 	public void showRaingage(){
-//		ResultSet rs = MainDao.getRaingageResultset("raingage");
-//		TableWindow tableWindow = new TableWindow(rs, "raingage");
-//        Utils.openDialogForm(tableWindow, 700, 300);
 		ResultSet rs = MainDao.getTableResultset("raingage");
 		RaingageDialog dialog = new RaingageDialog();
 		RaingageController inp = new RaingageController(dialog, rs);
@@ -168,7 +157,6 @@ public class MainController{
 		dialog.setLocationRelativeTo(null);   
 		dialog.setVisible(true);		        
 	}	
-		
 		
 
     public void chooseFileInp() {
@@ -190,7 +178,7 @@ public class MainController{
             }
             view.setFileInp(fileInp.getAbsolutePath());            
             prop.put("FILE_INP", fileInp.getAbsolutePath());
-            ModelPostgis.savePropertiesFile();
+            MainDao.savePropertiesFile();
             readyFileInp = true;
         }
 
@@ -217,7 +205,7 @@ public class MainController{
             }
             view.setFileRpt(fileRpt.getAbsolutePath());
             prop.put("FILE_RPT", fileRpt.getAbsolutePath());
-            ModelPostgis.savePropertiesFile();
+            MainDao.savePropertiesFile();
             readyFileRpt = true;
         }
 
@@ -227,16 +215,6 @@ public class MainController{
     public void executePostgis() {
 
         boolean continueExec = true;
-
-        //view.resetStatus();
-        
-        // Get schema from view
-        String schema = view.getSchema();
-        if (schema.equals("")){
-            Utils.showError("Any schema selected", "", "inp_descr");
-            return;
-        }
-        MainDao.setSchema(schema);
         
         // Which checks are selected?
         exportChecked = view.isExportChecked();
@@ -246,6 +224,23 @@ public class MainController{
         if (!exportChecked && !execChecked && !importChecked){
             Utils.showError("select_option", "", "inp_descr");
         }
+
+        // Get schema from view
+        String schema = view.getSchema();
+        if (schema.equals("")){
+            Utils.showError("Any schema selected", "", "inp_descr");
+            return;
+        }
+        MainDao.setSchema(schema);
+        
+        // Get software version from view
+        String id = view.getSoftwarePostgis();
+        if (id.equals("")){
+            Utils.showError("Any software version selected", "", "inp_descr");
+            return;
+        }
+        String version = MainDao.getSoftwareVersion("postgis", id);
+        Model.setSoftware(version);
         
         view.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
@@ -254,10 +249,8 @@ public class MainController{
             if (!readyFileInp) {
                 Utils.showError("file_inp_not_selected", "", "inp_descr");
                 return;
-            }            
-            //String status = "Export to INP\n" + bundleText.getString("processing") + "\n";            
-            continueExec = this.modelPostgis.processAll(fileInp);
-            //status = bundleText.getString("completed") + ": " + fileInp.getAbsolutePath();
+            }                
+            continueExec = ModelPostgis.processAll(fileInp);
         }
 
         // Run SWMM
@@ -269,9 +262,8 @@ public class MainController{
             if (!readyFileRpt) {
                 Utils.showError("file_rpt_not_selected", "", "inp_descr");
                 return;
-            }            
-            //String status = "Run SWMM\n" + bundleText.getString("processing") + "\n";          
-            continueExec = this.modelPostgis.execSWMM(fileInp, fileRpt);
+            }                  
+            continueExec = ModelPostgis.execSWMM(fileInp, fileRpt);
         }
 
         // Import RPT to Postgis
@@ -284,11 +276,11 @@ public class MainController{
             if (projectName.equals("")){
                 Utils.showError("project_name", "", "inp_descr");
             } else{
-                //String status = "Import RPT to Postgis\n" + bundleText.getString("processing") + "\n";
-            	continueExec = this.modelPostgis.importRpt(fileRpt, projectName);
+            	continueExec = ModelPostgis.importRpt(fileRpt, projectName);
+            	Model.closeFile();
             	if (!continueExec){
             		try {
-						ModelPostgis.connectionPostgis.rollback();
+						ModelPostgis.rollback();
 					} catch (SQLException e) {
 	    	            Utils.showError(e);
 					}
@@ -298,27 +290,9 @@ public class MainController{
         
     }
     
-    
-	public void openHelp() {
-		if (ModelPostgis.fileHelp != null) {
-			try {
-				Desktop.getDesktop().open(ModelPostgis.fileHelp);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}    
-	
-	
-    public void closeView(){
-		view.close();
-	}
-
-
+    	
 	public void setSoftware() {
-		List<String> list = MainDao.getSoftware();
-		view.setSoftware(list);
+		view.setSoftwarePostgis(MainDao.getAvailableVersions("postgis"));
 	}
-
 	
 }

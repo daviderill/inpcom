@@ -45,42 +45,23 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 public class ModelDbf extends Model{
 
-	private Map<Integer, File> dbfFiles;
+	private static Map<Integer, File> dbfFiles;
 
 	
-    public ModelDbf(String export, String execType) {
-    	this.sExport = export;
-    	this.execType = execType;
-    	init();
-    }   	
-
-    
-    public ModelDbf() {
-    	init();
-    }   	
-
-    
-    private void init(){
-
-        // Get properties file
-        if (!enabledPropertiesFile()) {
-            return;
-        }
-
-        // Sets initial configuration files
-        configIni();
-        
-        // Get log file
-        logger = Utils.getLogger();
-        
-        dbfFiles = new HashMap<Integer, File>();
-        
+    public static boolean setConnectionDbf(String sqlitePath) {
+		if (MainDao.setConnectionDbf(sqlitePath)){
+			connectionDbf = MainDao.connectionDbf;
+			return true;
+		} else{
+			return false;
+		}
+    	
     }
     
     
 	// Read content of the DBF file and saved it in an Array
 	@SuppressWarnings("resource")
-	public ArrayList<LinkedHashMap<String, String>> readDBF(File file) {
+	public static ArrayList<LinkedHashMap<String, String>> readDBF(File file) {
 
 		FileChannel in;
 		Row row;
@@ -117,32 +98,38 @@ public class ModelDbf extends Model{
 
 
 	// Main procedure
-	public void processAll(String dirOut, String fileOut) {
+	public static void processAll(String dirOut, String fileOut) {
 
 		try {
 
+			iniProperties = MainDao.getPropertiesFile();
+			
 			// Get INP output file
 			if (dirOut.equals("")){
-				dirOut = folderConfig;
+				dirOut = MainDao.folderConfig;
 			}
 			if (fileOut.equals("")){
-				fileOut = iniProperties.getProperty(sExport + "INP");
+				fileOut = iniProperties.getProperty("DEFAULT_INP", "out");
 			}
 			String sFile = dirOut + File.separator + fileOut;
 			File fileInp = new File(sFile);
 			
-			// Get some properties
-			//polygons_target_id = Integer.parseInt(iniProperties.getProperty(sExport + "POLYGONS_TARGET_ID"));
-			default_size = Integer.parseInt(iniProperties.getProperty(sExport + "SIZE_DEFAULT"));
-
+            // Get INP template File
+            String templatePath = MainDao.folderConfig + software + ".inp";
+            File fileTemplate = new File(templatePath);
+            if (!fileTemplate.exists()){
+            	Utils.showMessage("inp_error_notfound", fileTemplate.getAbsolutePath(), "inp_descr");
+            	return;
+            }			
+			
 			// Open template and output file
-			rat = new RandomAccessFile(this.fileTemplate, "r");
+			rat = new RandomAccessFile(fileTemplate, "r");
 			raf = new RandomAccessFile(fileInp, "rw");
 			raf.setLength(0);
 
 			// Get content of target table	
 			String sql = "SELECT id, name, dbf_id, lines FROM target";
-			Statement stat = connectionSqlite.createStatement();
+			Statement stat = connectionDbf.createStatement();
 			ResultSet rs = stat.executeQuery(sql);					
 			while (rs.next()) {
 				processTarget(rs.getInt("id"), rs.getInt("dbf_id"), rs.getInt("lines"));	
@@ -164,7 +151,7 @@ public class ModelDbf extends Model{
 
 
 	// Process target specified by id parameter
-	private void processTarget(int id, int fileIndex, int lines) throws IOException, SQLException {
+	private static void processTarget(int id, int fileIndex, int lines) throws IOException, SQLException {
 
 		// Go to the first line of the target
 		for (int i = 1; i <= lines; i++) {
@@ -183,24 +170,24 @@ public class ModelDbf extends Model{
 
 		// Get data of the specified DBF file
 		try{
-			this.lMapDades = readDBF(file);
+			lMapDades = readDBF(file);
 		}
 		catch (Exception e){
 			Utils.logError(e, "");
 		}
-		if (this.lMapDades.isEmpty()) return;		
+		if (lMapDades.isEmpty()) return;		
 
 		// Get DBF fields to write into this target
 		mHeader = new LinkedHashMap<String, Integer>();		
 		String sql = "SELECT name, space FROM target_fields WHERE target_id = " + id + " ORDER BY pos" ;
-		Statement stat = connectionSqlite.createStatement();
+		Statement stat = connectionDbf.createStatement();
 		ResultSet rs = stat.executeQuery(sql);			 		
 		while (rs.next()) {
 			mHeader.put(rs.getString("name").trim().toLowerCase(), rs.getInt("space"));
 		}
 		rs.close();
 
-		ListIterator<LinkedHashMap<String, String>> it = this.lMapDades.listIterator();
+		ListIterator<LinkedHashMap<String, String>> it = lMapDades.listIterator();
 		Map<String, String> m;   // Current DBF row data
 		String sValor = null;
 		int size = 0;
@@ -237,20 +224,13 @@ public class ModelDbf extends Model{
 
 
 	// Check all the necessary files to run the process
-	public boolean checkFiles(String sDirShp, String sDirOut) {
+	public static boolean checkFiles(String sDirShp, String sDirOut) {
 
-		// Get INP template file
-		String sFile = iniProperties.getProperty(sExport + "TEMPLATE");
-		sFile = folderConfig + File.separator + sFile;
-		fileTemplate = new File(sFile);
-		if (!fileTemplate.exists()) {
-			Utils.showError("inp_error_notfound", sFile, "inp_descr");				
-			return false;
-		}
-		
+        dbfFiles = new HashMap<Integer, File>();
+        
 		String sql = "SELECT id, name FROM dbf WHERE id > -1 ORDER BY id";
 		try {
-			Statement stat = connectionSqlite.createStatement();
+			Statement stat = connectionDbf.createStatement();
 			ResultSet rs = stat.executeQuery(sql);		
 			while (rs.next()) {
 				String sDBF = sDirShp + File.separator + rs.getString("name").trim() + ".dbf";

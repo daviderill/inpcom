@@ -49,45 +49,22 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 public class ModelPostgis extends Model {
 
-	public static Connection connectionPostgis;   	
-    private String insertSql;
-	private ArrayList<String> tokens;
-	private ArrayList<ArrayList<String>> tokensList;	
-	private File fileRpt;
-	private String projectName;
-	private int lineNumber;   // Number of lines read
-	private ArrayList<String> pollutants;
+	private static Connection connectionPostgis;
+    private static String insertSql;
+	private static ArrayList<String> tokens;
+	private static ArrayList<ArrayList<String>> tokensList;	
+	private static File fileRpt;
+	private static String projectName;
+	private static int lineNumber;   // Number of lines read
+	private static ArrayList<String> pollutants;
 	
-	
-    public ModelPostgis(String export, String execType) {
-    	this.sExport = export;
-        this.execType = execType;    	
-    	init();
-    }
-
-    public ModelPostgis() {
-    	init();
-    }    
-
     
-    private void init(){
-    	
-        // Get properties file
-        if (!enabledPropertiesFile()) {
-            return;
-        }
+    public static void execute(String execType, String export, String exec, String import_) {
 
-        // Sets initial configuration files
-        configIni();
-        
         // Get log file
         logger = Utils.getLogger();
+		iniProperties = MainDao.getPropertiesFile();   
         
-    }
-
-    
-    public void execute(String execType, String export, String exec, String import_) {
-
         // Process all Postgis tables and output to INP file
         if (export.equals("1")) {
             processAll(null);
@@ -98,14 +75,14 @@ public class ModelPostgis extends Model {
         }
 
         if (import_.equals("1")) {
-            File file = new File(iniProperties.getProperty("FILE_RPT"));            	
+            File file = new File(Model.iniProperties.getProperty("FILE_RPT"));            	
             importRpt(file, "test");
         }
 
     }
 
     
-    public boolean setConnectionPostgis(String host, String port, String db, String user, String password) {
+    public static boolean setConnectionPostgis(String host, String port, String db, String user, String password) {
     	boolean isConnected = MainDao.setConnectionPostgis(host, port, db, user, password);
     	connectionPostgis = MainDao.connectionPostgis;
     	return isConnected;
@@ -113,11 +90,11 @@ public class ModelPostgis extends Model {
     
 
     // Read content of the table saved it in an Array
-    private ArrayList<LinkedHashMap<String, String>> getTableData(String tableName) {
+    private static ArrayList<LinkedHashMap<String, String>> getTableData(String tableName) {
 
     	LinkedHashMap<String, String> mDades;
         ArrayList<LinkedHashMap<String, String>> mAux = new ArrayList<LinkedHashMap<String, String>>();
-        String sql = "SELECT * FROM sewnet." + tableName;
+        String sql = "SELECT * FROM " + MainDao.schema + "." +  tableName;
         PreparedStatement ps;
         try {
             ps = connectionPostgis.prepareStatement(sql);
@@ -151,32 +128,44 @@ public class ModelPostgis extends Model {
 
 
     // Main procedure
-    public boolean processAll(File fileInp) {
+    public static boolean processAll(File fileInp) {
 
+        // Get log file
+        logger = Utils.getLogger();
         logger.info("exportINP");
+
+		iniProperties = MainDao.getPropertiesFile();         
     	String sql = "";
    	
         try {
         	
             // Get default INP output file
             if (fileInp == null) {
-                String sFile = iniProperties.getProperty(sExport + "INP");
-                sFile = folderConfig + File.separator + sFile;
+                String sFile = iniProperties.getProperty("DEFAULT_INP", "out");
+                sFile = MainDao.folderConfig + sFile;
                 fileInp = new File(sFile);
+            }
+            
+            // Get INP template File
+            String templatePath = MainDao.folderConfig + software + ".inp";
+            File fileTemplate = new File(templatePath);
+            if (!fileTemplate.exists()){
+            	Utils.showMessage("inp_error_notfound", fileTemplate.getAbsolutePath(), "inp_descr");
+            	return false;
             }
                 
             // Get some properties
-            default_size = Integer.parseInt(iniProperties.getProperty(sExport + "SIZE_DEFAULT"));
+            //default_size = Integer.parseInt(iniProperties.getProperty(sExport + "SIZE_DEFAULT"));
 
             // Open template and output file
-            rat = new RandomAccessFile(this.fileTemplate, "r");
+            rat = new RandomAccessFile(fileTemplate, "r");
             raf = new RandomAccessFile(fileInp, "rw");
             raf.setLength(0);
 
             // Get content of target table
             sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
-            		+ "FROM " + MainDao.schemaDrivers + ".swmm_inp_target as target " 
-            		+ "INNER JOIN " + MainDao.schemaDrivers + ".swmm_inp_table as main ON target.table_id = main.id";      
+            		+ "FROM " + MainDao.schemaDrivers + "." + software + "_inp_target as target " 
+            		+ "INNER JOIN " + MainDao.schemaDrivers + "." + software + "_inp_table as main ON target.table_id = main.id";                  
             Statement stat = connectionPostgis.createStatement();            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
@@ -210,7 +199,7 @@ public class ModelPostgis extends Model {
 
 
     // Process target specified by id parameter
-    private void processTarget(int id, String tableName, int lines) throws IOException, SQLException {
+    private static void processTarget(int id, String tableName, int lines) throws IOException, SQLException {
 
         // Go to the first line of the target
         for (int i = 1; i <= lines; i++) {
@@ -224,15 +213,16 @@ public class ModelPostgis extends Model {
         }
 
         // Get data of the specified Postgis table
-        this.lMapDades = getTableData(tableName);
-        if (this.lMapDades.isEmpty()) {
+        lMapDades = getTableData(tableName);
+        if (lMapDades.isEmpty()) {
         	logger.info("Empty table: " + tableName);
             return;
         }
 
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
-        String sql = "SELECT name, space FROM " + MainDao.schemaDrivers + ".swmm_inp_target_fields WHERE target_id = " + id + " ORDER BY pos";
+        String sql = "SELECT name, space FROM " + MainDao.schemaDrivers + "." + software + "_inp_target_fields " + 
+        		"WHERE target_id = " + id + " ORDER BY pos";
         Statement stat = connectionPostgis.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
@@ -240,7 +230,7 @@ public class ModelPostgis extends Model {
         }
         rs.close();
 
-        ListIterator<LinkedHashMap<String, String>> it = this.lMapDades.listIterator();
+        ListIterator<LinkedHashMap<String, String>> it = lMapDades.listIterator();
         LinkedHashMap<String, String> m;   // Current Postgis row data
         //int index = 0;
         String sValor = null;
@@ -278,7 +268,7 @@ public class ModelPostgis extends Model {
 
     
     // Process target options or target report
-    private void processTarget2(int id, String tableName, int lines) throws IOException, SQLException {
+    private static void processTarget2(int id, String tableName, int lines) throws IOException, SQLException {
 
         // Go to the first line of the target
         for (int i = 1; i <= lines; i++) {
@@ -327,29 +317,38 @@ public class ModelPostgis extends Model {
 
     
     // Exec SWMM
-    public boolean execSWMM(File fileInp, File fileRpt) {
+    public static boolean execSWMM(File fileInp, File fileRpt) {
 
+        // Get log file
+        logger = Utils.getLogger();
         logger.info("execSWMM");
+        
+		iniProperties = MainDao.getPropertiesFile();   
 
-        String folder = iniProperties.getProperty("FOLDER_EPA_SWMM");
-        String exe = iniProperties.getProperty("EXE_EPA_SWMM");
-        String exeCmd = folder + File.separator + exe;
+		String exeCmd = MainDao.getSoftwareExecutable("postgis", software);
         File exeFile = new File(exeCmd);
         // Check if exeFile exists
 		if (!exeFile.exists()){
-			Utils.showError("inp_error_notfound", exeCmd, "inp_descr");
-			return false;
+			exeCmd = JOptionPane.showInputDialog(null, "EPA Software .exe file nout found: " + exeCmd + "\n" +
+            	"Please set correct path");
+            exeFile = new File(exeCmd);
+    		if (!exeFile.exists()){            
+    			Utils.showError("inp_error_notfound", exeCmd, "inp_descr");
+    			return false;
+    		}
+    		MainDao.updateSoftware(software, exeCmd);
 		}
 
         String sFile;
         // Get files
         if (fileInp == null) {
-            sFile = iniProperties.getProperty(sExport + "INP");
-            sFile = folderConfig + File.separator + sFile;
+            sFile = iniProperties.getProperty("DEFAULT_INP", "out");
+            sFile = MainDao.folderConfig + sFile;
             fileInp = new File(sFile);
             sFile = sFile.replace(".inp", ".rpt");
-            fileRpt = new File(sFile);
-        }
+            fileRpt = new File(sFile);            
+        }        
+        
         if (!fileInp.exists()){
 			Utils.showError("inp_error_notfound", fileInp.getAbsolutePath(), "inp_descr");     
 			return false;
@@ -385,13 +384,17 @@ public class ModelPostgis extends Model {
 
 
     // Import RPT file into Postgis tables
-    public boolean importRpt(File fileRpt, String projectName) {
+    public static boolean importRpt(File fileRpt, String projectName) {
         
-    	this.fileRpt = fileRpt;
-    	this.projectName = projectName;
-
+        // Get log file
+        logger = Utils.getLogger();    	
         logger.info("importRpt");
+
+		iniProperties = MainDao.getPropertiesFile();   
         
+    	ModelPostgis.fileRpt = fileRpt;
+    	ModelPostgis.projectName = projectName;
+
     	// Check if Project Name exists in rpt_result_id
     	boolean exists = false;
     	if (existsProjectName()){
@@ -413,7 +416,7 @@ public class ModelPostgis extends Model {
         
         // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + MainDao.schemaDrivers + "." + sExport.toLowerCase() + "rpt_target " +
+        String sql = "SELECT * FROM " + MainDao.schemaDrivers + "." + software + "_rpt_target " +
         		"WHERE type <> 0 ORDER BY id";
         try {
     		connectionPostgis.setAutoCommit(false);        	
@@ -467,7 +470,7 @@ public class ModelPostgis extends Model {
     }
 
 
-	private boolean existsProjectName() {
+	private static boolean existsProjectName() {
 		
 		String sql = "SELECT * FROM " + MainDao.schema + ".rpt_result_cat WHERE result_id = '" + projectName + "'";
 		try {
@@ -482,7 +485,7 @@ public class ModelPostgis extends Model {
 	}
 
 		
-	private boolean processRpt(RptTarget rpt) {
+	private static boolean processRpt(RptTarget rpt) {
 
 		// Read lines until rpt.getDescription() is found		
 		boolean found = false;
@@ -546,7 +549,7 @@ public class ModelPostgis extends Model {
 	}	
 	
 
-	private void getPollutants(RptTarget rpt) {
+	private static void getPollutants(RptTarget rpt) {
 		
 		// Open RPT file again
 		if (rpt.getType() == 3){
@@ -600,7 +603,7 @@ public class ModelPostgis extends Model {
 	
 	
 	// Parse all lines
-	private void parseLines(RptTarget rpt) {
+	private static void parseLines(RptTarget rpt) {
 		
 		tokens = new ArrayList<String>();			
 		boolean blankLine = false;		
@@ -648,7 +651,7 @@ public class ModelPostgis extends Model {
 		
 
 	// Parse values of current line
-	private void parseLine1(Scanner scanner, RptTarget rpt, boolean together) {
+	private static void parseLine1(Scanner scanner, RptTarget rpt, boolean together) {
 		
 		// Parse line
 		tokens = new ArrayList<String>();	
@@ -670,7 +673,7 @@ public class ModelPostgis extends Model {
 	
 	
 	// Parse values of current line that contains ".." in it
-	private void parseLine2(Scanner scanner, RptTarget rpt, boolean together) {
+	private static void parseLine2(Scanner scanner, RptTarget rpt, boolean together) {
 		
 		// Parse line
 		String token;
@@ -702,7 +705,7 @@ public class ModelPostgis extends Model {
 	}
 	
 	
-	private void processTokens(RptTarget rpt) {
+	private static void processTokens(RptTarget rpt) {
 
 		String fields = "result_id, ";
 		String values = "'" + projectName + "', ";
@@ -742,7 +745,7 @@ public class ModelPostgis extends Model {
 	}
 	
 	
-	private void processTokens3(RptTarget rpt) {
+	private static void processTokens3(RptTarget rpt) {
 
 		String sql = "SELECT * FROM " + MainDao.schema + "." + rpt.getTable();
 		try {
@@ -788,7 +791,7 @@ public class ModelPostgis extends Model {
 	}		
 		
 	
-	private void processTokens5(RptTarget rpt) {
+	private static void processTokens5(RptTarget rpt) {
 
 		String fields = "result_id, subc_id, poll_id, value";
 		String fixedValues = "'" + projectName + "', '" + tokens.get(0) + "', ";
@@ -816,7 +819,7 @@ public class ModelPostgis extends Model {
 	}	
 
 	
-	private void processTokens6(RptTarget rpt) {
+	private static void processTokens6(RptTarget rpt) {
 		
 		String fields = "result_id, node_id, flow_freq, avg_flow, max_flow, total_vol";
 		String fields2 = "result_id, node_id, poll_id, value";		
@@ -851,6 +854,11 @@ public class ModelPostgis extends Model {
 			insertSql += sql;		        
 		}
 		
+	}
+
+
+	public static void rollback() throws SQLException{
+		ModelPostgis.connectionPostgis.rollback();
 	}		
 	
 

@@ -29,7 +29,7 @@ import com.tecnicsassociats.gvsig.inpcom.gui.AboutDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.LicenseDialog;
 import com.tecnicsassociats.gvsig.inpcom.gui.MainFrame;
 import com.tecnicsassociats.gvsig.inpcom.gui.WelcomeDialog;
-import com.tecnicsassociats.gvsig.inpcom.model.ModelPostgis;
+import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 public class MenuController {
@@ -37,18 +37,11 @@ public class MenuController {
 	private MainFrame view;
 	private Properties prop;
 
-	// private ResourceBundle bundleText;
 
 	public MenuController(MainFrame mainFrame) {
-
 		this.view = mainFrame;
-		this.prop = ModelPostgis.getPropertiesFile();
+		this.prop = MainDao.getPropertiesFile();
 		view.setControl(this);
-
-		// userHomeFolder = System.getProperty("user.home");
-		// this.bundleForm = Utils.getBundleForm();
-		// this.bundleText = Utils.getBundleText();
-
 	}
 
 	public void action(String actionCommand) {
@@ -71,9 +64,9 @@ public class MenuController {
 	}
 
 	public void openHelp() {
-		if (ModelPostgis.fileHelp != null) {
+		if (MainDao.fileHelp != null) {
 			try {
-				Desktop.getDesktop().open(ModelPostgis.fileHelp);
+				Desktop.getDesktop().open(MainDao.fileHelp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -99,10 +92,16 @@ public class MenuController {
 		about.setVisible(true);
 	}
 
+//	public void showSoftware() {
+//		ResultSet rs = MainDao.getTableResultset(MainDao.connectionConfig, "postgis_software", ResultSet.TYPE_FORWARD_ONLY);
+//		TableWindow tableWindow = new TableWindow(rs, "postgis_software");
+//        Utils.openDialogForm(tableWindow, 500, 300);       
+//	}
+	
 	public void showLicense() {
 		String title = "License";
 		String info = "This product as a whole is distributed under the GNU General Public License version 3";
-		String info2 = "<html><font size='2'>This product has been funded wholly or in part by TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL. (hereafter TECNICSASSOCIATS). Mention of trade names or commercial products does not constitute endorsement or recommendation for use. Although It has been subjected to technical review before being released and although it has made a considerable effort to assure that the results obtained are correct, the computer programs are experimental. Therefore the author and TECNICSASSOCIATS are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from these programs, nor for any damages or litigation that result from the use of these programs for any purpose.</font></html>";
+		String info2 = "<html><p align=\"justify\"><font size='2'>This product has been funded wholly or in part by TECNICSASSOCIATS, TALLER D'ARQUITECTURA I ENGINYERIA, SL. (hereafter TECNICSASSOCIATS). Mention of trade names or commercial products does not constitute endorsement or recommendation for use. Although It has been subjected to technical review before being released and although it has made a considerable effort to assure that the results obtained are correct, the computer programs are experimental. Therefore the author and TECNICSASSOCIATS are not responsible and assume no liability whatsoever for any results or any use made of the results obtained from these programs, nor for any damages or litigation that result from the use of these programs for any purpose.</font></p></html>";
 		String info3 = "View license file";		
 		LicenseDialog about = new LicenseDialog(title, info, info2, info3);
 		about.setModal(true);

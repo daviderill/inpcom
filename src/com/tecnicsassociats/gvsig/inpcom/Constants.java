@@ -27,5 +27,6 @@ public class Constants {
 	public static final String EXEC_CONSOLE = "CONSOLE";
 	public static final String CONFIG_FOLDER = "config";
 	public static final String CONFIG_FILE = "inp.properties";
+	public static final String CONFIG_DB = "config.sqlite";
 
 }

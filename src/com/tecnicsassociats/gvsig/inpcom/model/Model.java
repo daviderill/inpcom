@@ -21,152 +21,39 @@
 package com.tecnicsassociats.gvsig.inpcom.model;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.iver.andami.PluginServices;
-import com.tecnicsassociats.gvsig.inpcom.Constants;
-import com.tecnicsassociats.gvsig.inpcom.util.Utils;
-
 
 public class Model {
 
-    protected static Logger logger;	
-    protected static String configFile;
-    protected static Properties iniProperties = new Properties();
-    protected static String appPath;
-    protected static Connection connectionSqlite;
+	protected static Logger logger;	
+	protected static Properties iniProperties;
+    protected static Connection connectionDbf;
+    protected static String software = "";    
+    protected static File fileTemplate;
+    protected static ArrayList<LinkedHashMap<String, String>> lMapDades;
+	protected static Map<String, Integer> mHeader;
+    protected static RandomAccessFile rat;
+    protected static RandomAccessFile raf;
     
-    private File fSqlite;
-    protected String folderConfig;
-    protected File fileTemplate;
-    protected ArrayList<LinkedHashMap<String, String>> lMapDades;
-	protected Map<String, Integer> mHeader;
-    protected int default_size;
-    protected RandomAccessFile rat;
-    protected RandomAccessFile raf;
-    public String sExport;   // "EPANET_" o "SWMM_"
-    public static File fileHelp;
-    protected String execType = Constants.EXEC_GVSIG;   // Constants.EXEC_CONSOLE, Constants.EXEC_GVSIG
-
-
-    public static Properties getPropertiesFile() {
-        return iniProperties;
+    
+    public static void setSoftware(String software){
+    	Model.software = software;
     }
-
-
-    public static void savePropertiesFile() {
-
-        File iniFile = new File(configFile);
-        try {
-            iniProperties.store(new FileOutputStream(iniFile), "");
-        } catch (FileNotFoundException e) {
-            Utils.showError("inp_error_notfound", iniFile.getPath(), "inp_descr");
-        } catch (IOException e) {
-            Utils.showError("inp_error_io", iniFile.getPath(), "inp_descr");
-        }
-
+    
+    public static void closeFile(){
+    	try {
+			Model.rat.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
-
-	
-    // Get Properties Files
-    protected boolean enabledPropertiesFile() {
-
-        if (execType.equals(Constants.EXEC_CONSOLE)) {
-            try {
-                appPath = new File(".").getCanonicalPath() + File.separator;
-            } catch (IOException e1) {
-                Utils.showError("inp_error_io", configFile, "inp_descr");
-                return false;
-            }
-        } else {
-            appPath = PluginServices.getPluginServices(this).getPluginDirectory().getPath() + File.separator;
-        }
-
-        configFile = appPath + Constants.CONFIG_FOLDER + File.separator + Constants.CONFIG_FILE;
-        File fileIni = new File(configFile);
-        try {
-            iniProperties.load(new FileInputStream(fileIni));
-        } catch (FileNotFoundException e) {
-            Utils.showError("inp_error_notfound", configFile, "inp_descr");
-            return false;
-        } catch (IOException e) {
-            Utils.showError("inp_error_io", configFile, "inp_descr");
-            return false;
-        }
-        return !iniProperties.isEmpty();
-
-    }
-
-
-    // Sets initial configuration files
-    protected boolean configIni() {
-
-        // Get schema drivers
-        String schemaProp = sExport + "SCHEMA_" + "DRIVERS";       
-    	MainDao.schemaDrivers = iniProperties.getProperty(schemaProp);     	    	
-    	
-        // Get INP folder
-        folderConfig = iniProperties.getProperty("FOLDER_CONFIG");
-        folderConfig = appPath + folderConfig;
-
-        // Get INP template file
-        String sFile = iniProperties.getProperty(sExport + "TEMPLATE");
-        sFile = folderConfig + File.separator + sFile;
-        fileTemplate = new File(sFile);
-        if (!fileTemplate.exists()) {
-            Utils.showError("inp_error_notfound", sFile, "inp_descr");
-            return false;
-        }
-
-        // Get PDF help file
-        if (fileHelp == null) {
-            sFile = iniProperties.getProperty("FILE_HELP");
-            sFile = folderConfig + File.separator + sFile;
-            fileHelp = new File(sFile);
-        }
-
-        return true;
-
-    }
-
-
-    // Connect to sqlite Database
-    // Still useful for DBF procedures!
-    public boolean connectDB(String fileName) {
-
-        try {
-            Class.forName("org.sqlite.JDBC");
-            String sFile = folderConfig + File.separator + fileName;
-            fSqlite = new File(sFile);
-            if (fSqlite.exists()) {
-                // sqliteURL = this.getClass().getClassLoader().getResource("inp.sqlite");
-                connectionSqlite = DriverManager.getConnection("jdbc:sqlite:" + sFile);
-                return true;
-            } else {
-                Utils.showError("inp_error_notfound", sFile, "inp_descr");
-                return false;
-            }
-        } catch (SQLException e) {
-            Utils.showError("inp_error_connection", e.getMessage(), "inp_descr");
-            return false;
-        } catch (ClassNotFoundException e) {
-            Utils.showError("inp_error_connection", "ClassNotFoundException", "inp_descr");
-            return false;
-        }
-
-    }
-
     
 }

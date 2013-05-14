@@ -37,22 +37,16 @@ import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 public class DatabaseController {
 
 	private Form view;
-	private ModelPostgis modelPostgis;
     private Properties prop;
-    
 	private boolean isConnected = false;
 	private ResourceBundle bundleText;
 	
 	
-	public DatabaseController(ModelPostgis modelPostgis, Form cmWindow) {
+	public DatabaseController(Form cmWindow) {
 		
-		this.view = cmWindow;
-		this.modelPostgis = modelPostgis;		
-        this.prop = ModelPostgis.getPropertiesFile();
+		this.view = cmWindow;	
+        this.prop = MainDao.getPropertiesFile();
 	    view.setControl(this);        
-    	
-//    	userHomeFolder = System.getProperty("user.home");
-//    	this.bundleForm = Utils.getBundleForm();
     	this.bundleText = Utils.getBundleText();
     	
 	}
@@ -128,13 +122,11 @@ public class DatabaseController {
 		db = view.getDatabase();
 		user = view.getUser();
 		password = view.getPassword();		
-		//String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + db + "?user=" + user + "&password=" + password;
-		isConnected  = modelPostgis.setConnectionPostgis(host, port, db, user, password);
+		isConnected  = ModelPostgis.setConnectionPostgis(host, port, db, user, password);
 		
 		if (isConnected){
 			view.setSchemas(MainDao.getSchemas());
-			//view.setDefaultSchema();
-			view.setSoftware(MainDao.getSoftware());
+			view.setSoftwarePostgis(MainDao.getAvailableVersions("postgis"));
 			prop.put("POSTGIS_HOST", host);
 			prop.put("POSTGIS_PORT", port);
 			prop.put("POSTGIS_DATABASE", db);
@@ -146,14 +138,11 @@ public class DatabaseController {
 				prop.put("POSTGIS_PASSWORD", "");
 			}
 			// Save properties file
-			ModelPostgis.savePropertiesFile();
-
+			MainDao.savePropertiesFile();
 			Utils.showMessage("Connection successful!", "", "INP.com");
-			
 		} else{
 			view.setSchemas(null);
 		}
-		//view.enablePanels(isConnected);
 		
 	}	
 	

@@ -294,6 +294,7 @@ public class Utils {
 
 
     private String doubleQuote(Object obj) {
+    	
         String aux = obj.toString().replaceAll("'", "''");
         StringBuffer strBuf = new StringBuffer(aux);
         ByteArrayOutputStream out = new ByteArrayOutputStream(strBuf.length());
@@ -343,8 +344,8 @@ public class Utils {
 	
     
 	public static void openFile(String file){
+		
 		try{    
-			//String file = "C:/gvSIG_1.11/bin/gvSIG/extensiones/org.gvsig.taGasNatural/exec_test.cmd";
 			File exec = new File(file);
 			if (exec.exists()){
 				//Process p = Runtime.getRuntime().exec(file);
@@ -361,6 +362,7 @@ public class Utils {
 		    System.out.println("InterruptedException Error");
 
 		}		
+		
 	}    
     
 }

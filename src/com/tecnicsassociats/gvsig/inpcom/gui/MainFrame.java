@@ -47,6 +47,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem mntmHelp;
 	private JMenuItem mntmWelcome;
 	private JMenu mnWelcome;
+	private JMenu mnConfiguration;
+	private JMenuItem mntmSoftware;
 
 
 	public static void main(String[] args) {
@@ -95,6 +97,14 @@ public class MainFrame extends JFrame {
 		mntmHelp.setActionCommand("openHelp");
 		mnWelcome.add(mntmHelp);
 		
+		mnConfiguration = new JMenu("Configuration");
+		mnConfiguration.setVisible(false);
+		menuBar.add(mnConfiguration);
+		
+		mntmSoftware = new JMenuItem("EPA Software");
+		mntmSoftware.setActionCommand("showSoftware");
+		mnConfiguration.add(mntmSoftware);
+		
 		JMenu mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
 		
@@ -131,6 +141,12 @@ public class MainFrame extends JFrame {
 		mntmHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				menuController.action(e.getActionCommand());				
+			}
+		});
+
+		mntmSoftware.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuController.action(e.getActionCommand());					
 			}
 		});
 		

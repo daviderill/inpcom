@@ -25,7 +25,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -48,12 +47,10 @@ import javax.swing.border.LineBorder;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.tecnicsassociats.gvsig.inpcom.controller.DatabaseController;
 import com.tecnicsassociats.gvsig.inpcom.controller.DbfController;
 import com.tecnicsassociats.gvsig.inpcom.controller.MainController;
-import com.tecnicsassociats.gvsig.inpcom.controller.DatabaseController;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 
 public class Form extends JPanel implements ActionListener {
@@ -158,10 +155,6 @@ public class Form extends JPanel implements ActionListener {
 		return new JDialog();
 	}
 
-//	public void setDialog(JDialog dialog) {
-//		this.dialog = dialog;
-//	}
-
 
 	// Panel Database Options
 	public String getHost() {
@@ -199,7 +192,6 @@ public class Form extends JPanel implements ActionListener {
 	@SuppressWarnings("deprecation")
 	public String getPassword() {
 		return txtPassword.getText();
-		// return txtPassword.getPassword();
 	}
 
 	public void setPassword(String path) {
@@ -218,17 +210,6 @@ public class Form extends JPanel implements ActionListener {
 		return elem;
 	}	
 	
-	public void setSoftware(List<String> list) {
-		for (int i = 0; i < list.size(); i++) {
-			cboSoftware.addItem(list.get(i));
-		}
-	}
-
-	public void setSoftwareDbf(List<String> list) {
-		cboSoftwareDbf.addItem("EPA SWMM 5.0e");
-		cboSoftwareDbf.addItem("EPANET 2.0e – P");
-	}
-
 	public void setResultCombo(Vector<String> v) {
 		ComboBoxModel<String> cbm = new DefaultComboBoxModel<String>(v);
 		cboResultId.setModel(cbm);
@@ -256,7 +237,56 @@ public class Form extends JPanel implements ActionListener {
 		return txtFileOut.getText().trim();
 	}
 
+	public String getSoftwareDbf() {
+		String elem = "";
+		if (cboSoftwareDbf.getSelectedIndex() != -1) {
+			elem = cboSoftwareDbf.getSelectedItem().toString();
+		}
+		return elem;
+	}	
+	
+	public void setSoftwareDbf(Vector<String> v) {
+		ComboBoxModel<String> cbm = new DefaultComboBoxModel<String>(v);
+		cboSoftwareDbf.setModel(cbm);		
+	}
+	
+	
 	// Panel Postgis
+	public void setSoftwarePostgis(Vector<String> v) {
+		ComboBoxModel<String> cbm = new DefaultComboBoxModel<String>(v);
+		cboSoftware.setModel(cbm);		
+	}
+	
+	public String getSoftwarePostgis() {
+		String elem = "";
+		if (cboSoftware.getSelectedIndex() != -1) {
+			elem = cboSoftware.getSelectedItem().toString();
+		}
+		return elem;
+	}	
+	
+	public void setSchemas(Vector<String> v) {
+		ComboBoxModel<String> cbm = new DefaultComboBoxModel<String>(v);
+		cboSchema.setModel(cbm);
+		cboSchema1.setModel(cbm);		
+	}
+
+	public String getSchema1() {
+		String elem = "";
+		if (cboSchema1.getSelectedIndex() != -1) {
+			elem = cboSchema1.getSelectedItem().toString();
+		}
+		return elem;
+	}
+	
+	public String getSchema() {
+		String elem = "";
+		if (cboSchema.getSelectedIndex() != -1) {
+			elem = cboSchema.getSelectedItem().toString();
+		}
+		return elem;
+	}
+	
 	public void setFileRpt(String path) {
 		txtFileRpt.setText(path);
 	}
@@ -278,34 +308,6 @@ public class Form extends JPanel implements ActionListener {
 //			cboSchema.setSelectedIndex(cboSchema.getItemCount() - 1);
 //		}
 //	}
-
-	public void setSchemas(List<String> elems) {
-		DefaultComboBoxModel<String> theModel;
-		theModel = (DefaultComboBoxModel<String>) cboSchema.getModel();
-		theModel.removeAllElements();
-		theModel = (DefaultComboBoxModel<String>) cboSchema1.getModel();
-		theModel.removeAllElements();		
-		for (int i = 0; i < elems.size(); i++) {
-			cboSchema.addItem(elems.get(i));
-			cboSchema1.addItem(elems.get(i));
-		}
-	}
-
-	public String getSchema() {
-		String elem = "";
-		if (cboSchema.getSelectedIndex() != -1) {
-			elem = cboSchema.getSelectedItem().toString();
-		}
-		return elem;
-	}
-
-	public String getSchema1() {
-		String elem = "";
-		if (cboSchema1.getSelectedIndex() != -1) {
-			elem = cboSchema1.getSelectedItem().toString();
-		}
-		return elem;
-	}
 	
 	public boolean isExportChecked() {
 		return chkExport.isSelected();
@@ -352,7 +354,7 @@ public class Form extends JPanel implements ActionListener {
 		comboBox = new JComboBox<String>();
 		comboBox.setPreferredSize(new Dimension(24, 20));
 		comboBox.setMinimumSize(new Dimension(24, 20));
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] { "Postgis" }));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"PG-9.1+PostGIS-1.5"}));
 		panel.add(comboBox, "cell 3 1,growx");
 
 		lblIp = new JLabel(BUNDLE.getString("Form.lblIp.text")); //$NON-NLS-1$
@@ -400,6 +402,7 @@ public class Form extends JPanel implements ActionListener {
 		panel.add(chkRemember, "cell 3 7,aligny baseline");
 
 		btnTest = new JButton(BUNDLE.getString("Form.btnTest.text")); //$NON-NLS-1$
+		btnTest.setMinimumSize(new Dimension(107, 23));
 		btnTest.setActionCommand(BUNDLE.getString("Form.btnTest.actionCommand")); //$NON-NLS-1$
 		panel.add(btnTest, "cell 5 7,alignx right");
 		// panel.setFocusTraversalPolicy(new FocusTraversalOnArray(new
@@ -409,7 +412,7 @@ public class Form extends JPanel implements ActionListener {
 		panel_5 = new JPanel();
 		panel_5.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_1.add(panel_5, "cell 1 3 2 1,grow");
-		panel_5.setLayout(new MigLayout("", "[10][60][15][140][130.00]", "[2][25][25]"));
+		panel_5.setLayout(new MigLayout("", "[10][60][15][140][136]", "[2][25][25]"));
 
 		lblNewLabel_1 = new JLabel(BUNDLE.getString("Form.lblNewLabel_1.text")); //$NON-NLS-1$
 		panel_5.add(lblNewLabel_1, "cell 1 1");
@@ -420,9 +423,10 @@ public class Form extends JPanel implements ActionListener {
 		cboSchema1.setMinimumSize(new Dimension(29, 20));
 		panel_5.add(cboSchema1, "cell 3 1,growx");
 		
-		btnCreateSchema = new JButton(BUNDLE.getString("Form.btnCreateSchema.text")); //$NON-NLS-1$
+		btnCreateSchema = new JButton(BUNDLE.getString("Form.btnCreateSchema.text"));
+		btnCreateSchema.setPreferredSize(new Dimension(105, 23));
 		btnCreateSchema.setActionCommand(BUNDLE.getString("Form.btnCreateSchema.actionCommand")); //$NON-NLS-1$
-		panel_5.add(btnCreateSchema, "cell 4 1,growx");
+		panel_5.add(btnCreateSchema, "cell 4 1,alignx right");
 
 		lblResultId = new JLabel(BUNDLE.getString("Form.lblResultId.text")); //$NON-NLS-1$
 		panel_5.add(lblResultId, "cell 1 2");
@@ -434,8 +438,11 @@ public class Form extends JPanel implements ActionListener {
 		panel_5.add(cboResultId, "cell 3 2,growx");
 		
 		btnDeleteSchema = new JButton(BUNDLE.getString("Form.btnDeleteSchema.text")); //$NON-NLS-1$
+		btnDeleteSchema.setMinimumSize(new Dimension(107, 23));
+		btnDeleteSchema.setMaximumSize(new Dimension(107, 23));
+		btnDeleteSchema.setPreferredSize(new Dimension(107, 23));
 		btnDeleteSchema.setActionCommand(BUNDLE.getString("Form.btnDeleteSchema.actionCommand")); //$NON-NLS-1$
-		panel_5.add(btnDeleteSchema, "cell 4 2,growx");
+		panel_5.add(btnDeleteSchema, "cell 4 2,alignx right");
 
 		// Panel 2
 		panel_2 = new JPanel();
@@ -699,14 +706,12 @@ public class Form extends JPanel implements ActionListener {
 		});		
 
 		// Panel Dbf
-		panel_2.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusGained(FocusEvent arg0) {
-				System.out.print("s2");
-//				dbfController.action("s2");
-				setSoftwareDbf(null);
-			}
-		});
+//		panel_2.addFocusListener(new FocusAdapter() {
+//			@Override
+//			public void focusGained(FocusEvent arg0) {
+//				setSoftwareDbf(null);
+//			}
+//		});
 		
 		btnFolderShp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

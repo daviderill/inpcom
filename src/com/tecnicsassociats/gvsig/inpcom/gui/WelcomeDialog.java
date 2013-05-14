@@ -21,6 +21,7 @@
 package com.tecnicsassociats.gvsig.inpcom.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -31,6 +32,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -54,20 +56,20 @@ public class WelcomeDialog extends JDialog {
 	}
 
 	
-	
+
 	/**
 	 * @wbp.parser.constructor
 	 */
 	public WelcomeDialog(String title, String info, String info2) {
+		
 		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 8));
 	
 		ImageIcon image = new ImageIcon("images/imago.png");
 		setIconImage(image.getImage());
 		setTitle(title);		
-		setSize(549, 231);
-		getContentPane().setLayout(new MigLayout("", "[150px,grow]", "[10px][grow][30px][30.00px][30.00]"));
+		setSize(422, 200);
+		getContentPane().setLayout(new MigLayout("", "[204.00px][187.00]", "[10px][45.00][30px][30.00px]"));
 
-		
 		final ImageIcon backgroundImage = new ImageIcon("images/imago.png");
 		
         JPanel panelLogo = new JPanel(new BorderLayout()) {
@@ -76,7 +78,7 @@ public class WelcomeDialog extends JDialog {
 			@Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(backgroundImage.getImage(), 0, 0, 90, 90, this);
+                g.drawImage(backgroundImage.getImage(), 0, 0, 40, 40, this);
             }
 
             @Override
@@ -89,16 +91,32 @@ public class WelcomeDialog extends JDialog {
                 return size;
             }
         };
-		getContentPane().add(panelLogo, "cell 0 1,alignx center,growy");
+        
+        panelLogo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		getContentPane().add(panelLogo, "cell 0 1,alignx right,aligny bottom");
 		panelLogo.setLayout(new BorderLayout());
+		
+		
+//		JLabel lblInpcom_1 = new JLabel("    INPCom");
+//		lblInpcom_1.setVerticalAlignment(SwingConstants.BOTTOM);
+//		lblInpcom_1.setHorizontalTextPosition(SwingConstants.LEFT);
+//		lblInpcom_1.setHorizontalAlignment(SwingConstants.RIGHT);
+//		lblInpcom_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+//		panelLogo.add(lblInpcom_1, BorderLayout.NORTH);
+		
+		JLabel lblInpcom = new JLabel("INPCom");
+		lblInpcom.setHorizontalTextPosition(SwingConstants.LEFT);
+		lblInpcom.setHorizontalAlignment(SwingConstants.LEFT);
+		lblInpcom.setFont(new Font("Tahoma", Font.BOLD, 12));
+		getContentPane().add(lblInpcom, "cell 1 1,alignx left");
 		
 		JLabel lblInfo = new JLabel(info);
 		lblInfo.setFont(new Font("Tahoma", Font.BOLD, 12));
-		getContentPane().add(lblInfo, "cell 0 2,alignx center");	
+		getContentPane().add(lblInfo, "cell 0 2 2 1,alignx center");	
 		
 		JLabel lblInfo2 = new JLabel(info2);
 		lblInfo2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		getContentPane().add(lblInfo2, "cell 0 3,alignx center");
+		getContentPane().add(lblInfo2, "cell 0 3 2 1,alignx center");
 		
 	}
 

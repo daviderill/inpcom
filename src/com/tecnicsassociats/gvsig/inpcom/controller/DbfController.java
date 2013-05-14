@@ -28,15 +28,16 @@ import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 
 import com.tecnicsassociats.gvsig.inpcom.gui.Form;
+import com.tecnicsassociats.gvsig.inpcom.model.MainDao;
 import com.tecnicsassociats.gvsig.inpcom.model.Model;
 import com.tecnicsassociats.gvsig.inpcom.model.ModelDbf;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
+
 
 //Controller of DBF Panel only
 public class DbfController {
 
 	private Form view;
-	private ModelDbf modelDbf;
 	private Properties prop;
 
 	private boolean readyShp = false;
@@ -45,20 +46,17 @@ public class DbfController {
 	private File dirOut;
 
 	private String userHomeFolder;
-	//private ResourceBundle bundleForm;
 	private ResourceBundle bundleText;
 
 	
-	public DbfController(ModelDbf modelDbf, Form view) {
+	public DbfController(Form view) {
 
 		this.view = view;
-		this.modelDbf = modelDbf;
-		this.prop = Model.getPropertiesFile();
+		this.prop = MainDao.getPropertiesFile();
 		view.setControl(this);
-		view.setSoftwareDbf(null);
+		view.setSoftwareDbf(MainDao.getAvailableVersions("dbf"));		
 
 		userHomeFolder = System.getProperty("user.home");
-		//this.bundleForm = Utils.getBundleForm();
 		this.bundleText = Utils.getBundleText();
 
 		dirShp = new File(prop.getProperty("FOLDER_SHP", userHomeFolder));
@@ -104,10 +102,9 @@ public class DbfController {
 		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			dirShp = chooser.getSelectedFile();
-			// form.getTextComponent(Constants.TXT_DIR_SHP).setText(dirShp.getAbsolutePath());
 			view.setFolderShp(dirShp.getAbsolutePath());
 			prop.put("FOLDER_SHP", dirShp.getAbsolutePath());
-			ModelDbf.savePropertiesFile();
+			MainDao.savePropertiesFile();
 			readyShp = true;
 		}
 
@@ -125,7 +122,7 @@ public class DbfController {
 			dirOut = chooser.getSelectedFile();
 			view.setFolderOut(dirOut.getAbsolutePath());
 			prop.put("FOLDER_INP", dirOut.getAbsolutePath());
-			ModelDbf.savePropertiesFile();
+			MainDao.savePropertiesFile();
 			readyOut = true;
 		}
 
@@ -143,28 +140,39 @@ public class DbfController {
 			return;
 		}
 
-		// Connect to sqlite database
-		String sqliteFile = prop.getProperty(this.modelDbf.sExport + "DB_DBF");
-		if (!this.modelDbf.connectDB(sqliteFile)) {
+        // Get software version from view
+		String id = view.getSoftwareDbf();
+        if (id.equals("")){
+            Utils.showError("Any software version selected", "", "inp_descr");
+            return;
+        }
+        String version = MainDao.getSoftwareVersion("dbf", id);
+        Model.setSoftware(version);
+		
+		// Get Sqlite Database			
+		String sqlitePath = version + ".sqlite";
+		if (!ModelDbf.setConnectionDbf(sqlitePath)){
+			return;
+		}
+		
+		// Get INP template file
+		String templatePath = MainDao.folderConfig + version + ".inp";
+		File fileTemplate = new File(templatePath);
+		if (!fileTemplate.exists()) {
+			Utils.showError("inp_error_notfound", templatePath, "inp_descr");				
 			return;
 		}
 
 		// Check if all necessary files exist
-		if (!this.modelDbf.checkFiles(dirShp.getAbsolutePath(),
-				dirOut.getAbsolutePath())) {
+		if (!ModelDbf.checkFiles(dirShp.getAbsolutePath(), dirOut.getAbsolutePath())) {
 			return;
 		}
 
 		// Process all shapes and output to INP file
 		String sFileOut = view.getTxtFileOut();
-		this.modelDbf.processAll(dirOut.getAbsolutePath(), sFileOut);
+		ModelDbf.processAll(dirOut.getAbsolutePath(), sFileOut);
 
 	}
 	
-	
-    public void closeView(){
-		view.close();
-	}
-    
 
 }

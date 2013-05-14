@@ -66,8 +66,8 @@ public class LicenseDialog extends JDialog {
 	 * @wbp.parser.constructor
 	 */
 	public LicenseDialog(String title, String info, String info2, String info3) {
+		
 		getContentPane().setFont(new Font("Tahoma", Font.PLAIN, 8));
-
 		ImageIcon image = new ImageIcon("images/imago.png");
 		setIconImage(image.getImage());
 		setTitle(title);		
@@ -78,7 +78,7 @@ public class LicenseDialog extends JDialog {
 		lblInfo.setFont(new Font("Tahoma", Font.BOLD, 12));
 		getContentPane().add(lblInfo, "cell 0 1,alignx center");	
 		
-		JLabel lblInfo12 = new JLabel("<html>\"This product is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details\u201D</html>");
+		JLabel lblInfo12 = new JLabel("<html><p align=\"justify\">\"This product is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details\u201D</p></html>");
 		getContentPane().add(lblInfo12, "cell 0 2");
 		
 		JLabel lblInfo2 = new JLabel(info2);

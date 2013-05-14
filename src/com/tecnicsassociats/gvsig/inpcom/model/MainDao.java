@@ -21,7 +21,9 @@
 package com.tecnicsassociats.gvsig.inpcom.model;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.sql.Connection;
@@ -29,23 +31,213 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
+import com.tecnicsassociats.gvsig.inpcom.Constants;
 import com.tecnicsassociats.gvsig.inpcom.util.Utils;
 
 public class MainDao {
 	
-	public static Connection connectionPostgis;   	
+    public static Connection connectionConfig;   // SQLite
+    public static Connection connectionDbf;	   // SQLite 
+	public static Connection connectionPostgis;   // Postgis
     public static String schema;
-	public static String schemaDrivers = "drivers";
+	public static String schemaDrivers;
 	
+	public static String folderConfig;	
+    public static File fileHelp;	
+	
+	private static Properties iniProperties = new Properties();	
+	private static String appPath;	
+	private static String configFile;
+	
+	
+    // Sets initial configuration files
+    public static boolean configIni() {
+
+    	if (!enabledPropertiesFile()){
+    		return false;
+    	}
+    	
+        // Get INP folder
+        folderConfig = iniProperties.getProperty("FOLDER_CONFIG");
+        folderConfig = appPath + folderConfig + File.separator;
+
+        // Get schema drivers
+    	schemaDrivers = iniProperties.getProperty("SCHEMA_DRIVERS", "drivers");     	    	
+
+    	// Set Config DB connection
+        if (!setConnectionConfig(Constants.CONFIG_DB)){
+        	return false;
+        }
+        
+        // Get PDF help file
+        if (fileHelp == null) {
+            String filePath = iniProperties.getProperty("FILE_HELP", "help.pdf");
+            filePath = folderConfig + File.separator + filePath;
+            fileHelp = new File(filePath);
+        }
+        
+        return true;
+
+    }
+    
+	
+    public static Properties getPropertiesFile() {
+        return iniProperties;
+    }
+
+
+    public static void savePropertiesFile() {
+
+        File iniFile = new File(configFile);
+        try {
+            iniProperties.store(new FileOutputStream(iniFile), "");
+        } catch (FileNotFoundException e) {
+            Utils.showError("inp_error_notfound", iniFile.getPath(), "inp_descr");
+        } catch (IOException e) {
+            Utils.showError("inp_error_io", iniFile.getPath(), "inp_descr");
+        }
+
+    }
+    
+    
+    // Get Properties Files
+    public static boolean enabledPropertiesFile() {
+
+        try {
+            appPath = new File(".").getCanonicalPath() + File.separator;
+        } catch (IOException e1) {
+            Utils.showError("inp_error_io", configFile, "inp_descr");
+            return false;
+        }
+
+        configFile = appPath + Constants.CONFIG_FOLDER + File.separator + Constants.CONFIG_FILE;
+        File fileIni = new File(configFile);
+        try {
+            iniProperties.load(new FileInputStream(fileIni));
+        } catch (FileNotFoundException e) {
+            Utils.showError("inp_error_notfound", configFile, "inp_descr");
+            return false;
+        } catch (IOException e) {
+            Utils.showError("inp_error_io", configFile, "inp_descr");
+            return false;
+        }
+        return !iniProperties.isEmpty();
+
+    }    
+	
+    
+    // Connect to Config sqlite Database
+    public static boolean setConnectionConfig(String fileName) {
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            String filePath = folderConfig + fileName;
+            File file = new File(filePath);
+            if (file.exists()) {
+            	connectionConfig = DriverManager.getConnection("jdbc:sqlite:" + filePath);
+                return true;
+            } else {
+                Utils.showError("inp_error_notfound", filePath, "inp_descr");
+                return false;
+            }
+        } catch (SQLException e) {
+            Utils.showError("inp_error_connection", e.getMessage(), "inp_descr");
+            return false;
+        } catch (ClassNotFoundException e) {
+            Utils.showError("inp_error_connection", "ClassNotFoundException", "inp_descr");
+            return false;
+        }
+
+    }
+    
+    
+    // Connect to sqlite Database
+    // Still useful for DBF procedures!
+    public static boolean setConnectionDbf(String fileName) {
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+            String filePath = folderConfig + fileName;
+            File file = new File(filePath);
+            if (file.exists()) {
+                connectionDbf = DriverManager.getConnection("jdbc:sqlite:" + filePath);
+                return true;
+            } else {
+                Utils.showError("inp_error_notfound", filePath, "inp_descr");
+                return false;
+            }
+        } catch (SQLException e) {
+            Utils.showError("inp_error_connection", e.getMessage(), "inp_descr");
+            return false;
+        } catch (ClassNotFoundException e) {
+            Utils.showError("inp_error_connection", "ClassNotFoundException", "inp_descr");
+            return false;
+        }
+
+    }  
+    
+    
+	public static String getSoftwareVersion(String type, String id) {
+		
+        String sql = "SELECT software_version FROM " + type + "_software WHERE id = '" + id + "'";
+        String result = "";
+        try {
+            Statement stat = connectionConfig.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            if (rs.next()) {
+            	 result = rs.getString(1);
+            }
+            rs.close();
+            stat.close();
+        } catch (SQLException e) {
+        	Utils.showError(e.getMessage(), "", "inp_descr");
+        }
+        return result;   
+        
+	}
+	
+
+	public static String getSoftwareExecutable(String type, String software) {
+		
+        String sql = "SELECT file FROM " + type + "_software WHERE software_version = '" + software + "'";
+        String result = "";        
+        try {
+            Statement stat = connectionConfig.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            if (rs.next()) {
+            	result = rs.getString(1);
+            }
+            rs.close();
+            stat.close();            
+        } catch (SQLException e) {
+        	Utils.showError(e.getMessage(), "", "inp_descr");
+        }
+        return result;   
+        
+	}	
+	
+	
+
+	public static void updateSoftware(String software, String exeFile) {
+		
+        String sql = "UPDATE postgis_software SET file = '" + exeFile + "' WHERE software_version = '" + software + "'";
+        try {
+    		connectionConfig.setAutoCommit(true);        	
+			Statement ps = connectionConfig.createStatement();
+	        ps.executeUpdate(sql);
+	        ps.close();
+        } catch (SQLException e) {
+        	Utils.showError(e.getMessage(), "", "inp_descr");
+        }
+        
+	}	
+    
 	
     public static boolean setConnectionPostgis(String host, String port, String db, String user, String password) {
     	
-        //String connectionString = iniProperties.getProperty("POSTGIS_CONNECTION_STRING");
-    	//jdbc\:postgresql\://176.31.185.134\:5432/demo_mtvo?user\=tecnics&password\=XavierTorret
         String connectionString = "jdbc:postgresql://" + host + ":" + port + "/" + db + "?user=" + user + "&password=" + password;
         try {
             connectionPostgis = DriverManager.getConnection(connectionString);
@@ -132,37 +324,36 @@ public class MainDao {
     }    
     
     
-	public static List<String> getSchemas(){
+	public static Vector<String> getSchemas(){
 
         String sql = "SELECT schema_name FROM information_schema.schemata " +
         		"WHERE schema_name <> 'information_schema' AND schema_name !~ E'^pg_' " +
         		"AND schema_name <> 'drivers' AND schema_name <> 'public' " +
         		"ORDER BY schema_name";
-    	List<String> elems = new ArrayList<String>();
+        Vector<String> vector = new Vector<String>();
         try {
     		connectionPostgis.setAutoCommit(false);        	
             Statement stat = connectionPostgis.createStatement();
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
-            	elems.add(rs.getString(1));
+            	vector.add(rs.getString(1));
             }
             rs.close();
-    		return elems;	            
+    		return vector;	            
         } catch (SQLException e) {
             Utils.showError(e.getMessage(), "", "inp_descr");
-            return elems;
+            return vector;
         }
 		
 	}
 	
 	
-	private static ResultSet getResultset(String sql){
+	private static ResultSet getResultset(Connection connection, String sql){
 		
         ResultSet rs = null;        
         try {
-            connectionPostgis.setAutoCommit(true);
-        	Statement stat = connectionPostgis.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 
-        			ResultSet.CONCUR_UPDATABLE);
+        	connection.setAutoCommit(true);
+        	Statement stat = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
             rs = stat.executeQuery(sql);
         } catch (SQLException e) {
             Utils.showError(e.getMessage(), "", "inp_descr");
@@ -170,10 +361,25 @@ public class MainDao {
         return rs;   
         
 	}
+
+	
+	private static ResultSet getResultset(String sql){
+		return getResultset(connectionPostgis, sql);
+	}
+	
+	
+	public static ResultSet getTableResultset(Connection connection, String table) {
+		String sql;
+		if (schema == null){
+			sql = "SELECT * FROM " + table;
+		} else{
+			sql = "SELECT * FROM " + schema + "." + table;
+		}
+        return getResultset(connection, sql);
+	}
 	
 	public static ResultSet getTableResultset(String table) {
-        String sql = "SELECT * FROM " + schema + "." + table;
-        return getResultset(sql);
+		return getTableResultset(connectionPostgis, table);
 	}
 	
 	
@@ -184,25 +390,24 @@ public class MainDao {
 	}	
 
 	
-    public static List<String> getSoftware(){
+    public static Vector<String> getAvailableVersions(String type){
 
-        // Get content of target table
-        String sql = "SELECT * "
-        		+ "FROM " + schemaDrivers + ".epa_software " 
-        		+ "WHERE status_datamanager = 'Ok' ";            
-        Statement stat;
-        List<String> list = new ArrayList<String>();
+        Vector<String> vector = new Vector<String>();
+        String sql = "SELECT id "
+        		+ "FROM " + type + "_software " 
+        		+ "WHERE available = 1 ORDER BY id DESC";            
 		try {
-			stat = connectionPostgis.createStatement();
+			Statement stat = connectionConfig.createStatement();
 	        ResultSet rs = stat.executeQuery(sql);
 	        while (rs.next()) {
-	        	list.add(rs.getString("id"));
+	        	vector.add(rs.getString("id"));
 	        }
-	        rs.close();   			
+	        rs.close();   
+            stat.close();	        
 		} catch (SQLException e) {
             Utils.showError(e.getMessage(), "", "inp_descr");
 		}            
-		return list;
+		return vector;
     	
     }
 
@@ -219,9 +424,8 @@ public class MainDao {
 			return vector;
 		}
 		String sql = "SELECT * FROM " + schemaParam + "." + table;
-        Statement stat;
 		try {
-			stat = connectionPostgis.createStatement();
+			Statement stat = connectionPostgis.createStatement();
 	        ResultSet rs = stat.executeQuery(sql);
 	        while (rs.next()) {
 	        	vector.add(rs.getString(1));
@@ -256,6 +460,8 @@ public class MainDao {
 	public static void deleteSchema(String schemaName) {
 		String sql = "DROP schema IF EXISTS " + schemaName + " CASCADE;";
 		executeSql(sql, true);		
+		sql = "DELETE FROM public.geometry_columns WHERE f_table_schema = '" + schemaName + "'";
+		executeSql(sql, true);			
 	}
 
 
@@ -286,6 +492,18 @@ public class MainDao {
 				while ((line = rat.readLine()) != null){
 					content += line + "\n";
 				}
+				// Add records into geometry_columns for selected schema
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'arc', 'the_geom', '2', '23031', 'MULTILINESTRING');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'catchment', 'the_geom', '2', '23031', 'MULTIPOLYGON');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'landuses', 'the_geom', '2', '23031', 'MULTIPOLYGON');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'node', 'the_geom', '2', '23031', 'POINT');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'raingage', 'the_geom', '2', '23031', 'POINT');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'subcatchment', 'the_geom', '2', '23031', 'MULTIPOLYGON');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'vertice', 'the_geom', '2', '23031', 'POINT');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_man_arc', 'the_geom', '2', '23031', 'MULTILINESTRING');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_man_node', 'the_geom', '2', '23031', 'POINT');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_rpt_arcflow_sum', 'the_geom', '2', '23031', 'POINT');\n";
+				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_rpt_nodeflood_sum', 'the_geom', '2', '23031', 'POINT');\n";
 				if (executeSql(content, true)){
 					Utils.showMessage("Schema creation completed", "", "INPcom");							
 				}
@@ -298,5 +516,5 @@ public class MainDao {
 		}
 		
 	}
-	
+
 }
