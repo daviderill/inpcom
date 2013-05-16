@@ -87,7 +87,7 @@ public class Form extends JPanel implements ActionListener {
 	private JButton btnOptions;
 	private JPanel panel;
 	private JLabel lblNewLabel;
-	private JComboBox<String> comboBox;
+	private JComboBox<String> cboDriver;
 	private JLabel lblPort;
 	private JLabel lblIp;
 	private JTextField txtIP;
@@ -157,6 +157,10 @@ public class Form extends JPanel implements ActionListener {
 
 
 	// Panel Database Options
+	public Integer getDriver() {
+		return cboDriver.getSelectedIndex();
+	}
+	
 	public String getHost() {
 		return txtIP.getText().trim();
 	}
@@ -339,8 +343,7 @@ public class Form extends JPanel implements ActionListener {
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab(
 				BUNDLE.getString("Form.panel_1.title"), null, panel_1, null); //$NON-NLS-1$
-		panel_1.setLayout(new MigLayout("", "[10][][380]",
-				"[5][208.00][10][80][]"));
+		panel_1.setLayout(new MigLayout("", "[10][][380]", "[5][208.00][10][80][]"));
 
 		panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -351,11 +354,11 @@ public class Form extends JPanel implements ActionListener {
 		lblNewLabel = new JLabel(BUNDLE.getString("Form.lblNewLabel.text_2")); //$NON-NLS-1$
 		panel.add(lblNewLabel, "cell 1 1");
 
-		comboBox = new JComboBox<String>();
-		comboBox.setPreferredSize(new Dimension(24, 20));
-		comboBox.setMinimumSize(new Dimension(24, 20));
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"PG-9.1+PostGIS-1.5"}));
-		panel.add(comboBox, "cell 3 1,growx");
+		cboDriver = new JComboBox<String>();
+		cboDriver.setPreferredSize(new Dimension(24, 20));
+		cboDriver.setMinimumSize(new Dimension(24, 20));
+		cboDriver.setModel(new DefaultComboBoxModel<String>(new String[] {"PG-9.1+PostGIS-1.5", "PG-9.2+PostGIS-2.0"}));
+		panel.add(cboDriver, "cell 3 1,growx");
 
 		lblIp = new JLabel(BUNDLE.getString("Form.lblIp.text")); //$NON-NLS-1$
 		panel.add(lblIp, "cell 1 2");

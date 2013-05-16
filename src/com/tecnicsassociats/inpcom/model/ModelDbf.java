@@ -48,17 +48,6 @@ public class ModelDbf extends Model{
 	private static Map<Integer, File> dbfFiles;
 
 	
-    public static boolean setConnectionDbf(String sqlitePath) {
-		if (MainDao.setConnectionDbf(sqlitePath)){
-			connectionDbf = MainDao.connectionDbf;
-			return true;
-		} else{
-			return false;
-		}
-    	
-    }
-    
-    
 	// Read content of the DBF file and saved it in an Array
 	@SuppressWarnings("resource")
 	public static ArrayList<LinkedHashMap<String, String>> readDBF(File file) {
@@ -128,8 +117,8 @@ public class ModelDbf extends Model{
 			raf.setLength(0);
 
 			// Get content of target table	
-			String sql = "SELECT id, name, dbf_id, lines FROM target";
-			Statement stat = connectionDbf.createStatement();
+			String sql = "SELECT id, name, table_id, lines FROM inp_target";
+			Statement stat = connectionDrivers.createStatement();
 			ResultSet rs = stat.executeQuery(sql);					
 			while (rs.next()) {
 				processTarget(rs.getInt("id"), rs.getInt("dbf_id"), rs.getInt("lines"));	
@@ -179,8 +168,8 @@ public class ModelDbf extends Model{
 
 		// Get DBF fields to write into this target
 		mHeader = new LinkedHashMap<String, Integer>();		
-		String sql = "SELECT name, space FROM target_fields WHERE target_id = " + id + " ORDER BY pos" ;
-		Statement stat = connectionDbf.createStatement();
+		String sql = "SELECT name, space FROM imp_target_fields WHERE target_id = " + id + " ORDER BY pos" ;
+		Statement stat = connectionDrivers.createStatement();
 		ResultSet rs = stat.executeQuery(sql);			 		
 		while (rs.next()) {
 			mHeader.put(rs.getString("name").trim().toLowerCase(), rs.getInt("space"));
@@ -228,12 +217,12 @@ public class ModelDbf extends Model{
 
         dbfFiles = new HashMap<Integer, File>();
         
-		String sql = "SELECT id, name FROM dbf WHERE id > -1 ORDER BY id";
+		String sql = "SELECT id, dbf_table FROM inp_table WHERE id > -1 ORDER BY id";
 		try {
-			Statement stat = connectionDbf.createStatement();
+			Statement stat = connectionDrivers.createStatement();
 			ResultSet rs = stat.executeQuery(sql);		
 			while (rs.next()) {
-				String sDBF = sDirShp + File.separator + rs.getString("name").trim() + ".dbf";
+				String sDBF = sDirShp + File.separator + rs.getString("dbf_table").trim() + ".dbf";
 				dbfFiles.put(rs.getInt("id"), new File(sDBF));
 			}
 			rs.close();

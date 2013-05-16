@@ -7,7 +7,7 @@
         
         <jar destfile="${dist}/inpcom.jar">
             <manifest>
-                <attribute name="Main-Class" value="com.tecnicsassociats.gvsig.inpcom.MainClass"/>
+                <attribute name="Main-Class" value="com.tecnicsassociats.inpcom.MainClass"/>
 				<attribute name="Class-Path" value=". lib/formsrt.jar lib/gt2-main.jar lib/gt2-postgis.jar lib/gt2-shapefile.jar lib/miglayout15-swing.jar lib/postgresql-9.1-901.jdbc4.jar lib/sqlitejdbc-v056.jar"/>
             </manifest>
             <fileset dir="O:/workspace_nav_table_forms/inpcom/bin"/>

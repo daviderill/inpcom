@@ -242,6 +242,12 @@ public class MainController{
         String version = MainDao.getSoftwareVersion("postgis", id);
         Model.setSoftware(version);
         
+		// Get Sqlite Database			
+		String sqlitePath = version + ".sqlite";
+		if (!Model.setConnectionDrivers(sqlitePath)){
+			return;
+		}        
+        
         view.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         // Export to INP

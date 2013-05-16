@@ -1,15 +1,8 @@
-
--- ----------------------------
--- View structure for "geography_columns"
--- ----------------------------
-CREATE VIEW "geography_columns" AS 
-SELECT current_database() AS f_table_catalog, n.nspname AS f_table_schema, c.relname AS f_table_name, a.attname AS f_geography_column, geography_typmod_dims(a.atttypmod) AS coord_dimension, geography_typmod_srid(a.atttypmod) AS srid, geography_typmod_type(a.atttypmod) AS type FROM pg_class c, pg_attribute a, pg_type t, pg_namespace n WHERE ((((((t.typname = 'geography'::name) AND (a.attisdropped = false)) AND (a.atttypid = t.oid)) AND (a.attrelid = c.oid)) AND (c.relnamespace = n.oid)) AND (NOT pg_is_other_temp_schema(c.relnamespace)));
-
 -- ----------------------------
 -- View structure for "v_inp_buildup"
 -- ----------------------------
 CREATE VIEW "v_inp_buildup" AS 
-SELECT inp_buildup_land_x_pol.landuses_id, inp_buildup_land_x_pol.poll_id, inp_buildup_land_x_pol.funcb_type, inp_buildup_land_x_pol.c1, inp_buildup_land_x_pol.c2, inp_buildup_land_x_pol.c3, inp_buildup_land_x_pol.perunit FROM inp_buildup_land_x_pol;
+SELECT inp_buildup_land_x_pol.landus_id, inp_buildup_land_x_pol.poll_id, inp_buildup_land_x_pol.funcb_type, inp_buildup_land_x_pol.c1, inp_buildup_land_x_pol.c2, inp_buildup_land_x_pol.c3, inp_buildup_land_x_pol.perunit FROM inp_buildup_land_x_pol;
 
 -- ----------------------------
 -- View structure for "v_inp_conduit_cu"
@@ -39,7 +32,7 @@ SELECT inp_controls.id, inp_controls.text FROM inp_controls ORDER BY inp_control
 -- View structure for "v_inp_coverages"
 -- ----------------------------
 CREATE VIEW "v_inp_coverages" AS 
-SELECT subcatchment.subc_id, inp_coverage_land_x_subc.landuses_id, inp_coverage_land_x_subc.percent, catch_selection.catch_id FROM ((inp_coverage_land_x_subc JOIN subcatchment ON ((inp_coverage_land_x_subc.subc_id = subcatchment.subc_id))) JOIN catch_selection ON ((subcatchment.catch_id = catch_selection.catch_id)));
+SELECT subcatchment.subc_id, inp_coverage_land_x_subc.landus_id, inp_coverage_land_x_subc.percent, catch_selection.catch_id FROM ((inp_coverage_land_x_subc JOIN subcatchment ON ((inp_coverage_land_x_subc.subc_id = subcatchment.subc_id))) JOIN catch_selection ON ((subcatchment.catch_id = catch_selection.catch_id)));
 
 -- ----------------------------
 -- View structure for "v_inp_curve"
@@ -177,7 +170,7 @@ SELECT node.node_id, node.elev, node.ymax, junction.y0, junction.ysur, junction.
 -- View structure for "v_inp_landuses"
 -- ----------------------------
 CREATE VIEW "v_inp_landuses" AS 
-SELECT inp_landuses.landuses_id, inp_landuses.sweepint, inp_landuses.availab, inp_landuses.lastsweep FROM inp_landuses;
+SELECT inp_landuses.landus_id, inp_landuses.sweepint, inp_landuses.availab, inp_landuses.lastsweep FROM inp_landuses;
 
 -- ----------------------------
 -- View structure for "v_inp_lidcontrol"
@@ -405,7 +398,7 @@ SELECT vertice.vertice_id, vertice.arc_id, (st_x(vertice.the_geom))::numeric(16,
 -- View structure for "v_inp_washoff"
 -- ----------------------------
 CREATE VIEW "v_inp_washoff" AS 
-SELECT inp_washoff_land_x_pol.landuses_id, inp_washoff_land_x_pol.poll_id, inp_washoff_land_x_pol.funcw_type, inp_washoff_land_x_pol.c1, inp_washoff_land_x_pol.c2, inp_washoff_land_x_pol.sweepeffic, inp_washoff_land_x_pol.bmpeffic FROM inp_washoff_land_x_pol;
+SELECT inp_washoff_land_x_pol.landus_id, inp_washoff_land_x_pol.poll_id, inp_washoff_land_x_pol.funcw_type, inp_washoff_land_x_pol.c1, inp_washoff_land_x_pol.c2, inp_washoff_land_x_pol.sweepeffic, inp_washoff_land_x_pol.bmpeffic FROM inp_washoff_land_x_pol;
 
 -- ----------------------------
 -- View structure for "v_inp_weir"
@@ -436,14 +429,6 @@ SELECT result_selection.result_id, rpt_arcflow_sum.arc_id, rpt_arcflow_sum.arc_t
 -- ----------------------------
 CREATE VIEW "v_rpt_nodeflood_sum" AS 
 SELECT result_selection.result_id, rpt_nodeflooding_sum.node_id, rpt_nodeflooding_sum.hour_flood, rpt_nodeflooding_sum.max_rate, rpt_nodeflooding_sum.time_days, rpt_nodeflooding_sum.time_hour, rpt_nodeflooding_sum.tot_flood, rpt_nodeflooding_sum.max_ponded, node.the_geom FROM ((node JOIN rpt_nodeflooding_sum ON ((rpt_nodeflooding_sum.node_id = node.node_id))) JOIN result_selection ON (((rpt_nodeflooding_sum.result_id)::text = (result_selection.result_id)::text)));
-
--- ----------------------------
--- Alter Sequences Owned By 
--- ----------------------------
-ALTER SEQUENCE "man_event_x_arc2_id_seq" OWNED BY "man_event_x_arc"."id";
-ALTER SEQUENCE "man_event_x_connec2_id_seq" OWNED BY "man_event_x_connec"."id";
-ALTER SEQUENCE "man_event_x_gully2_id_seq" OWNED BY "man_event_x_gully"."id";
-ALTER SEQUENCE "man_event_x_node2_id_seq" OWNED BY "man_event_x_node"."id";
 
 -- ----------------------------
 -- Primary Key structure for table "arc"
@@ -513,7 +498,7 @@ ALTER TABLE "inp_backdrop" ADD PRIMARY KEY ("id");
 -- ----------------------------
 -- Primary Key structure for table "inp_buildup_land_x_pol"
 -- ----------------------------
-ALTER TABLE "inp_buildup_land_x_pol" ADD PRIMARY KEY ("landuses_id", "poll_id");
+ALTER TABLE "inp_buildup_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
 
 -- ----------------------------
 -- Primary Key structure for table "inp_conduit"
@@ -528,7 +513,7 @@ ALTER TABLE "inp_controls" ADD PRIMARY KEY ("id");
 -- ----------------------------
 -- Primary Key structure for table "inp_coverage_land_x_subc"
 -- ----------------------------
-ALTER TABLE "inp_coverage_land_x_subc" ADD PRIMARY KEY ("subc_id", "landuses_id");
+ALTER TABLE "inp_coverage_land_x_subc" ADD PRIMARY KEY ("subc_id", "landus_id");
 
 -- ----------------------------
 -- Primary Key structure for table "inp_curve"
@@ -598,7 +583,7 @@ ALTER TABLE "inp_label" ADD PRIMARY KEY ("label");
 -- ----------------------------
 -- Primary Key structure for table "inp_landuses"
 -- ----------------------------
-ALTER TABLE "inp_landuses" ADD PRIMARY KEY ("landuses_id");
+ALTER TABLE "inp_landuses" ADD PRIMARY KEY ("landus_id");
 
 -- ----------------------------
 -- Primary Key structure for table "inp_lid_control"
@@ -863,7 +848,7 @@ ALTER TABLE "inp_value_yesno" ADD PRIMARY KEY ("id");
 -- ----------------------------
 -- Primary Key structure for table "inp_washoff_land_x_pol"
 -- ----------------------------
-ALTER TABLE "inp_washoff_land_x_pol" ADD PRIMARY KEY ("landuses_id", "poll_id");
+ALTER TABLE "inp_washoff_land_x_pol" ADD PRIMARY KEY ("landus_id", "poll_id");
 
 -- ----------------------------
 -- Primary Key structure for table "inp_weir"

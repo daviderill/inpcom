@@ -87,11 +87,47 @@ public class DatabaseController {
 	
 	public void createSchema(){
 		
-		String schemaName = JOptionPane.showInputDialog(this.view, bundleText.getString("enter_schema_name"), "");
-		view.setCursor(new Cursor(Cursor.WAIT_CURSOR));		
-		MainDao.createSchema(schemaName.trim());
-		view.setSchemas(MainDao.getSchemas());		
-		view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		Integer driver = view.getDriver();
+		String schemaName = JOptionPane.showInputDialog(this.view, bundleText.getString("enter_schema_name"), "schema_name");
+		if (schemaName == null){
+			return;
+		}
+		schemaName = schemaName.trim().toLowerCase();
+		if (schemaName.equals("")){
+			Utils.showError("Please, provide a valid name", "", "INPcom");
+			return;
+		}
+		
+		// Get default SRID from properties
+		String defaultSrid = prop.getProperty("SRID", "23030");
+		String sridValue = JOptionPane.showInputDialog(this.view, bundleText.getString("enter_srid"), defaultSrid);
+		if (sridValue == null){
+			return;
+		}		
+		sridValue = sridValue.trim();
+		if (!sridValue.equals("")){
+			Integer srid;
+			try{
+				srid = Integer.parseInt(sridValue);
+			} catch (NumberFormatException e){
+				Utils.showError("SRID must be a numeric value", "", "INPcom");
+				return;
+			}
+			if (!sridValue.equals(defaultSrid)){
+				prop.setProperty("SRID", sridValue);
+				MainDao.savePropertiesFile();
+			}
+			boolean isSridOk = MainDao.checkSrid(srid);
+			if (!isSridOk){
+				Utils.showError("SRID " + srid + " not found in spatial_ref_sys Postgis table\n" +
+					"Please provide a valid value", "", "INPcom");
+				return;
+			}
+			view.setCursor(new Cursor(Cursor.WAIT_CURSOR));		
+			MainDao.createSchema(schemaName.trim(), sridValue.trim(), driver);
+			view.setSchemas(MainDao.getSchemas());		
+			view.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		}
 		
 	}
 	

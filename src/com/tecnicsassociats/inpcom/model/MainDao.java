@@ -40,32 +40,30 @@ import com.tecnicsassociats.inpcom.util.Utils;
 public class MainDao {
 	
     public static Connection connectionConfig;   // SQLite
-    public static Connection connectionDbf;	   // SQLite 
+    public static Connection connectionDrivers;	   // SQLite 
 	public static Connection connectionPostgis;   // Postgis
     public static String schema;
-	public static String schemaDrivers;
 	
 	public static String folderConfig;	
     public static File fileHelp;	
 	
 	private static Properties iniProperties = new Properties();	
 	private static String appPath;	
-	private static String configFile;
+	private static String configPath;
+	private static FileOutputStream fos;
 	
 	
     // Sets initial configuration files
     public static boolean configIni() {
 
     	if (!enabledPropertiesFile()){
+    		Utils.showError("Properties file is empty. Application cannot start", "", "INPcom");
     		return false;
     	}
     	
         // Get INP folder
         folderConfig = iniProperties.getProperty("FOLDER_CONFIG");
         folderConfig = appPath + folderConfig + File.separator;
-
-        // Get schema drivers
-    	schemaDrivers = iniProperties.getProperty("SCHEMA_DRIVERS", "drivers");     	    	
 
     	// Set Config DB connection
         if (!setConnectionConfig(Constants.CONFIG_DB)){
@@ -91,9 +89,12 @@ public class MainDao {
 
     public static void savePropertiesFile() {
 
-        File iniFile = new File(configFile);
+        File iniFile = new File(configPath);
         try {
-            iniProperties.store(new FileOutputStream(iniFile), "");
+        	if (fos == null){
+        		fos = new FileOutputStream(iniFile);
+        	}
+            iniProperties.store(fos, "");
         } catch (FileNotFoundException e) {
             Utils.showError("inp_error_notfound", iniFile.getPath(), "inp_descr");
         } catch (IOException e) {
@@ -109,19 +110,19 @@ public class MainDao {
         try {
             appPath = new File(".").getCanonicalPath() + File.separator;
         } catch (IOException e1) {
-            Utils.showError("inp_error_io", configFile, "inp_descr");
+            Utils.showError("inp_error_io", configPath, "inp_descr");
             return false;
         }
 
-        configFile = appPath + Constants.CONFIG_FOLDER + File.separator + Constants.CONFIG_FILE;
-        File fileIni = new File(configFile);
+        configPath = appPath + Constants.CONFIG_FOLDER + File.separator + Constants.CONFIG_FILE;
+        File fileIni = new File(configPath);
         try {
             iniProperties.load(new FileInputStream(fileIni));
         } catch (FileNotFoundException e) {
-            Utils.showError("inp_error_notfound", configFile, "inp_descr");
+            Utils.showError("inp_error_notfound", configPath, "inp_descr");
             return false;
         } catch (IOException e) {
-            Utils.showError("inp_error_io", configFile, "inp_descr");
+            Utils.showError("inp_error_io", configPath, "inp_descr");
             return false;
         }
         return !iniProperties.isEmpty();
@@ -154,16 +155,15 @@ public class MainDao {
     }
     
     
-    // Connect to sqlite Database
-    // Still useful for DBF procedures!
-    public static boolean setConnectionDbf(String fileName) {
+    // Connect to sqlite drivers database
+    public static boolean setConnectionDrivers(String fileName) {
 
         try {
             Class.forName("org.sqlite.JDBC");
             String filePath = folderConfig + fileName;
             File file = new File(filePath);
             if (file.exists()) {
-                connectionDbf = DriverManager.getConnection("jdbc:sqlite:" + filePath);
+                connectionDrivers = DriverManager.getConnection("jdbc:sqlite:" + filePath);
                 return true;
             } else {
                 Utils.showError("inp_error_notfound", filePath, "inp_descr");
@@ -219,7 +219,6 @@ public class MainDao {
         
 	}	
 	
-	
 
 	public static void updateSoftware(String software, String exeFile) {
 		
@@ -254,7 +253,7 @@ public class MainDao {
     }	
     
     
-	public static boolean executeSql(String sql, boolean commit) {
+	public static boolean executeUpdateSql(String sql, boolean commit) {
 		try {
 			Statement ps = connectionPostgis.createStatement();
 	        ps.executeUpdate(sql);
@@ -269,17 +268,22 @@ public class MainDao {
 	}	
 	
 	
+	public static boolean executeUpdateSql(String sql) {
+		return executeUpdateSql(sql, false);
+	}		
+    
+	
 	public static boolean executeSql(String sql) {
 		try {
 			Statement ps = connectionPostgis.createStatement();
-	        ps.executeUpdate(sql);
+	        ps.execute(sql);
 			return true;
 		} catch (SQLException e) {
 			Utils.showError(e, sql);
 			return false;
 		}
 	}		
-    
+	
 	
     // Check if the table exists
 	public static boolean checkTable(String tableName) {
@@ -324,11 +328,25 @@ public class MainDao {
     }    
     
     
+    // Check if the selected srid exists in spatial_ref_sys
+	public static boolean checkSrid(Integer srid) {
+        String sql = "SELECT srid FROM spatial_ref_sys WHERE srid = " + srid;
+        try {
+            Statement stat = connectionPostgis.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            return (rs.next());
+        } catch (SQLException e) {
+        	Utils.showError(e.getMessage(), "", "inp_descr");
+            return false;
+        }
+    }    
+    
+    
 	public static Vector<String> getSchemas(){
 
         String sql = "SELECT schema_name FROM information_schema.schemata " +
         		"WHERE schema_name <> 'information_schema' AND schema_name !~ E'^pg_' " +
-        		"AND schema_name <> 'drivers' AND schema_name <> 'public' " +
+        		"AND schema_name <> 'drivers' AND schema_name <> 'public' AND schema_name <> 'topology' " +
         		"ORDER BY schema_name";
         Vector<String> vector = new Vector<String>();
         try {
@@ -441,9 +459,9 @@ public class MainDao {
 	
 	public static void setResultSelect(String schema, String table, String result) {
 		String sql = "DELETE FROM " + schema + "." + table;
-		executeSql(sql);
+		executeUpdateSql(sql);
 		sql = "INSERT INTO " + schema + "." + table + " VALUES ('" + result + "')";
-		executeSql(sql);
+		executeUpdateSql(sql);
 	}
 	
 	
@@ -451,27 +469,24 @@ public class MainDao {
 		MainDao.schema = schema;
 	}
 	
-	
-	public static void setSchemaDrivers(String schemaDrivers) {
-		MainDao.schemaDrivers = schemaDrivers;
-	}
-
 
 	public static void deleteSchema(String schemaName) {
 		String sql = "DROP schema IF EXISTS " + schemaName + " CASCADE;";
-		executeSql(sql, true);		
+		executeUpdateSql(sql, true);		
 		sql = "DELETE FROM public.geometry_columns WHERE f_table_schema = '" + schemaName + "'";
-		executeSql(sql, true);			
+		executeUpdateSql(sql, true);			
 	}
 
 
-	public static void createSchema(String schemaName) {
+	public static void createSchema(String schemaName, String srid, Integer driver) {
 		
 		String sql = "CREATE schema " + schemaName;
-		executeSql(sql);	
+		executeUpdateSql(sql);	
 		sql = "SET search_path TO '" + schemaName + "'";
-		executeSql(sql);	
+		executeUpdateSql(sql);	
+		
 		try {
+			
 	    	String folderRoot = new File(".").getCanonicalPath() + File.separator;         		
 			String file = folderRoot + "inp/create_schema.sql";
 			File fileName = new File(file);			
@@ -481,34 +496,35 @@ public class MainDao {
 			while ((line = rat.readLine()) != null){
 				content += line + "\n";
 			}
-			if (executeSql(content, true)){
+			if (executeUpdateSql(content, true)){
 				rat.close();				
 				sql = "SET search_path TO '" + schemaName + "', 'public'";
-				executeSql(sql);					
+				executeUpdateSql(sql);
+				
+				content = "";				
+				// Add geometry_columns info for selected schema				
+				String geometry = addGeometryColumnsTables(schemaName, srid);
+				executeSql(geometry);
+				
 				file = folderRoot + "inp/create_schema_2.sql";
 				fileName = new File(file);			
 				rat = new RandomAccessFile(fileName, "r");
-				content = "";
 				while ((line = rat.readLine()) != null){
 					content += line + "\n";
 				}
-				// Add records into geometry_columns for selected schema
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'arc', 'the_geom', '2', '23031', 'MULTILINESTRING');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'catchment', 'the_geom', '2', '23031', 'MULTIPOLYGON');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'landuses', 'the_geom', '2', '23031', 'MULTIPOLYGON');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'node', 'the_geom', '2', '23031', 'POINT');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'raingage', 'the_geom', '2', '23031', 'POINT');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'subcatchment', 'the_geom', '2', '23031', 'MULTIPOLYGON');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'vertice', 'the_geom', '2', '23031', 'POINT');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_man_arc', 'the_geom', '2', '23031', 'MULTILINESTRING');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_man_node', 'the_geom', '2', '23031', 'POINT');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_rpt_arcflow_sum', 'the_geom', '2', '23031', 'POINT');\n";
-				content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_rpt_nodeflood_sum', 'the_geom', '2', '23031', 'POINT');\n";
-				if (executeSql(content, true)){
+				
+				// If Postgis 1.5 add also geometry info for wiews
+				if (driver == 0){
+					geometry = addGeometryColumnsViews(schemaName, srid);
+					content+= geometry;
+				}				
+				if (executeUpdateSql(content, true)){
 					Utils.showMessage("Schema creation completed", "", "INPcom");							
 				}
+				
 				rat.close();	
 			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -516,5 +532,32 @@ public class MainDao {
 		}
 		
 	}
+
+
+	private static String addGeometryColumnsTables(String schemaName, String srid) {
+		
+		String content = "";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'arc', 'the_geom', '" + srid + "', 'MULTILINESTRING', 2);\n";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'node', 'the_geom', '" + srid + "', 'POINT', 2);\n";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'subcatchment', 'the_geom', '" + srid + "', 'MULTIPOLYGON', 2);\n";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'catchment', 'the_geom', '" + srid + "', 'MULTIPOLYGON', 2);\n";		
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'raingage', 'the_geom', '" + srid + "', 'POINT', 2);\n";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'vertice', 'the_geom', '" + srid + "', 'POINT', 2);\n";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'connec', 'the_geom', '" + srid + "', 'POINT', 2);\n";
+		content+= "SELECT addgeometryColumn('" + schemaName + "', 'gully', 'the_geom', '" + srid + "', 'POINT', 2);\n";
+		return content;
+		
+	}
+	
+	private static String addGeometryColumnsViews(String schemaName, String srid) {
+		
+		String content = "";
+		content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_man_arc', 'the_geom', '2', '" + srid + "', 'MULTILINESTRING');\n";
+		content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_man_node', 'the_geom', '2', '" + srid + "', 'POINT');\n";
+		content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_rpt_arcflow_sum', 'the_geom', '2', '" + srid + "', 'POINT');\n";
+		content+= "INSERT INTO public.geometry_columns VALUES (' ', '" + schemaName + "', 'v_rpt_nodeflood_sum', 'the_geom', '2', '" + srid + "', 'POINT');\n";
+		return content;
+		
+	}	
 
 }

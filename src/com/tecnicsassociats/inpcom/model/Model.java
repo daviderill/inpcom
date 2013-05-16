@@ -35,7 +35,7 @@ public class Model {
 
 	protected static Logger logger;	
 	protected static Properties iniProperties;
-    protected static Connection connectionDbf;
+    protected static Connection connectionDrivers;
     protected static String software = "";    
     protected static File fileTemplate;
     protected static ArrayList<LinkedHashMap<String, String>> lMapDades;
@@ -43,6 +43,15 @@ public class Model {
     protected static RandomAccessFile rat;
     protected static RandomAccessFile raf;
     
+    
+    public static boolean setConnectionDrivers(String sqlitePath) {
+		if (MainDao.setConnectionDrivers(sqlitePath)){
+			connectionDrivers = MainDao.connectionDrivers;
+			return true;
+		} else{
+			return false;
+		}
+    }    
     
     public static void setSoftware(String software){
     	Model.software = software;

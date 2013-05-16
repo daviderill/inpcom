@@ -151,7 +151,7 @@ public class DbfController {
 		
 		// Get Sqlite Database			
 		String sqlitePath = version + ".sqlite";
-		if (!ModelDbf.setConnectionDbf(sqlitePath)){
+		if (!Model.setConnectionDrivers(sqlitePath)){
 			return;
 		}
 		

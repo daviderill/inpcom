@@ -50,6 +50,7 @@ import com.tecnicsassociats.inpcom.util.Utils;
 public class ModelPostgis extends Model {
 
 	private static Connection connectionPostgis;
+	private static Connection connectionDrivers;   // SQLite
     private static String insertSql;
 	private static ArrayList<String> tokens;
 	private static ArrayList<ArrayList<String>> tokensList;	
@@ -154,19 +155,19 @@ public class ModelPostgis extends Model {
             	return false;
             }
                 
-            // Get some properties
-            //default_size = Integer.parseInt(iniProperties.getProperty(sExport + "SIZE_DEFAULT"));
-
             // Open template and output file
             rat = new RandomAccessFile(fileTemplate, "r");
             raf = new RandomAccessFile(fileInp, "rw");
             raf.setLength(0);
 
             // Get content of target table
-            sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
-            		+ "FROM " + MainDao.schemaDrivers + "." + software + "_inp_target as target " 
-            		+ "INNER JOIN " + MainDao.schemaDrivers + "." + software + "_inp_table as main ON target.table_id = main.id";                  
-            Statement stat = connectionPostgis.createStatement();            
+//          sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
+//            		+ "FROM " + MainDao.schemaDrivers + "." + software + "_inp_target as target " 
+//            		+ "INNER JOIN " + MainDao.schemaDrivers + "." + software + "_inp_table as main ON target.table_id = main.id"; 
+            sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.dbase_table as table_name "
+            		+ "FROM inp_target as target " 
+            		+ "INNER JOIN inp_table as main ON target.table_id = main.id";             
+            Statement stat = connectionDrivers.createStatement();            
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
             	logger.info("INP target: " + rs.getInt("target_id") + " - " + rs.getString("table_name") + " - " + rs.getInt("lines"));
@@ -221,9 +222,9 @@ public class ModelPostgis extends Model {
 
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
-        String sql = "SELECT name, space FROM " + MainDao.schemaDrivers + "." + software + "_inp_target_fields " + 
+        String sql = "SELECT name, space FROM inp_target_fields " + 
         		"WHERE target_id = " + id + " ORDER BY pos";
-        Statement stat = connectionPostgis.createStatement();
+        Statement stat = connectionDrivers.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
             mHeader.put(rs.getString("name").trim().toLowerCase(), rs.getInt("space"));
@@ -414,13 +415,12 @@ public class ModelPostgis extends Model {
 			return false;
 		}			
         
-        // Get info from rpt_target into memory
+        // TODO: Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM " + MainDao.schemaDrivers + "." + software + "_rpt_target " +
+        String sql = "SELECT * FROM rpt_target " +
         		"WHERE type <> 0 ORDER BY id";
         try {
-    		connectionPostgis.setAutoCommit(false);        	
-            Statement stat = connectionPostgis.createStatement();
+            Statement stat = connectionDrivers.createStatement();
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
                 RptTarget rpt = new RptTarget(rs);
@@ -442,11 +442,11 @@ public class ModelPostgis extends Model {
 	    		if (exists){
 	    			sql = "DELETE FROM " + MainDao.schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
 	    			logger.info(sql);
-	    			MainDao.executeSql(sql);
+	    			MainDao.executeUpdateSql(sql);
 	    		}
 	    		if (!insertSql.equals("")){
 	    			logger.info(insertSql);	    			
-		    		if (!MainDao.executeSql(insertSql)){
+		    		if (!MainDao.executeUpdateSql(insertSql)){
 						return false;
 					}
 	    		}
@@ -611,7 +611,6 @@ public class ModelPostgis extends Model {
 			try {
 				lineNumber++;
 				String line = rat.readLine().trim();
-				//System.out.println(line);
 				blankLine = (line.length()==0);
 				if (!blankLine){
 					Scanner scanner = new Scanner(line);
@@ -698,8 +697,7 @@ public class ModelPostgis extends Model {
 			}
 		}
 		if (valid == true && together){
-			tokens.add(aux.trim());
-			//System.out.println(aux);				
+			tokens.add(aux.trim());			
 		}	
 		
 	}

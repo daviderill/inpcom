@@ -302,12 +302,9 @@ CREATE TABLE "arc" (
 "y1" numeric(12,4),
 "y2" numeric(12,4),
 "direction" varchar(3),
-"link" varchar(254),
-"the_geom" "public"."geometry"
+"link" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "cat_arc"
@@ -327,9 +324,7 @@ CREATE TABLE "cat_arc" (
 "short_des" varchar(16),
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "cat_connec"
@@ -339,9 +334,7 @@ CREATE TABLE "cat_connec" (
 "short_des" varchar(16),
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "cat_cover"
@@ -352,9 +345,7 @@ CREATE TABLE "cat_cover" (
 "descript" varchar(100),
 "material" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "cat_gully"
@@ -364,9 +355,7 @@ CREATE TABLE "cat_gully" (
 "short_des" varchar(16),
 "descr" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "cat_mat"
@@ -376,9 +365,7 @@ CREATE TABLE "cat_mat" (
 "descript" varchar(100),
 "n" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "cat_mhole"
@@ -388,9 +375,7 @@ CREATE TABLE "cat_mhole" (
 "short_des" varchar(16),
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "catch_selection"
@@ -398,21 +383,16 @@ WITH (OIDS=FALSE)
 CREATE TABLE "catch_selection" (
 "catch_id" int4 NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "catchment"
 -- ----------------------------
 CREATE TABLE "catchment" (
 "catch_id" SERIAL,
-"descript" varchar(100),
-"the_geom" "public"."geometry"
+"descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "connec"
@@ -434,12 +414,9 @@ CREATE TABLE "connec" (
 "link" varchar(254),
 "tmp_inf" varchar(254),
 "com_inf" varchar(254),
-"wstage_id" varchar(16),
-"the_geom" "public"."geometry"
+"wstage_id" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "gully"
@@ -461,12 +438,9 @@ CREATE TABLE "gully" (
 "link" varchar(254),
 "tmp_inf" varchar(254),
 "com_inf" varchar(254),
-"wstage_id" varchar(16),
-"the_geom" "public"."geometry"
+"wstage_id" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_aquifer"
@@ -486,9 +460,7 @@ CREATE TABLE "inp_aquifer" (
 "wte" numeric(12,4),
 "umc" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_backdrop"
@@ -497,15 +469,13 @@ CREATE TABLE "inp_backdrop" (
 "id" SERIAL,
 "text" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_buildup_land_x_pol"
 -- ----------------------------
 CREATE TABLE "inp_buildup_land_x_pol" (
-"landuses_id" varchar(16) NOT NULL,
+"landus_id" varchar(16) NOT NULL,
 "poll_id" varchar(16) NOT NULL,
 "funcb_type" varchar(18),
 "c1" numeric(12,4),
@@ -513,9 +483,7 @@ CREATE TABLE "inp_buildup_land_x_pol" (
 "c3" numeric(12,4),
 "perunit" varchar(10)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_conduit"
@@ -531,9 +499,7 @@ CREATE TABLE "inp_conduit" (
 "q0" numeric(12,4),
 "qmax" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_controls"
@@ -542,21 +508,17 @@ CREATE TABLE "inp_controls" (
 "id" SERIAL,
 "text" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_coverage_land_x_subc"
 -- ----------------------------
 CREATE TABLE "inp_coverage_land_x_subc" (
 "subc_id" int4 NOT NULL,
-"landuses_id" varchar(16) NOT NULL,
+"landus_id" varchar(16) NOT NULL,
 "percent" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_curve"
@@ -568,9 +530,7 @@ CREATE TABLE "inp_curve" (
 "x_value" numeric(18,6),
 "y_value" numeric(18,6)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_curve_id"
@@ -579,9 +539,7 @@ CREATE TABLE "inp_curve_id" (
 "id" varchar(16) NOT NULL,
 "curve_type" varchar(20)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_divider"
@@ -595,9 +553,7 @@ CREATE TABLE "inp_divider" (
 "ht" numeric(12,4),
 "cd" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_dwf"
@@ -611,9 +567,7 @@ CREATE TABLE "inp_dwf" (
 "pat3" varchar(16),
 "pat4" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_dwf_pol_x_node"
@@ -627,9 +581,7 @@ CREATE TABLE "inp_dwf_pol_x_node" (
 "pat3" varchar(16),
 "pat4" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_evaporation"
@@ -665,9 +617,7 @@ CREATE TABLE "inp_evaporation" (
 "recovery" varchar(16),
 "dry_only" varchar(3)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_files"
@@ -678,9 +628,7 @@ CREATE TABLE "inp_files" (
 "file_type" varchar(18),
 "fname" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_groundwater"
@@ -698,9 +646,7 @@ CREATE TABLE "inp_groundwater" (
 "tw" numeric(10,4),
 "h" numeric(10,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_hydrograph"
@@ -709,9 +655,7 @@ CREATE TABLE "inp_hydrograph" (
 "id" SERIAL,
 "text" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_inflows"
@@ -724,9 +668,7 @@ CREATE TABLE "inp_inflows" (
 "base" numeric(12,4),
 "patter_id" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_inflows_pol_x_node"
@@ -741,9 +683,7 @@ CREATE TABLE "inp_inflows_pol_x_node" (
 "base" numeric(12,4),
 "patter_id" varchar(16)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_junction"
@@ -754,9 +694,7 @@ CREATE TABLE "inp_junction" (
 "ysur" numeric(12,4),
 "apond" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_label"
@@ -771,22 +709,18 @@ CREATE TABLE "inp_label" (
 "bold" varchar(3),
 "italic" varchar(3)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_landuses"
 -- ----------------------------
 CREATE TABLE "inp_landuses" (
-"landuses_id" varchar(16) NOT NULL,
+"landus_id" varchar(16) NOT NULL,
 "sweepint" numeric(12,4),
 "availab" numeric(12,4),
 "lastsweep" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_lid_control"
@@ -803,9 +737,7 @@ CREATE TABLE "inp_lid_control" (
 "value_7" numeric(12,4),
 "value_8" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_lidusage_subc_x_lidco"
@@ -821,9 +753,7 @@ CREATE TABLE "inp_lidusage_subc_x_lidco" (
 "toperv" numeric(12,4),
 "rptfile" varchar(10)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_loadings_pol_x_subc"
@@ -833,9 +763,7 @@ CREATE TABLE "inp_loadings_pol_x_subc" (
 "subc_id" int4 NOT NULL,
 "ibuilddup" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_mapdim"
@@ -847,9 +775,7 @@ CREATE TABLE "inp_mapdim" (
 "x2" numeric(18,6),
 "y2" numeric(18,6)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_mapunits"
@@ -858,9 +784,7 @@ CREATE TABLE "inp_mapunits" (
 "type_units" varchar(18),
 "map_type" varchar(18)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_options"
@@ -899,9 +823,7 @@ CREATE TABLE "inp_options" (
 "allow_ponding" varchar(3),
 "tempdir" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_orifice"
@@ -919,9 +841,7 @@ CREATE TABLE "inp_orifice" (
 "geom3" numeric,
 "geom4" numeric
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_outfall"
@@ -934,9 +854,7 @@ CREATE TABLE "inp_outfall" (
 "timser_id" varchar(16),
 "gate" varchar(3)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_outlet"
@@ -950,9 +868,7 @@ CREATE TABLE "inp_outlet" (
 "cd2" numeric(12,4),
 "flap" varchar(3)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_pattern"
@@ -985,9 +901,7 @@ CREATE TABLE "inp_pattern" (
 "factor_23" numeric(12,4),
 "factor_24" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_pollutant"
@@ -1004,9 +918,7 @@ CREATE TABLE "inp_pollutant" (
 "cofract" numeric(12,4),
 "cdwf" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_project_id"
@@ -1016,9 +928,7 @@ CREATE TABLE "inp_project_id" (
 "autor" varchar(50),
 "date" varchar(12)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_pump"
@@ -1030,9 +940,7 @@ CREATE TABLE "inp_pump" (
 "startup" numeric(12,4),
 "shutoff" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_rdii"
@@ -1042,9 +950,7 @@ CREATE TABLE "inp_rdii" (
 "hydro_id" varchar(16),
 "sewerarea" numeric(16,6)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_report"
@@ -1058,9 +964,7 @@ CREATE TABLE "inp_report" (
 "nodes" varchar(4),
 "links" varchar(4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_snowmelt"
@@ -1093,9 +997,7 @@ CREATE TABLE "inp_snowmelt" (
 "p_f8" numeric(12,4),
 "p_f9" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_snowpack"
@@ -1131,9 +1033,7 @@ CREATE TABLE "inp_snowpack" (
 "fsub" numeric(12,4),
 "subc_id" int4
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_storage"
@@ -1150,9 +1050,7 @@ CREATE TABLE "inp_storage" (
 "hc" numeric(12,4),
 "imd" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_temperature"
@@ -1163,9 +1061,7 @@ CREATE TABLE "inp_temperature" (
 "fname" varchar(254),
 "start" varchar(12)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_timeseries"
@@ -1180,9 +1076,7 @@ CREATE TABLE "inp_timeseries" (
 "value" numeric(12,4),
 "fname" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_timser_id"
@@ -1191,9 +1085,7 @@ CREATE TABLE "inp_timser_id" (
 "id" varchar(16) NOT NULL,
 "times_type" varchar(20)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_transects"
@@ -1202,9 +1094,7 @@ CREATE TABLE "inp_transects" (
 "id" SERIAL,
 "text" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_treatment_node_x_pol"
@@ -1214,9 +1104,7 @@ CREATE TABLE "inp_treatment_node_x_pol" (
 "poll_id" varchar(16) NOT NULL,
 "function" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_type_arc"
@@ -1226,9 +1114,7 @@ CREATE TABLE "inp_type_arc" (
 "table" varchar(30),
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_type_node"
@@ -1238,9 +1124,7 @@ CREATE TABLE "inp_type_node" (
 "table" varchar(30),
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_divider"
@@ -1249,9 +1133,7 @@ CREATE TABLE "inp_typevalue_divider" (
 "id" varchar(16) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_evap"
@@ -1260,9 +1142,7 @@ CREATE TABLE "inp_typevalue_evap" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_outfall"
@@ -1271,9 +1151,7 @@ CREATE TABLE "inp_typevalue_outfall" (
 "id" varchar(16) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_outlet"
@@ -1282,9 +1160,7 @@ CREATE TABLE "inp_typevalue_outlet" (
 "id" varchar(16) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_pattern"
@@ -1293,9 +1169,7 @@ CREATE TABLE "inp_typevalue_pattern" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_raingage"
@@ -1304,9 +1178,7 @@ CREATE TABLE "inp_typevalue_raingage" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_storage"
@@ -1315,9 +1187,7 @@ CREATE TABLE "inp_typevalue_storage" (
 "id" varchar(16) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_temp"
@@ -1326,9 +1196,7 @@ CREATE TABLE "inp_typevalue_temp" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_timeseries"
@@ -1337,9 +1205,7 @@ CREATE TABLE "inp_typevalue_timeseries" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_typevalue_windsp"
@@ -1348,9 +1214,7 @@ CREATE TABLE "inp_typevalue_windsp" (
 "id" varchar(16) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_allnone"
@@ -1358,9 +1222,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_allnone" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_buildup"
@@ -1368,9 +1230,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_buildup" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_curve"
@@ -1378,9 +1238,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_curve" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_files_actio"
@@ -1388,9 +1246,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_files_actio" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_files_type"
@@ -1398,9 +1254,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_files_type" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_lidcontrol"
@@ -1408,9 +1262,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_lidcontrol" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_mapunits"
@@ -1418,9 +1270,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_mapunits" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_fme"
@@ -1428,9 +1278,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_fme" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_fr"
@@ -1438,9 +1286,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_fr" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_fu"
@@ -1448,9 +1294,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_fu" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_id"
@@ -1458,9 +1302,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_id" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_in"
@@ -1468,9 +1310,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_in" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_lo"
@@ -1478,9 +1318,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_lo" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_options_nfl"
@@ -1488,9 +1326,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_options_nfl" (
 "id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_orifice"
@@ -1498,9 +1334,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_orifice" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_raingage"
@@ -1508,9 +1342,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_raingage" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_timserid"
@@ -1519,9 +1351,7 @@ CREATE TABLE "inp_value_timserid" (
 "id" varchar(20) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_washoff"
@@ -1529,9 +1359,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_washoff" (
 "id" varchar(18) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_weirs"
@@ -1540,9 +1368,7 @@ CREATE TABLE "inp_value_weirs" (
 "id" varchar(18) NOT NULL,
 "shape" varchar(18)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_value_yesno"
@@ -1550,15 +1376,13 @@ WITH (OIDS=FALSE)
 CREATE TABLE "inp_value_yesno" (
 "id" varchar(3) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_washoff_land_x_pol"
 -- ----------------------------
 CREATE TABLE "inp_washoff_land_x_pol" (
-"landuses_id" varchar(16) NOT NULL,
+"landus_id" varchar(16) NOT NULL,
 "poll_id" varchar(16) NOT NULL,
 "funcw_type" varchar(18),
 "c1" numeric(12,4),
@@ -1566,9 +1390,7 @@ CREATE TABLE "inp_washoff_land_x_pol" (
 "sweepeffic" numeric(12,4),
 "bmpeffic" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_weir"
@@ -1586,9 +1408,7 @@ CREATE TABLE "inp_weir" (
 "geom3" numeric(12,4),
 "geom4" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "inp_windspeed"
@@ -1609,9 +1429,7 @@ CREATE TABLE "inp_windspeed" (
 "value_12" numeric(12,4),
 "fname" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_arcdat"
@@ -1628,9 +1446,7 @@ CREATE TABLE "man_arcdat" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_element"
@@ -1646,10 +1462,8 @@ CREATE TABLE "man_element" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
+WITH (OIDS=FALSE);
 
-;
-COMMENT ON COLUMN "man_element"."elem_type" IS 'prova comentari';
 
 -- ----------------------------
 -- Table structure for "man_event"
@@ -1663,9 +1477,7 @@ CREATE TABLE "man_event" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_event_x_arc"
@@ -1682,9 +1494,7 @@ CREATE TABLE "man_event_x_arc" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_event_x_connec"
@@ -1701,9 +1511,7 @@ CREATE TABLE "man_event_x_connec" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_event_x_gully"
@@ -1719,9 +1527,7 @@ CREATE TABLE "man_event_x_gully" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_event_x_node"
@@ -1740,9 +1546,7 @@ CREATE TABLE "man_event_x_node" (
 "tmp_inf" varchar(254),
 "com_inf" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_manhole"
@@ -1769,9 +1573,7 @@ CREATE TABLE "man_manhole" (
 "com_inf" varchar(254),
 "build_date" varchar(12)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_type_event"
@@ -1780,9 +1582,7 @@ CREATE TABLE "man_type_event" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_type_node"
@@ -1791,9 +1591,7 @@ CREATE TABLE "man_type_node" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_arccategory"
@@ -1802,9 +1600,7 @@ CREATE TABLE "man_value_arccategory" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_arcloc"
@@ -1813,9 +1609,7 @@ CREATE TABLE "man_value_arcloc" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_conssta"
@@ -1824,9 +1618,7 @@ CREATE TABLE "man_value_conssta" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_coversta"
@@ -1835,9 +1627,7 @@ CREATE TABLE "man_value_coversta" (
 "id" varchar(16) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_direction"
@@ -1846,9 +1636,7 @@ CREATE TABLE "man_value_direction" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_elemtype"
@@ -1857,9 +1645,7 @@ CREATE TABLE "man_value_elemtype" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_gratesta"
@@ -1868,9 +1654,7 @@ CREATE TABLE "man_value_gratesta" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_roadloc"
@@ -1879,9 +1663,7 @@ CREATE TABLE "man_value_roadloc" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_sedsta"
@@ -1890,9 +1672,7 @@ CREATE TABLE "man_value_sedsta" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_soildata"
@@ -1901,9 +1681,7 @@ CREATE TABLE "man_value_soildata" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_value_systemtype"
@@ -1912,9 +1690,7 @@ CREATE TABLE "man_value_systemtype" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "man_workstage"
@@ -1923,9 +1699,7 @@ CREATE TABLE "man_workstage" (
 "id" varchar(18) NOT NULL,
 "descript" varchar(100)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "node"
@@ -1941,12 +1715,9 @@ CREATE TABLE "node" (
 "node_type" varchar(18),
 "swmm_type" varchar(18),
 "catch_id" int4,
-"link" varchar(254),
-"the_geom" "public"."geometry"
+"link" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "raingage"
@@ -1961,12 +1732,9 @@ CREATE TABLE "raingage" (
 "fname" varchar(254),
 "sta" varchar(12),
 "units" varchar(3),
-"link" varchar(254),
-"the_geom" "public"."geometry"
+"link" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "result_selection"
@@ -1974,9 +1742,7 @@ WITH (OIDS=FALSE)
 CREATE TABLE "result_selection" (
 "result_id" varchar(16) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_arcflow_sum"
@@ -1992,9 +1758,7 @@ CREATE TABLE "rpt_arcflow_sum" (
 "mfull_flow" numeric(12,4),
 "mfull_dept" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_condsurcharge_sum"
@@ -2008,9 +1772,7 @@ CREATE TABLE "rpt_condsurcharge_sum" (
 "hour_nflow" numeric(12,4),
 "hour_limit" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_continuity_errors"
@@ -2019,9 +1781,7 @@ CREATE TABLE "rpt_continuity_errors" (
 "result_id" varchar(16) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_critical_elements"
@@ -2030,9 +1790,7 @@ CREATE TABLE "rpt_critical_elements" (
 "result_id" varchar(254) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_flowclass_sum"
@@ -2051,9 +1809,7 @@ CREATE TABLE "rpt_flowclass_sum" (
 "froud_numb" numeric(12,4),
 "flow_chang" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_flowrouting_cont"
@@ -2072,9 +1828,7 @@ CREATE TABLE "rpt_flowrouting_cont" (
 "finst_vol" numeric(12,4),
 "cont_error" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_groundwater_cont"
@@ -2090,9 +1844,7 @@ CREATE TABLE "rpt_groundwater_cont" (
 "final_stor" numeric(12,4),
 "cont_error" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_high_conterrors"
@@ -2101,9 +1853,7 @@ CREATE TABLE "rpt_high_conterrors" (
 "result_id" varchar(254) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_high_flowinest_ind"
@@ -2112,9 +1862,7 @@ CREATE TABLE "rpt_high_flowinest_ind" (
 "result_id" varchar(254) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_instability_index"
@@ -2123,9 +1871,7 @@ CREATE TABLE "rpt_instability_index" (
 "result_id" varchar(254) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_lidperformance_sum"
@@ -2143,9 +1889,7 @@ CREATE TABLE "rpt_lidperformance_sum" (
 "final_stor" numeric(12,4),
 "per_error" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_nodedepth_sum"
@@ -2160,9 +1904,7 @@ CREATE TABLE "rpt_nodedepth_sum" (
 "time_days" varchar(10),
 "time_hour" varchar(10)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_nodeflooding_sum"
@@ -2177,9 +1919,7 @@ CREATE TABLE "rpt_nodeflooding_sum" (
 "tot_flood" numeric(12,4),
 "max_ponded" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_nodeinflow_sum"
@@ -2195,9 +1935,7 @@ CREATE TABLE "rpt_nodeinflow_sum" (
 "latinf_vol" numeric(12,4),
 "totinf_vol" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_nodesurcharge_sum"
@@ -2210,9 +1948,7 @@ CREATE TABLE "rpt_nodesurcharge_sum" (
 "max_height" numeric(12,4),
 "min_depth" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_outfallflow_sum"
@@ -2225,9 +1961,7 @@ CREATE TABLE "rpt_outfallflow_sum" (
 "max_flow" numeric(12,4),
 "total_vol" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_outfallload_sum"
@@ -2238,9 +1972,7 @@ CREATE TABLE "rpt_outfallload_sum" (
 "node_id" int4 NOT NULL,
 "value" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_pumping_sum"
@@ -2255,9 +1987,7 @@ CREATE TABLE "rpt_pumping_sum" (
 "powus_kwh" numeric(12,4),
 "timoff_cur" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_qualrouting_cont"
@@ -2277,9 +2007,7 @@ CREATE TABLE "rpt_qualrouting_cont" (
 "finst_mas" numeric(12,4),
 "cont_error" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_rainfall_dep"
@@ -2290,9 +2018,7 @@ CREATE TABLE "rpt_rainfall_dep" (
 "rdiip_prod" numeric(12,4),
 "rdiir_rat" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_result_cat"
@@ -2317,9 +2043,7 @@ CREATE TABLE "rpt_result_cat" (
 "rout_tstep" varchar(10),
 "exec_date" timestamp(6) DEFAULT now()
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_routing_timestep"
@@ -2328,9 +2052,7 @@ CREATE TABLE "rpt_routing_timestep" (
 "result_id" varchar(254) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_runoff_qual"
@@ -2348,9 +2070,7 @@ CREATE TABLE "rpt_runoff_qual" (
 "rem_buil" numeric(12,4),
 "cont_error" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_runoff_quant"
@@ -2367,9 +2087,7 @@ CREATE TABLE "rpt_runoff_quant" (
 "finals_sto" numeric(12,4),
 "cont_error" numeric(16,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_storagevol_sum"
@@ -2386,9 +2104,7 @@ CREATE TABLE "rpt_storagevol_sum" (
 "time_hour" varchar(10),
 "max_out" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_subcatchwashoff_sum"
@@ -2399,9 +2115,7 @@ CREATE TABLE "rpt_subcatchwashoff_sum" (
 "poll_id" varchar(16) NOT NULL,
 "value" numeric
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_subcathrunoff_sum"
@@ -2418,9 +2132,7 @@ CREATE TABLE "rpt_subcathrunoff_sum" (
 "peak_runof" numeric(12,4),
 "runoff_coe" numeric(12,4)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "rpt_timestep_critelem"
@@ -2429,9 +2141,7 @@ CREATE TABLE "rpt_timestep_critelem" (
 "result_id" varchar(16) NOT NULL,
 "text" varchar(255) NOT NULL
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "subcatchment"
@@ -2465,19 +2175,15 @@ CREATE TABLE "subcatchment" (
 "conduct_2" numeric(12,4),
 "drytime_2" numeric(12,4),
 "catch_id" int4,
-"link" varchar(254),
-"the_geom" "public"."geometry"
+"link" varchar(254)
 )
-WITH (OIDS=FALSE)
-
-;
+WITH (OIDS=FALSE);
 
 -- ----------------------------
 -- Table structure for "vertice"
 -- ----------------------------
 CREATE TABLE "vertice" (
 "vertice_id" SERIAL,
-"arc_id" int4,
-"the_geom" "public"."geometry"
+"arc_id" int4
 )
 WITH (OIDS=FALSE);
