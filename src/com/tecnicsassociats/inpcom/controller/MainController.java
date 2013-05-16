@@ -129,7 +129,6 @@ public class MainController{
 	}
 	
 	
-	
 	public void showOptions(){
 		ResultSet rs = MainDao.getTableResultset("inp_options");
 		OptionsDialog dialog = new OptionsDialog();
@@ -142,9 +141,10 @@ public class MainController{
 	
 
 	public void showCatchment(){
-		ResultSet rs = MainDao.getTableResultset("catch_selection");
-		TableWindow tableWindow = new TableWindow(rs, "catch_selection");
-        Utils.openDialogForm(tableWindow, 500, 300);
+		//ResultSet rs = MainDao.getTableResultset("catch_selection");
+		//TableWindow tableWindow = new TableWindow(rs, "catch_selection");
+		TableWindow tableWindow = new TableWindow();
+        Utils.openDialogForm(tableWindow, 350, 280);
 	}	
 	
 	

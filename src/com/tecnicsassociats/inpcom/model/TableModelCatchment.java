@@ -45,7 +45,7 @@ public class TableModelCatchment extends TableModelSuper {
 		TableColumn column;
 		
 		column = tcm.getColumn(0);
-		vector = MainDao.getTable("catchment", null);
+		vector = MainDao.getTable("catchment", null, false);
 		setColumnRendering(column, vector);
   
 	}

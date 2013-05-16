@@ -176,8 +176,11 @@ public class DatabaseController {
 			// Save properties file
 			MainDao.savePropertiesFile();
 			Utils.showMessage("Connection successful!", "", "INP.com");
+			view.enableButtons(true);
+			MainDao.setSchema(view.getSchema1());
 		} else{
-			view.setSchemas(null);
+			view.enableButtons(false);
+			view.setSchemas(null);			
 		}
 		
 	}	

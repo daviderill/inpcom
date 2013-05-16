@@ -129,16 +129,23 @@ public class TableModelSuper extends AbstractTableModel {
 	
 	public void setValueAt(Object value, int row, int col) {
 
-		System.out.println("setValueAt: " + value.toString() + " in " + row + " " + col);
+//		System.out.println("setValueAt: " + value.toString() + " in " + row + " " + col);
 		boolean isInsert = false;
 		
 		try {
 			
-			rs.absolute(row + 1);
-			System.out.println(rs.isAfterLast());
-			if (rs.isAfterLast()){
+			// Si no tenim cap registre previ
+			if (!rs.isAfterLast()){
 				isInsert = true;				
 				rs.moveToInsertRow();
+			}
+			// Si ja teniem algun registre previ comprovem si és el darrer o no
+			else{			
+				rs.absolute(row + 1);
+				if (rs.isAfterLast()){
+					isInsert = true;				
+					rs.moveToInsertRow();
+				}
 			}
 			
 			int columnType = metadata.getColumnType(col + 1);

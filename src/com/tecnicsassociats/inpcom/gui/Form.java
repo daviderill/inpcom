@@ -70,7 +70,6 @@ public class Form extends JPanel implements ActionListener {
 	private JButton btnFileInp;
 	private JButton btnFileRpt;
 	private JButton btnAccept;
-	private JButton btnCancel;
 	private JCheckBox chkExport;
 	private JCheckBox chkExec;
 	private JCheckBox chkImport;
@@ -79,7 +78,6 @@ public class Form extends JPanel implements ActionListener {
 	private JButton btnFolderShp;
 	private JButton btnFolderOut;
 	private JButton btnAccept2;
-	private JButton btnCancel2;
 	private JTextArea txtExportTo;
 	private JButton btnFileInp3;
 	private JButton btnAccept3;
@@ -125,6 +123,7 @@ public class Form extends JPanel implements ActionListener {
 	public Form() {
 		try {
 			initConfig();
+			enableButtons(false);
 		} catch (MissingResourceException e) {
 			Utils.showError(e.getMessage(), "", "Error");
 			System.exit(ERROR);
@@ -157,6 +156,15 @@ public class Form extends JPanel implements ActionListener {
 
 
 	// Panel Database Options
+	public void enableButtons(boolean isEnabled) {
+		btnAccept.setEnabled(isEnabled);
+		btnCreateSchema.setEnabled(isEnabled);
+		btnDeleteSchema.setEnabled(isEnabled);
+		btnOptions.setEnabled(isEnabled);
+		btnCatchSelection.setEnabled(isEnabled);
+		btnRaingage.setEnabled(isEnabled);
+	}
+	
 	public Integer getDriver() {
 		return cboDriver.getSelectedIndex();
 	}
@@ -427,6 +435,7 @@ public class Form extends JPanel implements ActionListener {
 		panel_5.add(cboSchema1, "cell 3 1,growx");
 		
 		btnCreateSchema = new JButton(BUNDLE.getString("Form.btnCreateSchema.text"));
+		btnCreateSchema.setEnabled(false);
 		btnCreateSchema.setPreferredSize(new Dimension(105, 23));
 		btnCreateSchema.setActionCommand(BUNDLE.getString("Form.btnCreateSchema.actionCommand")); //$NON-NLS-1$
 		panel_5.add(btnCreateSchema, "cell 4 1,alignx right");
@@ -441,6 +450,7 @@ public class Form extends JPanel implements ActionListener {
 		panel_5.add(cboResultId, "cell 3 2,growx");
 		
 		btnDeleteSchema = new JButton(BUNDLE.getString("Form.btnDeleteSchema.text")); //$NON-NLS-1$
+		btnDeleteSchema.setEnabled(false);
 		btnDeleteSchema.setMinimumSize(new Dimension(107, 23));
 		btnDeleteSchema.setMaximumSize(new Dimension(107, 23));
 		btnDeleteSchema.setPreferredSize(new Dimension(107, 23));
@@ -510,12 +520,6 @@ public class Form extends JPanel implements ActionListener {
 		btnAccept2.setActionCommand(BUNDLE.getString("Form.btnAccept2.actionCommand")); //$NON-NLS-1$
 		panel_2.add(btnAccept2, "flowx,cell 2 9,alignx right");
 
-		btnCancel2 = new JButton();
-		btnCancel2.setText(BUNDLE.getString("Form.btnCancel.text")); //$NON-NLS-1$
-		btnCancel2.setName("Cancel");
-		btnCancel2.setActionCommand("closeView");
-		panel_2.add(btnCancel2, "cell 2 9,alignx right");
-
 		// Panel 3
 		JPanel panel_3 = new JPanel();
 		panel_3.setVisible(false);
@@ -578,6 +582,7 @@ public class Form extends JPanel implements ActionListener {
 		panel_4.add(chkExport, "cell 1 3 2 1");
 
 		btnOptions = new JButton(BUNDLE.getString("Form.btnOptions.text")); //$NON-NLS-1$
+		btnOptions.setEnabled(false);
 		btnOptions.setMinimumSize(new Dimension(110, 23));
 		btnOptions.setPreferredSize(new Dimension(110, 23));
 		btnOptions.setActionCommand(BUNDLE.getString("Form.btnOptions.actionCommand")); //$NON-NLS-1$
@@ -641,25 +646,21 @@ public class Form extends JPanel implements ActionListener {
 		panel_4.add(txtProject, "cell 3 8,growx,aligny top");
 
 		btnAccept = new JButton();
+		btnAccept.setEnabled(false);
 		btnAccept.setText(BUNDLE.getString("Form.btnAccept.text")); //$NON-NLS-1$
 		btnAccept.setName("btn_accept_postgis");
 		btnAccept.setActionCommand(BUNDLE.getString("Form.btnAccept.actionCommand")); //$NON-NLS-1$
 		panel_4.add(btnAccept, "flowx,cell 3 10,alignx right");
 
-		btnCancel = new JButton();
-		btnCancel.setText(BUNDLE.getString("Form.btnCancel.text")); //$NON-NLS-1$
-		btnCancel.setName(BUNDLE.getString("Form.btnCancel.text")); //$NON-NLS-1$
-		btnCancel.setActionCommand(BUNDLE
-				.getString("Form.btnCancel.actionCommand")); //$NON-NLS-1$
-		panel_4.add(btnCancel, "cell 3 10");
-
 		btnCatchSelection = new JButton(BUNDLE.getString("Form.btnCatchSelection.text")); //$NON-NLS-1$
+		btnCatchSelection.setEnabled(false);
 		btnCatchSelection.setMaximumSize(new Dimension(110, 23));
 		btnCatchSelection.setActionCommand(BUNDLE
 				.getString("Form.btnCatchSelection.actionCommand")); //$NON-NLS-1$
 		panel_4.add(btnCatchSelection, "cell 3 3");
 
 		btnRaingage = new JButton(BUNDLE.getString("Form.btnNewButton.text")); //$NON-NLS-1$
+		btnRaingage.setEnabled(false);
 		btnRaingage.setPreferredSize(new Dimension(110, 23));
 		btnRaingage.setMaximumSize(new Dimension(110, 23));
 		btnRaingage.setActionCommand(BUNDLE.getString("Form.btnRaingage.actionCommand")); //$NON-NLS-1$
@@ -731,11 +732,6 @@ public class Form extends JPanel implements ActionListener {
 				dbfController.action(e.getActionCommand());
 			}
 		});
-		btnCancel2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dbfController.action(e.getActionCommand());
-			}
-		});
 
 		// Panel INP to Database
 		btnFileInp3.addActionListener(new ActionListener() {
@@ -757,7 +753,6 @@ public class Form extends JPanel implements ActionListener {
 		btnFileInp.addActionListener(this);
 		btnFileRpt.addActionListener(this);
 		btnAccept.addActionListener(this);
-		btnCancel.addActionListener(this);
 		btnOptions.addActionListener(this);
 		btnCatchSelection.addActionListener(this);
 		btnRaingage.addActionListener(this);

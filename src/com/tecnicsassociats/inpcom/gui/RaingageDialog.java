@@ -109,7 +109,7 @@ public class RaingageDialog extends JDialog {
 
 	private void initConfig(){
 
-		setTitle("Options Table");
+		setTitle("Raingage Table");
 		setBounds(100, 100, 633, 246);
 		getContentPane().setLayout(new MigLayout("", "[90.00][200px]", "[][15px][36.00]"));
 		

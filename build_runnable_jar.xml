@@ -13,22 +13,26 @@
             <fileset dir="O:/workspace_nav_table_forms/inpcom/bin"/>
         </jar>
 
-        <copy todir="${dist}/lib">
-			<fileset dir="lib/" includes="*.jar" />
-		</copy>	
-		
 		<copy todir="${dist}">
-		    <fileset dir="config/" includes="text*.properties"/>			
+		    <fileset dir="." includes="*.txt"/>			
 		</copy>
 		
 		<copy todir="${dist}/config">
 			<fileset dir="config/" includes="*.properties"/>
 		</copy>		
 		
+		<copy todir="${dist}/images">
+			<fileset dir="images/" includes="*"/>
+		</copy>		
+    	
 		<copy todir="${dist}/inp">
 			<fileset dir="inp/" includes="*" />
 		</copy>		        
 
+        <copy todir="${dist}/lib">
+			<fileset dir="lib/" includes="*.jar" />
+		</copy>	
+    	
     </target>
     
 </project>

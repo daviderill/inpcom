@@ -430,10 +430,13 @@ public class MainDao {
     }
 
 
-	public static Vector<String> getTable(String table, String schemaParam) {
+	public static Vector<String> getTable(String table, String schemaParam, boolean addBlank) {
         
         Vector<String> vector = new Vector<String>();
-        vector.add("");
+        
+        if (addBlank){
+        	vector.add("");
+        }
         
 		if (schemaParam == null){
 			schemaParam = schema;
@@ -455,6 +458,11 @@ public class MainDao {
 		return vector;
 		
 	}	
+	
+	
+	public static Vector<String> getTable(String table, String schemaParam) {
+		return getTable(table, schemaParam, true);
+	}
 	
 	
 	public static void setResultSelect(String schema, String table, String result) {

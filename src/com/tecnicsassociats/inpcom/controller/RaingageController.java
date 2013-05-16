@@ -92,7 +92,7 @@ public class RaingageController {
 		else if (comboName.equals("rgage_type")){
 			tableName = "inp_typevalue_raingage";
 		}
-		values = MainDao.getTable(tableName, "sewnet");
+		values = MainDao.getTable(tableName, null);
 		
 		return values;
 		

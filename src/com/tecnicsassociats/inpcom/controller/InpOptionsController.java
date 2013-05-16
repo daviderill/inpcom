@@ -107,7 +107,7 @@ public class InpOptionsController {
 		else{
 			tableName = "inp_value_yesno";
 		}				
-		values = MainDao.getTable(tableName, "sewnet");
+		values = MainDao.getTable(tableName, null);
 		
 		return values;
 		

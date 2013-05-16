@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -34,8 +35,11 @@ import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 
+import com.tecnicsassociats.inpcom.model.MainDao;
 import com.tecnicsassociats.inpcom.model.TableModelCatchment;
 import com.tecnicsassociats.inpcom.model.TableModelRaingage;
+import com.tecnicsassociats.inpcom.util.Utils;
+import java.awt.Dimension;
 
 
 public class TableWindow extends JPanel {
@@ -45,44 +49,32 @@ public class TableWindow extends JPanel {
 	private JButton btnInsert;
 
 	private TableModelCatchment tableModelCatchment;
-	private TableModelRaingage tableModelRaingage;
 	private JButton btnDelete;
+	private JButton btnDeleteAll;
 
 	
 	public TableWindow() {
 		initConfig();
-	}
-	
-	
-	public TableWindow(ResultSet rs, String tableName) {
-	
-		initConfig();
-		
-		if(tableName.equals("catch_selection")){
-			tableModelCatchment = new TableModelCatchment(rs);
-			tableModelCatchment.setTable(table);
-			table.setModel(tableModelCatchment);
-			tableModelCatchment.setCombos();
-			btnInsert.setVisible(true);
-			btnDelete.setVisible(true);			
-		}
-		else if(tableName.equals("raingage")){
-			tableModelRaingage = new TableModelRaingage(rs);
-			tableModelRaingage.setTable(table);
-			table.setModel(tableModelRaingage);
-			tableModelRaingage.setCombos();		
-			btnInsert.setVisible(false);			
-			btnDelete.setVisible(false);	
-		}
-		
+		setData();
 	}
 
 	
+	private void setData(){
+		ResultSet rs = MainDao.getTableResultset("catch_selection");		
+		tableModelCatchment = new TableModelCatchment(rs);
+		tableModelCatchment.setTable(table);
+		table.setModel(tableModelCatchment);
+		tableModelCatchment.setCombos();
+		btnInsert.setVisible(true);
+		btnDelete.setVisible(true);			
+	}
+	
+	
 	private void initConfig(){
 		
-		setLayout(new MigLayout("", "[10px][400px:600px:850px,grow][12]", "[25.00][12px][:130px:200px][12px][]"));
+		setLayout(new MigLayout("", "[10px][100px:200px:400px,grow][12]", "[25.00][8px][:130px:200px][8px][]"));
 		
-		JLabel lblTable = new JLabel("Table content");
+		JLabel lblTable = new JLabel("Table catch_selection");
 		lblTable.setFont(new Font("Tahoma", Font.BOLD, 14));
 		add(lblTable, "cell 1 0,alignx center");
 		
@@ -99,6 +91,7 @@ public class TableWindow extends JPanel {
 		scrollPane.setViewportView(table);
 		
 		btnInsert = new JButton("Insert");
+		btnInsert.setMinimumSize(new Dimension(79, 23));
 		btnInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				insert();
@@ -107,6 +100,8 @@ public class TableWindow extends JPanel {
 		add(btnInsert, "flowx,cell 1 4,alignx left");
 		
 		btnDelete = new JButton("Delete");
+		btnDelete.setMinimumSize(new Dimension(79, 23));
+		btnDelete.setMaximumSize(new Dimension(79, 23));
 		btnDelete.setVisible(false);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -114,6 +109,14 @@ public class TableWindow extends JPanel {
 			}
 		});
 		add(btnDelete, "cell 1 4");
+		
+		btnDeleteAll = new JButton("Delete All");
+		btnDeleteAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				deleteAll();
+			}
+		});
+		add(btnDeleteAll, "cell 1 4");
 		
 	}
 
@@ -123,10 +126,24 @@ public class TableWindow extends JPanel {
 		tableModelCatchment.setCombos();
 	}
 	
+	
 	private void delete(){
-		int rowIndex = table.getSelectedRow();
-		tableModelCatchment.deleteRow(rowIndex);
+    	int rowIndex = table.getSelectedRow();
+    	tableModelCatchment.deleteRow(rowIndex);
+    	setData();
 	}
 
+	
+	private void deleteAll(){
+        int res = JOptionPane.showConfirmDialog(this, "Are you sure? This will delete all records of this table", "INPcom", JOptionPane.YES_NO_OPTION);
+        if (res == 0){
+        	String sql = "DELETE FROM " + MainDao.schema + ".catch_selection";
+        	MainDao.executeUpdateSql(sql);
+    		setData();
+//        	for (int i = 1; i < tableModelCatchment.getRowCount(); i++) {
+//            	tableModelCatchment.deleteRow(i);
+//			}
+        }
+	}
+	
 }
-
