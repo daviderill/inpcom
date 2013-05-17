@@ -838,8 +838,8 @@ CREATE TABLE "inp_orifice" (
 "shape" varchar(18),
 "geom1" numeric(12,4),
 "geom2" numeric(12,4),
-"geom3" numeric,
-"geom4" numeric
+"geom3" numeric(12,4),
+"geom4" numeric(12,4)
 )
 WITH (OIDS=FALSE);
 

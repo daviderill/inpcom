@@ -28,6 +28,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -141,10 +143,11 @@ public class MainController{
 	
 
 	public void showCatchment(){
-		//ResultSet rs = MainDao.getTableResultset("catch_selection");
-		//TableWindow tableWindow = new TableWindow(rs, "catch_selection");
 		TableWindow tableWindow = new TableWindow();
-        Utils.openDialogForm(tableWindow, 350, 280);
+        JDialog dialog = Utils.openDialogForm(tableWindow, 350, 280);
+		ImageIcon image = new ImageIcon("images/imago.png");        
+        dialog.setIconImage(image.getImage());
+        dialog.setVisible(true);
 	}	
 	
 	

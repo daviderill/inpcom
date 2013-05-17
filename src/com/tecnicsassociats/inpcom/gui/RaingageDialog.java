@@ -30,6 +30,7 @@ import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -93,9 +94,10 @@ public class RaingageDialog extends JDialog {
         componentMap = new HashMap<String, JComboBox>();
         textMap = new HashMap<String, JTextField>();
         Component[] components = getContentPane().getComponents();
-        JPanel panelGeneral = null;;
-		panelGeneral = (JPanel) components[0];            
-        Component[] comp = panelGeneral.getComponents();        
+        
+        JPanel panel = null;;
+		panel = (JPanel) components[0];            
+        Component[] comp = panel.getComponents();        
         for (int i=0; i < comp.length; i++) {        
         	if (comp[i] instanceof JComboBox) {         	
         		componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
@@ -104,20 +106,43 @@ public class RaingageDialog extends JDialog {
         		textMap.put(comp[i].getName(), (JTextField) comp[i]);
         	}
         }
+        
+		panel = (JPanel) components[1];               
+        comp = panel.getComponents(); 		
+        for (int i=0; i < comp.length; i++) {
+			if (comp[i] instanceof JComboBox) {         	
+				componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
+			}
+			else if (comp[i] instanceof JTextField) {      
+				textMap.put(comp[i].getName(), (JTextField) comp[i]);
+			}			
+        }
+        
+		panel = (JPanel) components[2];               
+        comp = panel.getComponents(); 		
+        for (int i=0; i < comp.length; i++) {
+			if (comp[i] instanceof JComboBox) {         	
+				componentMap.put(comp[i].getName(), (JComboBox) comp[i]);
+			}
+			else if (comp[i] instanceof JTextField) {      
+				textMap.put(comp[i].getName(), (JTextField) comp[i]);
+			}			
+        }             
+        
 	}
 
 
 	private void initConfig(){
 
 		setTitle("Raingage Table");
-		setBounds(100, 100, 633, 246);
-		getContentPane().setLayout(new MigLayout("", "[90.00][200px]", "[][15px][36.00]"));
+		setBounds(100, 100, 633, 339);
+		getContentPane().setLayout(new MigLayout("", "[90.00,grow][200px]", "[80.00][60.00px][80.00][10px][36.00]"));
 		
 		JPanel panelGeneral = new JPanel();
 		panelGeneral.setFont(new Font("Tahoma", Font.BOLD, 14));
 		panelGeneral.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "GENERAL", TitledBorder.CENTER, TitledBorder.TOP, null, null));
 		getContentPane().add(panelGeneral, "cell 0 0 2 1,grow");
-		panelGeneral.setLayout(new MigLayout("", "[75.00][200.00,grow][10px][80px][200px,grow]", "[][][][][][]"));
+		panelGeneral.setLayout(new MigLayout("", "[75.00][200.00][10px][80px][200px,grow]", "[][][][][][]"));
 
 		JLabel lblFlowUnits = new JLabel("Form type:");
 		panelGeneral.add(lblFlowUnits, "cell 0 0,alignx trailing");
@@ -148,38 +173,9 @@ public class RaingageDialog extends JDialog {
 		JComboBox comboBox_3 = new JComboBox();
 		panelGeneral.add(comboBox_3, "cell 4 1,growx");
 		comboBox_3.setName("rgage_type");
-
-		JLabel lblFlowRouting = new JLabel("Timeseries id:");
-		panelGeneral.add(lblFlowRouting, "cell 0 2,alignx trailing");
-
-		JComboBox flow_routing = new JComboBox();
-		panelGeneral.add(flow_routing, "cell 1 2,growx");
-		flow_routing.setName("timser_id");
 		
-		JLabel lblIgnoreGroundwater = new JLabel("Fname:");
-		panelGeneral.add(lblIgnoreGroundwater, "cell 3 2,alignx trailing");
-		
-		textField_3 = new JTextField();
-		textField_3.setName("fname");
-		textField_3.setColumns(10);
-		panelGeneral.add(textField_3, "cell 4 2,growx");
-		
-		JLabel lblMinSlope = new JLabel("Sta:");
-		panelGeneral.add(lblMinSlope, "cell 0 3,alignx trailing");
-		lblMinSlope.setName("");
-		
-		textField_18 = new JTextField();
-		panelGeneral.add(textField_18, "cell 1 3,growx");
-		textField_18.setName("sta");
-		textField_18.setColumns(10);
-		
-		JLabel lblIgnoreRouting = new JLabel("Units:");
-		panelGeneral.add(lblIgnoreRouting, "cell 3 3,alignx trailing");
-		
-		textField_4 = new JTextField();
-		textField_4.setName("units");
-		textField_4.setColumns(10);
-		panelGeneral.add(textField_4, "cell 4 3,growx");
+		ImageIcon image = new ImageIcon("images/imago.png");        
+		super.setIconImage(image.getImage());		
 		
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
@@ -187,7 +183,51 @@ public class RaingageDialog extends JDialog {
 				controller.saveData();
 			}
 		});
-		getContentPane().add(btnSave, "cell 1 2,alignx right");
+		
+		JPanel panelTimeseries = new JPanel();
+		panelTimeseries.setFont(new Font("Tahoma", Font.BOLD, 14));
+		panelTimeseries.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "TIMESERIES", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		getContentPane().add(panelTimeseries, "cell 0 1 2 1,grow");
+		panelTimeseries.setLayout(new MigLayout("", "[75px][200px][10.00][80][200]", "[]"));
+				
+		JLabel lblFlowRouting = new JLabel("Timeseries id:");
+		panelTimeseries.add(lblFlowRouting, "cell 0 0,alignx right");
+								
+		JComboBox flow_routing = new JComboBox();
+		panelTimeseries.add(flow_routing, "cell 1 0,growx");
+		flow_routing.setName("timser_id");
+		
+		JPanel panelFile = new JPanel();
+		panelFile.setFont(new Font("Tahoma", Font.BOLD, 14));
+		panelFile.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "FILE", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		getContentPane().add(panelFile, "cell 0 2 2 1,grow");
+		panelFile.setLayout(new MigLayout("", "[75px][200px][10px][80px][200px,grow]", "[][]"));
+		
+		JLabel lblIgnoreGroundwater = new JLabel("Fname:");
+		panelFile.add(lblIgnoreGroundwater, "cell 0 0,alignx right");
+		
+		textField_3 = new JTextField();
+		panelFile.add(textField_3, "cell 1 0,growx");
+		textField_3.setName("fname");
+		textField_3.setColumns(10);
+		
+		JLabel lblMinSlope = new JLabel("Sta:");
+		panelFile.add(lblMinSlope, "cell 3 0,alignx right");
+		lblMinSlope.setName("");
+		
+		textField_18 = new JTextField();
+		panelFile.add(textField_18, "cell 4 0,growx");
+		textField_18.setName("sta");
+		textField_18.setColumns(10);
+		
+		JLabel lblIgnoreRouting = new JLabel("Units:");
+		panelFile.add(lblIgnoreRouting, "cell 0 1,alignx right");
+		
+		textField_4 = new JTextField();
+		panelFile.add(textField_4, "cell 1 1,growx");
+		textField_4.setName("units");
+		textField_4.setColumns(10);
+		getContentPane().add(btnSave, "cell 1 4,alignx right");
 		
 	}
 

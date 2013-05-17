@@ -66,8 +66,8 @@ public class AboutDialog extends JDialog {
 		ImageIcon image = new ImageIcon("images/imago.png");
 		setIconImage(image.getImage());		
 		setTitle(title);
-		setSize(350, 201);
-		getContentPane().setLayout(new MigLayout("", "[116.00][173.00px,grow]", "[100.00px][][50px][50px]"));
+		setSize(320, 180);
+		getContentPane().setLayout(new MigLayout("", "[116.00][173.00px,grow]", "[60.00px][:15px:20px][15px][15px]"));
 
 		final ImageIcon backgroundImage = new ImageIcon("images/logo_tecnics.png");
 		
@@ -77,8 +77,7 @@ public class AboutDialog extends JDialog {
 			@Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                //g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
-                g.drawImage(backgroundImage.getImage(), 0, 0, 310, 70, this);
+                g.drawImage(backgroundImage.getImage(), 20, 10, 250, 50, this);
             }
 
             @Override

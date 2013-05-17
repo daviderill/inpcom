@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -106,7 +107,7 @@ public class OptionsDialog extends JDialog {
 		
         componentMap = new HashMap<String, JComboBox>();
         textMap = new HashMap<String, JTextField>();
-     Component[] components = getContentPane().getComponents();
+        Component[] components = getContentPane().getComponents();
     
         JPanel panel = null;
         Component[] comp;
@@ -415,6 +416,9 @@ public class OptionsDialog extends JDialog {
 		panelDynamic.add(textField_16, "cell 4 2,growx");
 		textField_16.setName("min_surfarea");
 		textField_16.setColumns(10);
+		
+		ImageIcon image = new ImageIcon("images/imago.png");        
+		super.setIconImage(image.getImage());
 		
 		JButton btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {

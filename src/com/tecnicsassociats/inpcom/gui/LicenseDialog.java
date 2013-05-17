@@ -71,19 +71,21 @@ public class LicenseDialog extends JDialog {
 		ImageIcon image = new ImageIcon("images/imago.png");
 		setIconImage(image.getImage());
 		setTitle(title);		
-		setSize(550, 230);
-		getContentPane().setLayout(new MigLayout("", "[150px,grow]", "[10px][30px][][30.00px][30.00]"));
+		setSize(660, 301);
+		getContentPane().setLayout(new MigLayout("", "[10px][150px,grow][10px]", "[5px][25px][][30.00px][30.00]"));
 		
-		JLabel lblInfo = new JLabel(info);
+		JLabel lblInfo = new JLabel(info.toUpperCase());
 		lblInfo.setFont(new Font("Tahoma", Font.BOLD, 12));
-		getContentPane().add(lblInfo, "cell 0 1,alignx center");	
+		getContentPane().add(lblInfo, "cell 1 1,alignx left");	
 		
-		JLabel lblInfo12 = new JLabel("<html><p align=\"justify\">\"This product is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details\u201D</p></html>");
-		getContentPane().add(lblInfo12, "cell 0 2");
+		String aux = "<html><p align=\"justify\">\"This product is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details\u201D</p></html>";
+		aux = aux.toUpperCase();
+		JLabel lblInfo12 = new JLabel(aux);
+		getContentPane().add(lblInfo12, "cell 1 2");
 		
-		JLabel lblInfo2 = new JLabel(info2);
+		JLabel lblInfo2 = new JLabel(info2.toUpperCase());
 		lblInfo2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		getContentPane().add(lblInfo2, "cell 0 3,alignx center");
+		getContentPane().add(lblInfo2, "cell 1 3,alignx center");
 		
 		class OpenUrlAction implements ActionListener {
 		    @Override public void actionPerformed(ActionEvent e) {
@@ -105,7 +107,7 @@ public class LicenseDialog extends JDialog {
 		
 		JButton btngsdf = new JButton();
 		btngsdf.setFont(new Font("Tahoma", Font.BOLD, 12));
-		String text = "<HTML><FONT color=\"#000099\"><U>" + info3 + "</U></FONT></HTML>";
+		String text = "<HTML><FONT color=\"#000099\"><U>" + info3.toUpperCase() + "</U></FONT></HTML>";
 		btngsdf.setText(text);
 		btngsdf.setHorizontalAlignment(SwingConstants.LEFT);
 		btngsdf.setBorderPainted(false);
@@ -113,10 +115,12 @@ public class LicenseDialog extends JDialog {
 		btngsdf.setBackground(Color.WHITE);
 		btngsdf.setToolTipText(file.toString());
 		btngsdf.addActionListener(new OpenUrlAction());		
-		getContentPane().add(btngsdf, "flowx,cell 0 4,alignx center");
+		getContentPane().add(btngsdf, "flowx,cell 1 4,alignx center");
 		
-		JLabel lblNewLabel = new JLabel("Copyright 2013 T\u00E8cnicsassociats");
-		getContentPane().add(lblNewLabel, "cell 0 4");
+		String info4 = "Copyright 2013 T\u00E8cnicsassociats";
+		info4 = info4.toUpperCase();
+		JLabel lblNewLabel = new JLabel(info4);
+		getContentPane().add(lblNewLabel, "cell 1 4");
 		
 	}
 

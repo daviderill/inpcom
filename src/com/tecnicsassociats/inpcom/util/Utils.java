@@ -117,8 +117,7 @@ public class Utils {
 	    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	    
 	    f.pack();
 	    f.setSize(width, height);
-	    f.setLocationRelativeTo(null);   
-	    f.setVisible(true);		
+	    f.setLocationRelativeTo(null);   	
 	    return f;
 	}     
 

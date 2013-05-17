@@ -20,6 +20,7 @@
  */
 package com.tecnicsassociats.inpcom.gui;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,15 +32,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ScrollPaneConstants;
 
 import net.miginfocom.swing.MigLayout;
 
 import com.tecnicsassociats.inpcom.model.MainDao;
 import com.tecnicsassociats.inpcom.model.TableModelCatchment;
-import com.tecnicsassociats.inpcom.model.TableModelRaingage;
-import com.tecnicsassociats.inpcom.util.Utils;
-import java.awt.Dimension;
 
 
 public class TableWindow extends JPanel {
@@ -79,7 +76,6 @@ public class TableWindow extends JPanel {
 		add(lblTable, "cell 1 0,alignx center");
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		add(scrollPane, "cell 1 2,grow");
 		
 		table = new JTable();
