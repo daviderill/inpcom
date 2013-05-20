@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.MissingResourceException;
@@ -43,6 +45,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+
+import com.tecnicsassociats.inpcom.model.MainDao;
 
 
 public class Utils {
@@ -79,6 +83,24 @@ public class Utils {
         return logger;
 
     }
+    
+    
+    public static String getAppPath(){
+    	
+    	CodeSource codeSource = MainDao.class.getProtectionDomain().getCodeSource();
+    	File jarFile;
+    	String appPath = "";
+    	try {
+    		jarFile = new File(codeSource.getLocation().toURI().getPath());
+    	   	appPath = jarFile.getParentFile().getPath() + File.separator;  
+    	}
+    	catch (URISyntaxException e) {
+    		e.printStackTrace();
+    	}
+    	return appPath;
+    	
+    }
+
     
     
     public static ResourceBundle getBundleForm(){

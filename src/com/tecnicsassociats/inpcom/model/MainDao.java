@@ -57,7 +57,6 @@ public class MainDao {
     public static boolean configIni() {
 
     	if (!enabledPropertiesFile()){
-    		Utils.showError("Properties file is empty. Application cannot start", "", "INPcom");
     		return false;
     	}
     	
@@ -107,14 +106,9 @@ public class MainDao {
     // Get Properties Files
     public static boolean enabledPropertiesFile() {
 
-        try {
-            appPath = new File(".").getCanonicalPath() + File.separator;
-        } catch (IOException e1) {
-            Utils.showError("inp_error_io", configPath, "inp_descr");
-            return false;
-        }
-
+    	appPath = Utils.getAppPath();
         configPath = appPath + Constants.CONFIG_FOLDER + File.separator + Constants.CONFIG_FILE;
+        Utils.getLogger().info("Config file: " + configPath);
         File fileIni = new File(configPath);
         try {
             iniProperties.load(new FileInputStream(fileIni));
