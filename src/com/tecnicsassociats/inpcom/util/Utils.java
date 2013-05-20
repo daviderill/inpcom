@@ -61,7 +61,7 @@ public class Utils {
 
     	if (logger == null) {
             try {
-            	String folderRoot = new File(".").getCanonicalPath() + File.separator;            	
+            	String folderRoot = Utils.getAppPath();         	
                 String folder = folderRoot + LOG_FOLDER;
                 File folderFile = new File(folder);
                 folderFile.mkdirs();
