@@ -20,6 +20,7 @@
  */
 package com.tecnicsassociats.inpcom.gui;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,9 +38,6 @@ import net.miginfocom.swing.MigLayout;
 
 import com.tecnicsassociats.inpcom.model.MainDao;
 import com.tecnicsassociats.inpcom.model.TableModelCatchment;
-import com.tecnicsassociats.inpcom.model.TableModelRaingage;
-import com.tecnicsassociats.inpcom.util.Utils;
-import java.awt.Dimension;
 
 
 public class TableWindow extends JPanel {

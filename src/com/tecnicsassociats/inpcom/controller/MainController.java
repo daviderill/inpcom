@@ -65,14 +65,14 @@ public class MainController{
     	
     	this.view = view;	
         this.prop = MainDao.getPropertiesFile();
-	    view.setControl(this);        
-    	
+	    view.setControl(this);
+
     	userHomeFolder = System.getProperty("user.home");
     	this.bundleText = Utils.getBundleText();
     	
     	// Set default values
     	setDefaultValues();
-    	    	
+   	
 	}
 
     

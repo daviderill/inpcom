@@ -50,7 +50,6 @@ import com.tecnicsassociats.inpcom.util.Utils;
 public class ModelPostgis extends Model {
 
 	private static Connection connectionPostgis;
-	private static Connection connectionDrivers;   // SQLite
     private static String insertSql;
 	private static ArrayList<String> tokens;
 	private static ArrayList<ArrayList<String>> tokensList;	
