@@ -925,7 +925,7 @@ WITH (OIDS=FALSE);
 -- ----------------------------
 CREATE TABLE "inp_project_id" (
 "title" varchar(254),
-"autor" varchar(50),
+"author" varchar(50),
 "date" varchar(12)
 )
 WITH (OIDS=FALSE);

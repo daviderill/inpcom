@@ -121,7 +121,7 @@ public class ModelDbf extends Model{
 			Statement stat = connectionDrivers.createStatement();
 			ResultSet rs = stat.executeQuery(sql);					
 			while (rs.next()) {
-				processTarget(rs.getInt("id"), rs.getInt("dbf_id"), rs.getInt("lines"));	
+				processTarget(rs.getInt("id"), rs.getInt("table_id"), rs.getInt("lines"));	
 			}		    
 			rs.close();
 			rat.close();
@@ -168,7 +168,7 @@ public class ModelDbf extends Model{
 
 		// Get DBF fields to write into this target
 		mHeader = new LinkedHashMap<String, Integer>();		
-		String sql = "SELECT name, space FROM imp_target_fields WHERE target_id = " + id + " ORDER BY pos" ;
+		String sql = "SELECT name, space FROM inp_target_fields WHERE target_id = " + id + " ORDER BY pos" ;
 		Statement stat = connectionDrivers.createStatement();
 		ResultSet rs = stat.executeQuery(sql);			 		
 		while (rs.next()) {
