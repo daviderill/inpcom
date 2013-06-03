@@ -132,7 +132,7 @@ public class RaingageController {
 						rs.updateString(col, (String) value);
 					}
 				}
-				else if(columnType == Types.INTEGER || columnType == Types.BIGINT || columnType == Types.SMALLINT || columnType == Types.NUMERIC) {
+				else if (columnType == Types.INTEGER || columnType == Types.BIGINT || columnType == Types.SMALLINT) {
 					if (((String)value).trim().equals("")){
 						rs.updateNull(col);
 					} else{					
@@ -140,11 +140,17 @@ public class RaingageController {
 						rs.updateInt(col, aux);						
 					}
 				}
-				else if(columnType == Types.DECIMAL || columnType == Types.DOUBLE || columnType == Types.FLOAT || columnType == Types.REAL) {
-					Double aux = Double.parseDouble(value.toString());				
-					rs.updateDouble(col, aux);
-			    }
-				else if(columnType == Types.TIME || columnType == Types.TIMESTAMP || columnType == Types.DATE) {
+				else if (columnType == Types.NUMERIC || columnType == Types.DECIMAL || columnType == Types.DOUBLE || 
+					columnType == Types.FLOAT || columnType == Types.REAL) {
+					if (((String)value).trim().equals("")){
+						rs.updateNull(col);
+					} else{					
+						String s = value.toString();
+						Double aux = Double.parseDouble(s.replace(",", "."));
+						rs.updateDouble(col, aux);						
+					}
+				}				
+				else if (columnType == Types.TIME || columnType == Types.TIMESTAMP || columnType == Types.DATE) {
 					rs.updateTimestamp(col, (Timestamp) value);
 				}				
 			}		
