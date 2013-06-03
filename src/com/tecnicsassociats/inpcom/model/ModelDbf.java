@@ -100,7 +100,7 @@ public class ModelDbf extends Model{
 			if (fileOut.equals("")){
 				fileOut = iniProperties.getProperty("DEFAULT_INP", "out");
 			}
-			String sFile = dirOut + File.separator + fileOut;
+			String sFile = dirOut + File.separator + fileOut + ".inp";
 			File fileInp = new File(sFile);
 			
             // Get INP template File
