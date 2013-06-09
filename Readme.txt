@@ -8,11 +8,11 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
 DISCLAIMER:
@@ -20,7 +20,7 @@ This tool has been funded wholly or in part by TECNICSASSOCIATS, TALLER D'ARQUIT
 (hereafter TECNICSASSOCIATS). Mention of trade names or commercial products does not constitute endorsement
 or recommendation for use. Although It has been subjected to technical review before being released and although
 it has made a considerable effort to assure that the results obtained are correct, the computer programs are 
-experimental. Therefore the author and  TECNICSASSOCIATS are not responsible and assume no liability whatsoever
+experimental. Therefore the author and TECNICSASSOCIATS are not responsible and assume no liability whatsoever
 for any results or any use made of the results obtained from these programs, nor for any damages or litigation 
 that result from the use of these programs for any purpose.
 

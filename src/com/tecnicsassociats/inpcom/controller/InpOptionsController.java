@@ -163,8 +163,7 @@ public class InpOptionsController {
 					rs.updateTimestamp(col, (Timestamp) value);
 				}				
 			}		
-			rs.updateRow();
-			rs.close();			
+			rs.updateRow();		
 		} catch (SQLException e) {
 			Utils.showError(e);
 		} catch (Exception e) {

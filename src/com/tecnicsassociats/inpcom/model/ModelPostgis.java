@@ -391,7 +391,6 @@ public class ModelPostgis extends Model {
         logger.info("importRpt");
 
 		iniProperties = MainDao.getPropertiesFile();   
-        
     	ModelPostgis.fileRpt = fileRpt;
     	ModelPostgis.projectName = projectName;
 
@@ -426,6 +425,7 @@ public class ModelPostgis extends Model {
                 targets.put(rpt.getId(), rpt);
             }
             rs.close();
+			connectionPostgis.setAutoCommit(false);       
         } catch (SQLException e) {
             Utils.showError(e, sql);
             return false;
@@ -456,7 +456,9 @@ public class ModelPostgis extends Model {
         
         // Commit transaction ONLY if everything ok
         try {
-			connectionPostgis.commit();
+        	if (!connectionPostgis.getAutoCommit()){
+        		connectionPostgis.commit();
+        	}
 		} catch (SQLException e) {
             Utils.showError(e, sql);
 		}

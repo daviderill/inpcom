@@ -155,7 +155,6 @@ public class RaingageController {
 				}				
 			}		
 			rs.updateRow();
-			rs.close();			
 		} catch (SQLException e) {
 			Utils.showError(e);
 		} catch (Exception e) {

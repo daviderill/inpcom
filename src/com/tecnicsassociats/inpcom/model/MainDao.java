@@ -50,7 +50,6 @@ public class MainDao {
 	private static Properties iniProperties = new Properties();	
 	private static String appPath;	
 	private static String configPath;
-	private static FileOutputStream fos;
 	
 	
     // Sets initial configuration files
@@ -90,9 +89,7 @@ public class MainDao {
 
         File iniFile = new File(configPath);
         try {
-        	if (fos == null){
-        		fos = new FileOutputStream(iniFile);
-        	}
+        	FileOutputStream fos = new FileOutputStream(iniFile);
             iniProperties.store(fos, "");
         } catch (FileNotFoundException e) {
             Utils.showError("inp_error_notfound", iniFile.getPath(), "inp_descr");
@@ -251,7 +248,7 @@ public class MainDao {
 		try {
 			Statement ps = connectionPostgis.createStatement();
 	        ps.executeUpdate(sql);
-	        if (commit){
+	        if (commit && !connectionPostgis.getAutoCommit()){
 	        	connectionPostgis.commit();
 	        }
 			return true;
