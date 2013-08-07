@@ -57,6 +57,11 @@ public class ModelPostgis extends Model {
 	private static String projectName;
 	private static int lineNumber;   // Number of lines read
 	private static ArrayList<String> pollutants;
+	private static final String OPTIONS_TABLE = "inp_options";
+	private static final String REPORTS_TABLE = "inp_report";
+	private static final String TIMES_TABLE = "inp_times";
+	private static final String PATTERNS_TABLE = "inp_patterns";
+	private static final Integer DEFAULT_SPACE = 23;
 	
     
     public static void execute(String execType, String export, String exec, String import_) {
@@ -160,9 +165,6 @@ public class ModelPostgis extends Model {
             raf.setLength(0);
 
             // Get content of target table
-//          sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.name as table_name "
-//            		+ "FROM " + MainDao.schemaDrivers + "." + software + "_inp_target as target " 
-//            		+ "INNER JOIN " + MainDao.schemaDrivers + "." + software + "_inp_table as main ON target.table_id = main.id"; 
             sql = "SELECT target.id as target_id, target.name as target_name, lines, main.id as main_id, main.dbase_table as table_name "
             		+ "FROM inp_target as target " 
             		+ "INNER JOIN inp_table as main ON target.table_id = main.id";             
@@ -170,9 +172,9 @@ public class ModelPostgis extends Model {
             ResultSet rs = stat.executeQuery(sql);
             while (rs.next()) {
             	logger.info("INP target: " + rs.getInt("target_id") + " - " + rs.getString("table_name") + " - " + rs.getInt("lines"));
-            	Integer optionsTable = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_TABLE"));
-            	Integer reportTable = Integer.parseInt(iniProperties.getProperty("INP_REPORT_TABLE"));
-            	if (rs.getInt("main_id") == optionsTable || rs.getInt("main_id") == reportTable){
+            	if (rs.getString("table_name").equals(OPTIONS_TABLE) || 
+            		rs.getString("table_name").equals(REPORTS_TABLE) ||
+            		rs.getString("table_name").equals(TIMES_TABLE)){
             		processTarget2(rs.getInt("target_id"), rs.getString("table_name"), rs.getInt("lines"));
             	}
             	else{
@@ -196,7 +198,7 @@ public class ModelPostgis extends Model {
         }
 
     }
-
+    
 
     // Process target specified by id parameter
     private static void processTarget(int id, String tableName, int lines) throws IOException, SQLException {
@@ -209,13 +211,14 @@ public class ModelPostgis extends Model {
 
         // If table is null or doesn't exit then exit function
         if (!MainDao.checkTable(tableName) && !MainDao.checkView(tableName)) {
+        	logger.info("Table or view doesn't exist: " + tableName);
             return;
         }
 
         // Get data of the specified Postgis table
         lMapDades = getTableData(tableName);
         if (lMapDades.isEmpty()) {
-        	logger.info("Empty table: " + tableName);
+        	logger.info("Table or view empty: " + tableName);
             return;
         }
 
@@ -230,44 +233,84 @@ public class ModelPostgis extends Model {
         }
         rs.close();
 
-        ListIterator<LinkedHashMap<String, String>> it = lMapDades.listIterator();
-        LinkedHashMap<String, String> m;   // Current Postgis row data
-        //int index = 0;
-        String sValor = null;
-        int size = 0;
+        ListIterator<LinkedHashMap<String, String>> itData = lMapDades.listIterator();
+        LinkedHashMap<String, String> rowData;   // Current Postgis row data
+        String sKey;
+        int size, sizeId;
+        Set<String> set = mHeader.keySet();
+        Iterator<String> itKey = set.iterator();        
         
-        // Iterate over Postgis table
-        while (it.hasNext()) {
-            m = it.next();
-            Set<String> set = mHeader.keySet();
-            Iterator<String> itKey = set.iterator();
-            // Iterate over fields specified in table target_fields
-            while (itKey.hasNext()) {
-                String sKey = (String) itKey.next();
-                sKey = sKey.toLowerCase();
-                size = mHeader.get(sKey);
-                // Write to the output file if the field exists in Postgis table
-                if (m.containsKey(sKey)) {
-                    sValor = (String) m.get(sKey);
-                    raf.writeBytes(sValor);
-                    // Complete spaces with empty values
-                    for (int j = sValor.length(); j <= size; j++) {
-                        raf.writeBytes(" ");
-                    }
-                } // If key doesn't exist write empty spaces
-                else {
-                    for (int j = 0; j <= size; j++) {
-                        raf.writeBytes(" ");
-                    }
-                }
-            }
-            raf.writeBytes("\r\n");
+        if (tableName.equals(PATTERNS_TABLE)){
+	        // Iterate over Postgis table
+	        while (itData.hasNext()) {
+	            rowData = itData.next();
+	            itKey = set.iterator();
+	            // First element: id
+                String sKeyId = (String) itKey.next();
+                sKeyId = sKeyId.toLowerCase();
+                sizeId = mHeader.get(sKeyId);
+	            parseField(rowData, sKeyId, sizeId);
+	            // Every Postgis row fills 4 lines -> 6 factors per line	            
+	            int i = 0;
+	            while (itKey.hasNext()) {
+	            	// Iterate over fields specified in table target_fields
+	                sKey = (String) itKey.next();
+	                sKey = sKey.toLowerCase();
+	                size = mHeader.get(sKey);
+		            parseField(rowData, sKey, size);
+	            	i++;
+	            	if (i%6 == 0 && i%24 != 0){
+	    	            raf.writeBytes("\r\n");
+	    	            parseField(rowData, sKeyId, sizeId);		    	            
+	            	}
+				}
+	            raf.writeBytes("\r\n");
+	        }
         }
-
+        
+        else{
+	        // Iterate over Postgis table
+	        while (itData.hasNext()) {
+	            rowData = itData.next();
+	            itKey = set.iterator();
+	            // Iterate over fields specified in table target_fields
+	            while (itKey.hasNext()) {
+	                sKey = (String) itKey.next();
+	                sKey = sKey.toLowerCase();
+	                size = mHeader.get(sKey);
+		            parseField(rowData, sKey, size);	
+	            }
+	            raf.writeBytes("\r\n");
+	        }
+        }
+        
     }
 
     
-    // Process target options or target report
+    private static void parseField(LinkedHashMap<String, String> rowData, String sKey, int size) throws IOException {
+
+        // Write to the output file if the field exists in Postgis table
+        if (rowData.containsKey(sKey)) {
+            String sValor = (String) rowData.get(sKey);
+            raf.writeBytes(sValor);
+            // Complete spaces with empty values
+            for (int j = sValor.length(); j <= size; j++) {
+                raf.writeBytes(" ");
+            }
+        } // If key doesn't exist write empty spaces
+        else {
+            for (int j = 0; j <= size; j++) {
+                raf.writeBytes(" ");
+            }
+        }
+        if (size == 0){
+        	raf.writeBytes(" ");
+        }        
+        
+	}
+
+
+	// Process target options or target report
     private static void processTarget2(int id, String tableName, int lines) throws IOException, SQLException {
 
         // Go to the first line of the target
@@ -291,7 +334,8 @@ public class ModelPostgis extends Model {
         ListIterator<LinkedHashMap<String, String>> it = options.listIterator();
         LinkedHashMap<String, String> m;   // Current Postgis row data
         String sValor = null;
-        int size = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_SIZE"));
+//        int size = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_SIZE"));
+        int size = DEFAULT_SPACE;
         
         // Iterate over Postgis table (only one element)
         while (it.hasNext()) {
@@ -356,6 +400,8 @@ public class ModelPostgis extends Model {
         sFile = fileRpt.getAbsolutePath().replace(".rpt", ".out");
         File fileOut = new File(sFile);
 
+        // Create command
+        exeCmd = "\"" + exeCmd + "\"";
         exeCmd += " " + fileInp.getAbsolutePath() + " " + fileRpt.getAbsolutePath() + " " + fileOut.getAbsolutePath();
 
         // Ending message
@@ -413,10 +459,10 @@ public class ModelPostgis extends Model {
 			return false;
 		}			
         
-        // TODO: Get info from rpt_target into memory
+        // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
         String sql = "SELECT * FROM rpt_target " +
-        		"WHERE type <> 0 ORDER BY id";
+        	"WHERE type <> 0 ORDER BY id";
         try {
             Statement stat = connectionDrivers.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -798,7 +844,7 @@ public class ModelPostgis extends Model {
 		String values;
 		Double units;
 		
-		// TODO: No permetre tipus String (peta a Subcatchment)
+		// No permetre tipus String (peta a Subcatchment)
 		try{
 			Integer.parseInt(tokens.get(0));
 		} catch (NumberFormatException e){

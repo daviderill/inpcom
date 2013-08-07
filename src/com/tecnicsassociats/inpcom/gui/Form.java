@@ -299,8 +299,18 @@ public class Form extends JPanel implements ActionListener {
 		return elem;
 	}
 	
+	public String getFileRpt() {
+		String fileRpt = txtFileRpt.getText().trim();
+		return fileRpt;
+	}
+	
 	public void setFileRpt(String path) {
 		txtFileRpt.setText(path);
+	}
+	
+	public String getFileInp() {
+		String fileInp = txtFileInp.getText().trim();
+		return fileInp;
 	}
 
 	public void setFileInp(String path) {

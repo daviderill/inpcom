@@ -53,8 +53,6 @@ public class MainController{
     private File fileInp;
     private File fileRpt;
     private String projectName;
-    private boolean readyFileInp = false;
-    private boolean readyFileRpt = false;
     private boolean exportChecked;
     private boolean execChecked;
     private boolean importChecked;
@@ -83,12 +81,10 @@ public class MainController{
     	fileInp = new File(prop.getProperty("FILE_INP", userHomeFolder));
 		if (fileInp.exists()) {
 			view.setFileInp(fileInp.getAbsolutePath());
-			readyFileInp = true;
 		}
 		fileRpt = new File(prop.getProperty("FILE_RPT", userHomeFolder));
 		if (fileRpt.exists()) {
 			view.setFileRpt(fileRpt.getAbsolutePath());
-			readyFileRpt = true;
 		}    	
 		
 		projectName = prop.getProperty("PROJECT_NAME");
@@ -180,9 +176,8 @@ public class MainController{
                 fileInp = new File(path);
             }
             view.setFileInp(fileInp.getAbsolutePath());            
-            prop.put("FILE_INP", fileInp.getAbsolutePath());
-            MainDao.savePropertiesFile();
-            readyFileInp = true;
+//            prop.put("FILE_INP", fileInp.getAbsolutePath());
+//            MainDao.savePropertiesFile();
         }
 
     }
@@ -207,13 +202,47 @@ public class MainController{
                 fileRpt = new File(path);
             }
             view.setFileRpt(fileRpt.getAbsolutePath());
-            prop.put("FILE_RPT", fileRpt.getAbsolutePath());
-            MainDao.savePropertiesFile();
-            readyFileRpt = true;
+//            prop.put("FILE_RPT", fileRpt.getAbsolutePath());
+//            MainDao.savePropertiesFile();
+//            readyFileRpt = true;
         }
 
     }
+    
+    
+    private boolean getFileInp(){
+    	
+        String path = view.getFileInp();
+        if (path.equals("")){
+            return false;        	
+        }
+        if (path.lastIndexOf(".") == -1) {
+            path += ".inp";
+        }
+        fileInp = new File(path);        
+        prop.put("FILE_INP", fileInp.getAbsolutePath());
+        MainDao.savePropertiesFile();
+        return true;    
+        
+    }
 
+    
+    private boolean getFileRpt(){
+    	
+        String path = view.getFileRpt();
+        if (path.equals("")){
+            return false;        	
+        }
+        if (path.lastIndexOf(".") == -1) {
+            path += ".rpt";
+        }
+        fileRpt = new File(path);        
+        prop.put("FILE_RPT", fileRpt.getAbsolutePath());
+        MainDao.savePropertiesFile();
+        return true;    
+        
+    }
+    
 
     public void executePostgis() {
 
@@ -255,7 +284,7 @@ public class MainController{
         
         // Export to INP
         if (exportChecked) {
-            if (!readyFileInp) {
+            if (!getFileInp()) {
                 Utils.showError("file_inp_not_selected", "", "inp_descr");
                 return;
             }                
@@ -264,11 +293,11 @@ public class MainController{
 
         // Run SWMM
         if (execChecked && continueExec) {
-            if (!readyFileInp) {
+            if (!getFileInp()) {
                 Utils.showError("file_inp_not_selected", "", "inp_descr");
                 return;
             }            
-            if (!readyFileRpt) {
+            if (!getFileRpt()) {
                 Utils.showError("file_rpt_not_selected", "", "inp_descr");
                 return;
             }                  
@@ -277,7 +306,7 @@ public class MainController{
 
         // Import RPT to Postgis
         if (importChecked && continueExec) {
-            if (!readyFileRpt) {
+            if (!getFileRpt()) {
                 Utils.showError("file_rpt_not_selected", "", "inp_descr");
                 return;
             }            
