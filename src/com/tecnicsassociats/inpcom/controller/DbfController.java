@@ -147,7 +147,7 @@ public class DbfController {
             return;
         }
         String version = MainDao.getSoftwareVersion("dbf", id);
-        Model.setSoftware(version);
+        Model.setSoftwareVersion(version);
 		
 		// Get Sqlite Database			
 		String sqlitePath = version + ".sqlite";

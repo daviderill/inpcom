@@ -266,13 +266,13 @@ public class MainController{
         MainDao.setSchema(schema);
         
         // Get software version from view
-        String id = view.getSoftwarePostgis();
-        if (id.equals("")){
+        String softwareId = view.getSoftwarePostgis();
+        if (softwareId.equals("")){
             Utils.showError("Any software version selected", "", "inp_descr");
             return;
         }
-        String version = MainDao.getSoftwareVersion("postgis", id);
-        Model.setSoftware(version);
+        String version = MainDao.getSoftwareVersion("postgis", softwareId);
+        Model.setSoftwareVersion(version);
         
 		// Get Sqlite Database			
 		String sqlitePath = version + ".sqlite";
@@ -313,8 +313,9 @@ public class MainController{
             projectName = view.getProjectName();
             if (projectName.equals("")){
                 Utils.showError("project_name", "", "inp_descr");
-            } else{
-            	continueExec = ModelPostgis.importRpt(fileRpt, projectName);
+            } 
+            else{
+           		continueExec = ModelPostgis.importRpt(fileRpt, projectName);
             	Model.closeFile();
             	if (!continueExec){
             		try {

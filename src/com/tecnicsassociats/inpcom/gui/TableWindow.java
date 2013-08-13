@@ -133,7 +133,7 @@ public class TableWindow extends JPanel {
 	private void deleteAll(){
         int res = JOptionPane.showConfirmDialog(this, "Are you sure? This will delete all records of this table", "INPcom", JOptionPane.YES_NO_OPTION);
         if (res == 0){
-        	String sql = "DELETE FROM " + MainDao.schema + ".catch_selection";
+        	String sql = "DELETE FROM " + MainDao.getSchema() + ".catch_selection";
         	MainDao.executeUpdateSql(sql);
     		setData();
 //        	for (int i = 1; i < tableModelCatchment.getRowCount(); i++) {

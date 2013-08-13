@@ -36,7 +36,8 @@ public class Model {
 	protected static Logger logger;	
 	protected static Properties iniProperties;
     protected static Connection connectionDrivers;
-    protected static String software = "";    
+    protected static String softwareVersion = "";
+    protected static String softwareName = "";    
     protected static File fileTemplate;
     protected static ArrayList<LinkedHashMap<String, String>> lMapDades;
 	protected static Map<String, Integer> mHeader;
@@ -53,8 +54,13 @@ public class Model {
 		}
     }    
     
-    public static void setSoftware(String software){
-    	Model.software = software;
+    public static void setSoftwareVersion(String softwareVersion){
+    	Model.softwareVersion = softwareVersion;
+    	if (softwareVersion.substring(0, 4).toLowerCase().equals("swmm")){
+    		softwareName = "swmm";
+    	} else{
+    		softwareName = "epanet";
+    	}
     }
     
     public static void closeFile(){

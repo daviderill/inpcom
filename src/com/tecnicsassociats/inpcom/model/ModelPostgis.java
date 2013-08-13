@@ -57,12 +57,16 @@ public class ModelPostgis extends Model {
 	private static String projectName;
 	private static int lineNumber;   // Number of lines read
 	private static ArrayList<String> pollutants;
+	
+	private static String firstLine;
+	private static String lastTimeHydraulic = "";
+	
 	private static final String OPTIONS_TABLE = "inp_options";
 	private static final String REPORTS_TABLE = "inp_report";
 	private static final String TIMES_TABLE = "inp_times";
-	private static final String PATTERNS_TABLE = "inp_patterns";
+	private static final String PATTERNS_TABLE = "inp_pattern";
 	private static final Integer DEFAULT_SPACE = 23;
-	
+
     
     public static void execute(String execType, String export, String exec, String import_) {
 
@@ -93,13 +97,19 @@ public class ModelPostgis extends Model {
     	return isConnected;
     }
     
+	
+    
+	public static void rollback() throws SQLException{
+		ModelPostgis.connectionPostgis.rollback();
+	}	    
 
+	
     // Read content of the table saved it in an Array
     private static ArrayList<LinkedHashMap<String, String>> getTableData(String tableName) {
 
     	LinkedHashMap<String, String> mDades;
         ArrayList<LinkedHashMap<String, String>> mAux = new ArrayList<LinkedHashMap<String, String>>();
-        String sql = "SELECT * FROM " + MainDao.schema + "." +  tableName;
+        String sql = "SELECT * FROM " + MainDao.getSchema() + "." +  tableName;
         PreparedStatement ps;
         try {
             ps = connectionPostgis.prepareStatement(sql);
@@ -152,7 +162,7 @@ public class ModelPostgis extends Model {
             }
             
             // Get INP template File
-            String templatePath = MainDao.folderConfig + software + ".inp";
+            String templatePath = MainDao.folderConfig + softwareVersion + ".inp";
             File fileTemplate = new File(templatePath);
             if (!fileTemplate.exists()){
             	Utils.showMessage("inp_error_notfound", fileTemplate.getAbsolutePath(), "inp_descr");
@@ -210,7 +220,7 @@ public class ModelPostgis extends Model {
         }
 
         // If table is null or doesn't exit then exit function
-        if (!MainDao.checkTable(tableName) && !MainDao.checkView(tableName)) {
+        if (!MainDao.checkTable(MainDao.getSchema(), tableName) && !MainDao.checkView(MainDao.getSchema(), tableName)) {
         	logger.info("Table or view doesn't exist: " + tableName);
             return;
         }
@@ -224,8 +234,8 @@ public class ModelPostgis extends Model {
 
         // Get table columns to write into this target
         mHeader = new LinkedHashMap<String, Integer>();
-        String sql = "SELECT name, space FROM inp_target_fields " + 
-        		"WHERE target_id = " + id + " ORDER BY pos";
+        String sql = "SELECT name, space FROM inp_target_fields" + 
+        	" WHERE target_id = " + id + " ORDER BY pos";
         Statement stat = connectionDrivers.createStatement();
         ResultSet rs = stat.executeQuery(sql);
         while (rs.next()) {
@@ -369,7 +379,7 @@ public class ModelPostgis extends Model {
         
 		iniProperties = MainDao.getPropertiesFile();   
 
-		String exeCmd = MainDao.getSoftwareExecutable("postgis", software);
+		String exeCmd = MainDao.getSoftwareExecutable("postgis", softwareVersion);
         File exeFile = new File(exeCmd);
         // Check if exeFile exists
 		if (!exeFile.exists()){
@@ -380,7 +390,7 @@ public class ModelPostgis extends Model {
     			Utils.showError("inp_error_notfound", exeCmd, "inp_descr");
     			return false;
     		}
-    		MainDao.updateSoftware(software, exeCmd);
+    		MainDao.updateSoftware(softwareVersion, exeCmd);
 		}
 
         String sFile;
@@ -461,7 +471,7 @@ public class ModelPostgis extends Model {
         
         // Get info from rpt_target into memory
         TreeMap<Integer, RptTarget> targets = new TreeMap<Integer, RptTarget>();
-        String sql = "SELECT * FROM rpt_target " +
+        String sql = "SELECT id, db_table, description, type, title_lines, tokens, dbf_table FROM rpt_target " +
         	"WHERE type <> 0 ORDER BY id";
         try {
             Statement stat = connectionDrivers.createStatement();
@@ -480,24 +490,66 @@ public class ModelPostgis extends Model {
         // Iterate over targets
         Iterator<Entry<Integer, RptTarget>> it = targets.entrySet().iterator();
         while (it.hasNext()) {
+        	
         	insertSql = "";
             Map.Entry<Integer, RptTarget> mapEntry = it.next();
             RptTarget rpt = mapEntry.getValue();
-        	if (processRpt(rpt)){
+            boolean ok = false;
+            boolean processTarget = true;
+            boolean continueTarget;
+            if (softwareName.equals("swmm")){
+            	ok = processRpt(rpt);
+            } 
+            else{
+        		if (rpt.getId() >= 40){
+        			processTarget = false;
+        			continueTarget = true;
+		    		if (exists){
+		    			sql = "DELETE FROM " + MainDao.getSchema() + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
+		    			logger.info(sql);
+		    			MainDao.executeUpdateSql(sql);
+		    		}            			
+        			while (continueTarget){
+            			insertSql = "";            				
+        				ok = processRptEpanet(rpt);
+        	        	if (ok){
+        		    		if (!insertSql.equals("")){
+        		            	if (softwareName.equals("epanet") && rpt.getId() >= 40){
+        		            		firstLine = firstLine.substring(15, 24).trim(); 
+        		            		sql = "UPDATE " + MainDao.getSchema() + "." + rpt.getTable() + " SET time = '" + firstLine + "' WHERE time is null;";
+        		            		insertSql+= sql;
+        		            	}
+        		    			logger.info(insertSql);	            	
+        			    		if (!MainDao.executeUpdateSql(insertSql)){
+        							return false;
+        						}
+        		    		}
+        	        	}
+        				continueTarget = (lineNumber > 0);            	        	
+        			}
+        		}
+        		else{
+    				ok = processRptEpanet(rpt);
+        		}
+            }
+            
+        	if (ok && processTarget){
 	    		if (exists){
-	    			sql = "DELETE FROM " + MainDao.schema + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
+	    			sql = "DELETE FROM " + MainDao.getSchema() + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
 	    			logger.info(sql);
 	    			MainDao.executeUpdateSql(sql);
 	    		}
 	    		if (!insertSql.equals("")){
-	    			logger.info(insertSql);	    			
+	    			logger.info(insertSql);	            	
 		    		if (!MainDao.executeUpdateSql(insertSql)){
 						return false;
 					}
 	    		}
-        	} else{
+        	} 
+        	else{
            		logger.info("Target not found: " + rpt.getId() + " - " + rpt.getDescription());
         	}
+        	
         }
         
         // Commit transaction ONLY if everything ok
@@ -519,7 +571,8 @@ public class ModelPostgis extends Model {
 
 	private static boolean existsProjectName() {
 		
-		String sql = "SELECT * FROM " + MainDao.schema + ".rpt_result_cat WHERE result_id = '" + projectName + "'";
+		String sql = "SELECT * FROM " + MainDao.getSchema() + ".rpt_result_cat " +
+			" WHERE result_id = '" + projectName + "'";
 		try {
 			PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -541,6 +594,7 @@ public class ModelPostgis extends Model {
 		
 		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
 		
+		// Read lines until rpt.getDescription() is found		
 		while (!found){
 			try {
 				// If pointer has reached EOF, return to first position
@@ -636,7 +690,7 @@ public class ModelPostgis extends Model {
 					}
 				}
 				// Get pollutant name
-				parseLine1(scanner, rpt, false);		
+				parseLine1(scanner, false);		
 				pollutants = new ArrayList<String>();	
 				for (int i = 0; i < tokens.size(); i++) {
 					pollutants.add(tokens.get(i));
@@ -662,7 +716,7 @@ public class ModelPostgis extends Model {
 				if (!blankLine){
 					Scanner scanner = new Scanner(line);
 					if (rpt.getType() == 1){
-						parseLine1(scanner, rpt, false);
+						parseLine1(scanner, false);
 						processTokens(rpt);							
 					}		
 					else if (rpt.getType() == 2){					
@@ -674,17 +728,22 @@ public class ModelPostgis extends Model {
 						tokensList.add(tokens);
 					}					
 					else if (rpt.getType() == 4){					
-						parseLine1(scanner, rpt, true);
+						parseLine1(scanner, true);
 						processTokens(rpt);							
 					}	
 					else if (rpt.getType() == 5){					
 						tokens = new ArrayList<String>();
-						parseLine1(scanner, rpt, false);
+						parseLine1(scanner, false);
 						processTokens5(rpt);						
 					}				
 					else if (rpt.getType() == 6){					
 						tokens = new ArrayList<String>();
-						parseLine1(scanner, rpt, false);
+						parseLine1(scanner, false);
+						processTokens6(rpt);						
+					}			
+					else if (rpt.getType() == 7){					
+						tokens = new ArrayList<String>();
+						parseLine1(scanner, false);
 						processTokens6(rpt);						
 					}							
 				}
@@ -694,10 +753,10 @@ public class ModelPostgis extends Model {
 		}		
 		
 	}
-		
+	
 
 	// Parse values of current line
-	private static void parseLine1(Scanner scanner, RptTarget rpt, boolean together) {
+	private static void parseLine1(Scanner scanner, boolean together) {
 		
 		// Parse line
 		tokens = new ArrayList<String>();	
@@ -754,14 +813,20 @@ public class ModelPostgis extends Model {
 
 		String fields = "result_id, ";
 		String values = "'" + projectName + "', ";
-		String sql = "SELECT * FROM " + MainDao.schema + "." + rpt.getTable();
+		String sql = "SELECT * FROM " + MainDao.getSchema() + "." + rpt.getTable();
 		try {
 	        PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
 	        ResultSetMetaData rsmd = rs.getMetaData();	
+            if (softwareName.equals("epanet")){
+            	if (tokens.size() < rsmd.getColumnCount() - 3){
+            		Utils.getLogger().warning("Line not valid");
+            		return;
+            	}
+            }
 	        rs.close();
 	        int j;
-	        for (int i = 0; i < tokens.size(); i++){
+	        for (int i=0; i<tokens.size(); i++){
 	        	j = i + 2;
 	        	switch (rsmd.getColumnType(j)) {
 				case Types.NUMERIC:
@@ -784,7 +849,7 @@ public class ModelPostgis extends Model {
 	
 		fields = fields.substring(0, fields.length() - 2);
 		values = values.substring(0, values.length() - 2);
-		sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		sql = "INSERT INTO " + MainDao.getSchema() + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 		insertSql += sql;
 		
 	}
@@ -792,7 +857,7 @@ public class ModelPostgis extends Model {
 	
 	private static void processTokens3(RptTarget rpt) {
 
-		String sql = "SELECT * FROM " + MainDao.schema + "." + rpt.getTable();
+		String sql = "SELECT * FROM " + MainDao.getSchema() + "." + rpt.getTable();
 		try {
 	        PreparedStatement ps = connectionPostgis.prepareStatement(sql);
 	        ResultSet rs = ps.executeQuery();
@@ -823,7 +888,7 @@ public class ModelPostgis extends Model {
 				}
 				fields = fields.substring(0, fields.length() - 2);
 				values = values.substring(0, values.length() - 2);
-				sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+				sql = "INSERT INTO " + MainDao.getSchema() + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 				insertSql += sql;				
 	        }
 			
@@ -856,7 +921,7 @@ public class ModelPostgis extends Model {
 			for (int i = 0; i < pollutants.size(); i++) {
 				units = Double.valueOf(tokens.get(i + 1));
 				values = fixedValues + "'" + pollutants.get(i) + "', " + units;
-				sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+				sql = "INSERT INTO " + MainDao.getSchema() + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 				insertSql += sql;		        
 			}
 		}
@@ -884,7 +949,7 @@ public class ModelPostgis extends Model {
 			values += tokens.get(j) + ", ";
 		}
 		values = values.substring(0, values.length() - 2);		
-		sql = "INSERT INTO " + MainDao.schema + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		sql = "INSERT INTO " + MainDao.getSchema() + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
 		insertSql += sql;				
 		
 		// Iterate over pollutants
@@ -892,19 +957,153 @@ public class ModelPostgis extends Model {
 			int j = i + 5;
 			units = Double.valueOf(tokens.get(j));
 			values = fixedValues + "'" + pollutants.get(i) + "', " + units;
-			sql = "DELETE FROM " + MainDao.schema + ".rpt_outfallload_sum " +
+			sql = "DELETE FROM " + MainDao.getSchema() + ".rpt_outfallload_sum " +
 				"WHERE result_id = '" + projectName + "' AND node_id = '"  + tokens.get(0) + "' AND poll_id = '" + pollutants.get(i) + "';\n";
 			insertSql += sql;	
-			sql = "INSERT INTO " + MainDao.schema + ".rpt_outfallload_sum (" + fields2 + ") VALUES (" + values + ");\n";
+			sql = "INSERT INTO " + MainDao.getSchema() + ".rpt_outfallload_sum (" + fields2 + ") VALUES (" + values + ");\n";
 			insertSql += sql;		        
 		}
 		
 	}
 
+	
+	
+	// Epanet
+	private static boolean processRptEpanet(RptTarget rpt) {
 
-	public static void rollback() throws SQLException{
-		ModelPostgis.connectionPostgis.rollback();
-	}		
+		boolean found = false;
+		String line;
+		String aux;
+		
+		logger.info("Target: " + rpt.getId() + " - " + rpt.getDescription());
+
+		// Read lines until rpt.getDescription() is found			
+		while (!found){
+			try {
+				// If pointer has reached EOF, return to first position
+				if (rat.getFilePointer() >= rat.length()){
+					rat.seek(0);
+					lineNumber = 0;
+					return false;
+				}
+				lineNumber++;				
+				line = rat.readLine().trim();
+				if (line.length() >= rpt.getDescription().length()){
+					aux = line.substring(0, rpt.getDescription().length()).toLowerCase();
+					if (aux.equals(rpt.getDescription().toLowerCase())){
+						found = true;
+						firstLine = line;						
+						logger.info("Target line number: " + lineNumber);						
+					}
+				}
+			} catch (IOException e) {
+				Utils.showError(e);
+			}
+		}
+		
+		// Jump number of lines specified in rpt.getTitleLines()
+		for (int i=1; i<=rpt.getTitleLines(); i++) {
+			try {
+				lineNumber++;
+				line = rat.readLine();
+				// Check if we have reached next Target
+				if (line.contains("No ")){
+					return false;
+				}				
+			} catch (IOException e) {
+				Utils.showError("inp_error_io", "", "inp_descr");
+			}
+		}		
+		
+		// Read following lines until blank line is found
+		tokensList = new ArrayList<ArrayList<String>>();
+		if (rpt.getType() == 7){
+			parseLinesHydraulic(rpt);
+		}
+		else{
+			parseLines(rpt);
+			if (rpt.getType() == 2){
+				processTokens(rpt);
+			}
+		}
+		
+		return true;
+		
+	}	
+
+	
+	// Parse all lines of Hydraulic Target
+	private static void parseLinesHydraulic(RptTarget rpt) {
+		
+		tokens = new ArrayList<String>();			
+		boolean blankLine = false;		
+		int numBlankLines = 0;
+		while (numBlankLines <= 2){
+			try {
+				lineNumber++;
+				String line = rat.readLine().trim();
+				blankLine = (line.length()==0);
+				if (!blankLine){
+					Scanner scanner = new Scanner(line);
+					parseLineHydraulic(scanner);
+					processTokensHydraulic(rpt);
+					numBlankLines = 0;					
+				}
+				else{
+					numBlankLines++;
+				}
+			} catch (IOException e) {
+				Utils.showError("inp_error_io", "", "inp_descr");
+			}
+		}		
+		
+	}
+	
+	
+	// Parse values of current line
+	private static void parseLineHydraulic(Scanner scanner) {
+		
+		// Parse line
+		tokens = new ArrayList<String>();	
+		String token = "";
+		String first = "";
+		boolean firstWord = true;
+		while (scanner.hasNext()){
+			if (firstWord){
+				first = scanner.next();
+				firstWord = false;
+			}
+			else{
+				token += " " + scanner.next();
+			}
+		}
+		tokens.add(first.trim());
+		tokens.add(token.trim());
+		
+	}	
+	
+	
+	private static void processTokensHydraulic(RptTarget rpt) {
+
+		String fields = "result_id, time, text";
+		String values = "'" + projectName + "', ";
+        String time;
+        String text = "";
+        time = tokens.get(0);
+        time = tokens.get(0).substring(0, time.length() - 1);
+        if (time.substring(0, 7).toLowerCase().equals("warning")){
+        	text = tokens.get(0) + " ";
+        	time = lastTimeHydraulic;
+        } else{
+        	lastTimeHydraulic = time;
+        }
+        text += tokens.get(1);
+		values += "'" + time + "', '" + text + "'";
+	
+		String sql = "INSERT INTO " + MainDao.getSchema() + "." + rpt.getTable() + " (" + fields + ") VALUES (" + values + ");\n";
+		insertSql += sql;
+		
+	}
 	
 
 }

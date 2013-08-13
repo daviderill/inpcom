@@ -42,7 +42,7 @@ public class MainDao {
     public static Connection connectionConfig;   // SQLite
     public static Connection connectionDrivers;	   // SQLite 
 	public static Connection connectionPostgis;   // Postgis
-    public static String schema;
+    private static String schema;
 	
 	public static String folderConfig;	
     public static File fileHelp;	
@@ -278,7 +278,8 @@ public class MainDao {
 	
     // Check if the table exists
 	public static boolean checkTable(String tableName) {
-        String sql = "SELECT * FROM pg_tables WHERE lower(tablename) = '" + tableName + "'";
+        String sql = "SELECT * FROM pg_tables" +
+        	" WHERE lower(tablename) = '" + tableName + "'";
         try {
             Statement stat = connectionPostgis.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -292,8 +293,8 @@ public class MainDao {
 	
     // Check if the table exists
 	public static boolean checkTable(String schemaName, String tableName) {
-        String sql = "SELECT * FROM pg_tables " +
-        		"WHERE lower(schemaname) = '" + schemaName + "' AND lower(tablename) = '" + tableName + "'";
+        String sql = "SELECT * FROM pg_tables" +
+        	" WHERE lower(schemaname) = '" + schemaName + "' AND lower(tablename) = '" + tableName + "'";
         try {
             Statement stat = connectionPostgis.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -307,7 +308,8 @@ public class MainDao {
     
     // Check if the view exists
     public static boolean checkView(String viewName) {
-        String sql = "SELECT * FROM pg_views WHERE lower(viewname) = '" + viewName + "'";
+        String sql = "SELECT * FROM pg_views" +
+        	" WHERE lower(viewname) = '" + viewName + "'";
         try {
             Statement stat = connectionPostgis.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -317,6 +319,21 @@ public class MainDao {
             return false;
         }
     }    
+    
+    
+    // Check if the view exists
+    public static boolean checkView(String schemaName, String viewName) {
+        String sql = "SELECT * FROM pg_views" +
+        	" WHERE lower(schemaname) = '" + schemaName + "' AND lower(viewname) = '" + viewName + "'";
+        try {
+            Statement stat = connectionPostgis.createStatement();
+            ResultSet rs = stat.executeQuery(sql);
+            return (rs.next());
+        } catch (SQLException e) {
+        	Utils.showError(e.getMessage(), "", "inp_descr");
+            return false;
+        }
+    }        
     
     
     // Check if the selected srid exists in spatial_ref_sys
@@ -461,6 +478,11 @@ public class MainDao {
 		executeUpdateSql(sql);
 		sql = "INSERT INTO " + schema + "." + table + " VALUES ('" + result + "')";
 		executeUpdateSql(sql);
+	}
+	
+	
+	public static String getSchema() {
+		return schema;
 	}
 	
 	

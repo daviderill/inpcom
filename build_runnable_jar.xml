@@ -2,7 +2,7 @@
 <project default="create_run_jar" name="Create Runnable Jar for Project extTaGasNatural with libraries in sub-folder">
 
     <property name="from" location="O:/workspace_nav_table_forms/inpcom" />    
-	<property name="dist" location="C:/Dropbox/Tecnics/SWMM/jar" />    
+	<property name="dist" location="C:/Dropbox/Tecnics/inpcom/jar" />    
     <target name="create_run_jar">
         
         <jar destfile="${dist}/inpcom.jar">
