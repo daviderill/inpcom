@@ -61,7 +61,7 @@ public class ModelPostgis extends Model {
 	private static String firstLine;
 	private static String lastTimeHydraulic = "";
 	
-	private static final String OPTIONS_TABLE = "inp_options";
+	private static final String OPTIONS_TABLE = "v_inp_options";
 	private static final String REPORTS_TABLE = "inp_report";
 	private static final String TIMES_TABLE = "inp_times";
 	private static final String PATTERNS_TABLE = "inp_pattern";
