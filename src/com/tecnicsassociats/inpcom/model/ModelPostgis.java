@@ -344,7 +344,6 @@ public class ModelPostgis extends Model {
         ListIterator<LinkedHashMap<String, String>> it = options.listIterator();
         LinkedHashMap<String, String> m;   // Current Postgis row data
         String sValor = null;
-//        int size = Integer.parseInt(iniProperties.getProperty("INP_OPTIONS_SIZE"));
         int size = DEFAULT_SPACE;
         
         // Iterate over Postgis table (only one element)
@@ -432,7 +431,13 @@ public class ModelPostgis extends Model {
 		}
 
         // Ending message
-        Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr");                
+        // Utils.showMessage("inp_end", fileOut.getAbsolutePath(), "inp_descr");          
+        String msg = Utils.getBundleText().getString("inp_end") + "\n" + fileRpt.getAbsolutePath() + "\n" + 
+        	Utils.getBundleText().getString("rpt_view_file");
+        int answer = JOptionPane.showConfirmDialog(null, msg, Utils.getBundleText().getString("inp_descr"), JOptionPane.YES_NO_OPTION);
+        if (answer == JOptionPane.YES_OPTION){
+        	Utils.openFile(fileRpt.getAbsolutePath());
+        }        
 
         return true;
 
@@ -449,7 +454,7 @@ public class ModelPostgis extends Model {
 		iniProperties = MainDao.getPropertiesFile();   
     	ModelPostgis.fileRpt = fileRpt;
     	ModelPostgis.projectName = projectName;
-
+            
     	// Check if Project Name exists in rpt_result_id
     	boolean exists = false;
     	if (existsProjectName()){
@@ -506,7 +511,7 @@ public class ModelPostgis extends Model {
         			continueTarget = true;
 		    		if (exists){
 		    			sql = "DELETE FROM " + MainDao.getSchema() + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
-		    			logger.info(sql);
+		    			//logger.info(sql);
 		    			MainDao.executeUpdateSql(sql);
 		    		}            			
         			while (continueTarget){
@@ -519,7 +524,7 @@ public class ModelPostgis extends Model {
         		            		sql = "UPDATE " + MainDao.getSchema() + "." + rpt.getTable() + " SET time = '" + firstLine + "' WHERE time is null;";
         		            		insertSql+= sql;
         		            	}
-        		    			logger.info(insertSql);	            	
+        		    			//logger.info(insertSql);	            	
         			    		if (!MainDao.executeUpdateSql(insertSql)){
         							return false;
         						}
@@ -536,11 +541,11 @@ public class ModelPostgis extends Model {
         	if (ok && processTarget){
 	    		if (exists){
 	    			sql = "DELETE FROM " + MainDao.getSchema() + "." + rpt.getTable() + " WHERE result_id = '" + projectName + "'";
-	    			logger.info(sql);
+	    			//logger.info(sql);
 	    			MainDao.executeUpdateSql(sql);
 	    		}
 	    		if (!insertSql.equals("")){
-	    			logger.info(insertSql);	            	
+	    			//logger.info(insertSql);	            	
 		    		if (!MainDao.executeUpdateSql(insertSql)){
 						return false;
 					}
@@ -562,12 +567,12 @@ public class ModelPostgis extends Model {
 		}
         
         // Ending message
-        Utils.showMessage("import_end", "", "inp_descr");                
+        Utils.showMessage("import_end", "", "inp_descr");        
 
 		return true;
 		
     }
-
+    
 
 	private static boolean existsProjectName() {
 		

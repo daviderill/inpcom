@@ -354,10 +354,10 @@ public class Utils {
 			//Process p = Runtime.getRuntime().exec(file);
 			Process p = Runtime.getRuntime().exec("cmd /c start " + process);				
 			p.waitFor();
-		}catch( IOException ex ){
-		    System.out.println("IOException Error");
-		}catch( InterruptedException ex ){
-		    System.out.println("InterruptedException Error");
+		} catch (IOException ex){
+			logger.warning(ex.getMessage());
+		} catch (InterruptedException ex){
+			logger.warning(ex.getMessage());
 
 		}		
 	}
@@ -368,21 +368,19 @@ public class Utils {
 		try{    
 			File exec = new File(file);
 			if (exec.exists()){
-				//Process p = Runtime.getRuntime().exec(file);
-				Process p = Runtime.getRuntime().exec("cmd /c start " + file);				
+				Process p = Runtime.getRuntime().exec("cmd /c start " + file);			
 				p.waitFor();
 			} else{
 				Utils.showMessage("FILE_NOT_FOUND", file, "TITLE");
 			}
 
-		}catch( IOException ex ){
-		    System.out.println("IOException Error");
-
-		}catch( InterruptedException ex ){
-		    System.out.println("InterruptedException Error");
-
+		} catch (IOException ex){
+			logger.warning(ex.getMessage());
+		} catch (InterruptedException ex){
+			logger.warning(ex.getMessage());
 		}		
 		
 	}    
+    
     
 }
